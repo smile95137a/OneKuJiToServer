@@ -53,4 +53,7 @@ public interface UserTransactionRepository {
 
     @Select("select * from user_transaction where order_number = #{orderNumber}")
     UserTransaction findByOrderNumber2(String orderNumber);
+
+    @Update("UPDATE user_transaction SET status = 'IS_PAY' WHERE order_number = #{orderNumber}")
+    void updateByTop(@Param("orderNumber") String orderNumber);
 }
