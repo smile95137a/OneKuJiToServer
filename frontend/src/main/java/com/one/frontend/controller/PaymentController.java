@@ -228,21 +228,24 @@ public class PaymentController {
         var userDetails = SecurityUtils.getCurrentUserPrinciple();
         var userId = userDetails.getId();
         try {
-            Boolean status = paymentService.recordDeposit2(creditDto);
-            if(status == null){
-                ApiResponse<Object> failure = ResponseUtils.failure(400, "無付款資訊", null);
-                return ResponseEntity.ok(failure);
+            if("1".equals(creditDto.getCreditResult())){
+                Boolean status = paymentService.recordDeposit2(creditDto);
+                if(status == null){
+                    ApiResponse<Object> failure = ResponseUtils.failure(400, "無付款資訊", null);
+                    return ResponseEntity.ok(failure);
+                }
+                if (status) {
+                    ApiResponse<Object> success = ResponseUtils.success(200, "付款成功，信用卡狀態已為已付款", null);
+                    return ResponseEntity.ok(success);
+                } else {
+                    ApiResponse<Object> failure = ResponseUtils.failure(400, "已付款訂單編號，不得重複刷新", null);
+                    return ResponseEntity.ok(failure);
+                }
+            }else{
+                ApiResponse<Object> failure = ResponseUtils.failure(400, "儲值失敗", null);
+                    return ResponseEntity.ok(failure);
             }
-
-
-
-            if (status) {
-                ApiResponse<Object> success = ResponseUtils.success(200, "付款成功，信用卡狀態已為已付款", null);
-                return ResponseEntity.ok(success);
-            } else {
-                ApiResponse<Object> failure = ResponseUtils.failure(400, "已付款訂單編號，不得重複刷新", null);
-                return ResponseEntity.ok(failure);
-            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
