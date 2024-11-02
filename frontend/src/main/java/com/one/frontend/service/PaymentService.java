@@ -385,6 +385,9 @@ return null;
      * 记录储值交易
      */
     public String recordDeposit(Long userId, BigDecimal amount , String orderId) {
+        System.out.println("Send_Type: " + userId);
+        System.out.println("Send_Type: " + amount);
+        System.out.println("Send_Type: " + orderId);
         int amountInCents = amount.intValue(); // 转为整数分
         userRepository.updateBalance(userId, amountInCents);
         userTransactionRepository.updateByTop(orderId);

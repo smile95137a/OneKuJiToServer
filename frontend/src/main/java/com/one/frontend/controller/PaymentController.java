@@ -183,7 +183,7 @@ public class PaymentController {
         if("1".equals(result)){
             // 记录储值交易
             PaymentResponse byId = paymentResponseMapper.findById(OrderID);
-            paymentService.recordDeposit(byId.getUserId(), BigDecimal.valueOf(Long.parseLong(PayAmount)) , OrderID);
+            paymentService.recordDeposit(byId.getUserId(), new BigDecimal(PayAmount) , OrderID);
             ApiResponse<Void> response1 = ResponseUtils.success(200, "成功", null);
 
             return ResponseEntity.ok("Received payment callback successfully");
