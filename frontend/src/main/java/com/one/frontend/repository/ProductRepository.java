@@ -82,6 +82,22 @@ public interface ProductRepository {
     @Select("select * from product where product_type = #{type}")
     List<ProductRes> getProductByType(String type);
 
-    @Select("SELECT * FROM product")
+    @Select("WITH product_summary AS ( " +
+            "  SELECT product_id, " +
+            "    SUM(quantity) AS detailQuantity, " +
+            "    SUM(stock_quantity) AS detailStockQuantity " +
+            "  FROM product_detail " +
+            "  WHERE grade <> 'LAST' " + // 移到 WITH 子句中，減少需要處理的數據量
+            "  GROUP BY product_id " +
+            ") " +
+            "SELECT p.*, " +
+            "       pc.category_uuid, " +
+            "       COALESCE(ps.detailQuantity, 0) AS detailQuantity, " + // 使用 COALESCE 處理 NULL
+            "       COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity " +
+            "FROM product p " +
+            "LEFT JOIN product_summary ps ON p.product_id = ps.product_id " +
+            "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
+            "ORDER BY p.product_id")
     List<ProductRes> getAll();
+
 }
