@@ -63,8 +63,8 @@ public class PaymentService {
 
     public PaymentResponse creditCard(PaymentRequest paymentRequest) {
 
-        String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-//        String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+        // String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("0".trim())  // 傳送型態，寫死去除空白
@@ -137,8 +137,8 @@ return null;
 
 
     public PaymentResponse webATM(PaymentRequest paymentRequest) {
-        String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-//        String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+        // String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("4".trim())  // 傳送型態，去除空白
@@ -197,8 +197,8 @@ return null;
     }
 
     public PaymentResponse webATM2(PaymentRequest paymentRequest) {
-        String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-//        String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+        // String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("4".trim())  // 傳送型態，去除空白
@@ -258,13 +258,15 @@ return null;
     public PaymentResponse topOp(PaymentRequest paymentRequest, String payMethod , Long userId) throws Exception {
         PaymentResponse response = null;
         if("2".equals(payMethod)){
+            String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+            String amountInCents = paymentRequest.getAmount();
+            BigDecimal amount = new BigDecimal(amountInCents);
             UserRes user = userRepository.getUserById(userId);
             paymentRequest.setBuyerName(user.getNickname());
             paymentRequest.setBuyerMail(user.getUsername());
             paymentRequest.setBuyerTelm(user.getPhoneNumber());
             response = this.webATM2(paymentRequest);
-            response.setUserId(userId);
-            paymentResponseMapper.insert(response);
+            userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , response.getOrderId());
         }
 
 
@@ -382,12 +384,14 @@ return null;
     /**
      * 记录储值交易
      */
-    public String recordDeposit(Long userId, BigDecimal amount) {
-        String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+    public String recordDeposit(Long userId, BigDecimal amount , String orderId) {
+        System.out.println("Send_Type: " + userId);
+        System.out.println("Send_Type: " + amount);
+        System.out.println("Send_Type: " + orderId);
         int amountInCents = amount.intValue(); // 转为整数分
         userRepository.updateBalance(userId, amountInCents);
-        userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount, orderNumber);
-        return orderNumber;
+        userTransactionRepository.updateByTop(orderId);
+        return orderId;
     }
 
     public String recordDeposit3(Long userId, BigDecimal amount) {

@@ -102,12 +102,12 @@ public class InvoiceService {
         LocalDate currentDate = LocalDate.now();
         // 将当前日期格式化为字符串
         String formattedDate = currentDate.format(formatter);
-        String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
-//        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
-        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("47075614").idno("eason")
-                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
-//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
+//        String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
+        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
+//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("47075614").idno("eason")
 //                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
+        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
+                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
 
         // 发送 POST 请求
         try {
@@ -125,10 +125,10 @@ public class InvoiceService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         String date = System.currentTimeMillis()+"";
-       String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
-//        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
-        InvoicePictureRequest req = InvoicePictureRequest.builder().timeStamp(date).uncode("47075614").idno("eason").sign(md5).code(code).type("2").build();
-//        InvoicePictureRequest req = InvoicePictureRequest.builder().timeStamp(date).uncode("53418005").idno("Giveme09").sign(md5).code(code).type("2").build();
+//       String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
+        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
+//        InvoicePictureRequest req = InvoicePictureRequest.builder().timeStamp(date).uncode("47075614").idno("eason").sign(md5).code(code).type("2").build();
+        InvoicePictureRequest req = InvoicePictureRequest.builder().timeStamp(date).uncode("53418005").idno("Giveme09").sign(md5).code(code).type("2").build();
         // 发送 POST 请求
         ResponseEntity<byte[]> response = restTemplate.postForEntity(url, req, byte[].class);
         UserRes user = userRepository.getUserById(userId);

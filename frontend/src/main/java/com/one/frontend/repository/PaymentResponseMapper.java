@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface PaymentResponseMapper {
 
-    @Select("SELECT * FROM payment_response WHERE order_id = #{orderId}")
+    @Select("SELECT * FROM user_transaction WHERE order_number = #{orderId}")
     PaymentResponse findById(@Param("orderId") String orderId);
 
     @Select("SELECT * FROM payment_response")
