@@ -542,18 +542,18 @@ public class DrawResultService {
 						.sum();
 
 				// 3. 生成隨機數，使用更精確的範圍
-//				double randomNumber = random.nextDouble() * totalProbability;
-//				double cumulativeProbability = 0.0;
+				double randomNumber = random.nextDouble() * totalProbability;
+				double cumulativeProbability = 0.0;
 
 				// 4. 改進的抽獎邏輯
 				boolean prizeSelected = false;
 				for (ProductDetailRes detail : availableProductDetails) {
 					// 使用平方處理概率，增加低概率獎品的難度
-//					double adjustedProbability = Math.pow(detail.getProbability(), 2);
-//					cumulativeProbability += adjustedProbability;
+					double adjustedProbability = Math.pow(detail.getProbability(), 2);
+					cumulativeProbability += adjustedProbability;
 
 					// 額外的隨機性檢查，降低低概率獎品的中獎機會
-//					if (randomNumber <= cumulativeProbability) {
+					if (randomNumber <= cumulativeProbability) {
 //						// 對於低概率獎品增加額外的隨機性檢查
 //						if (detail.getProbability() < 0.5) {  // 可以調整這個閾值
 //							// 再次生成隨機數，必須小於原始概率才能中獎
@@ -585,28 +585,28 @@ public class DrawResultService {
 								break;
 							}
 						}
-//					}
+					}
 				}
 
 				// 如果沒有選中獎品，默認選擇最高概率的獎品
-//				if (!prizeSelected && !availableProductDetails.isEmpty()) {
-//					ProductDetailRes highestProbabilityPrize = availableProductDetails.get(availableProductDetails.size() - 1);
-//					if (highestProbabilityPrize.getQuantity() > 0) {
-//						selectedPrizeNumber.setLevel(highestProbabilityPrize.getGrade());
-//						selectedPrizeNumber.setIsDrawn(true);
-//						selectedPrizeNumber.setProductDetailId(highestProbabilityPrize.getProductDetailId());
-//
-//						int newQuantity = highestProbabilityPrize.getQuantity() - 1;
-//						highestProbabilityPrize.setQuantity(newQuantity);
-//
-//						toUpdateProductDetails.add(new ProductDetail(
-//								highestProbabilityPrize.getProductDetailId(),
-//								newQuantity,
-//								highestProbabilityPrize.getDrawnNumbers()
-//						));
-//						toUpdatePrizeNumbers.add(selectedPrizeNumber);
-//					}
-//				}
+				if (!prizeSelected && !availableProductDetails.isEmpty()) {
+					ProductDetailRes highestProbabilityPrize = availableProductDetails.get(availableProductDetails.size() - 1);
+					if (highestProbabilityPrize.getQuantity() > 0) {
+						selectedPrizeNumber.setLevel(highestProbabilityPrize.getGrade());
+						selectedPrizeNumber.setIsDrawn(true);
+						selectedPrizeNumber.setProductDetailId(highestProbabilityPrize.getProductDetailId());
+
+						int newQuantity = highestProbabilityPrize.getQuantity() - 1;
+						highestProbabilityPrize.setQuantity(newQuantity);
+
+						toUpdateProductDetails.add(new ProductDetail(
+								highestProbabilityPrize.getProductDetailId(),
+								newQuantity,
+								highestProbabilityPrize.getDrawnNumbers()
+						));
+						toUpdatePrizeNumbers.add(selectedPrizeNumber);
+					}
+				}
 
 				// 9. 批量更新數據
 				if (!toUpdatePrizeNumbers.isEmpty()) {
