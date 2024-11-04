@@ -64,6 +64,36 @@ public class ProductController {
         }
     }
 
+    @Operation(summary = "獲取所有獎品", description = "檢索所有獎品的列表")
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ProductRes>>> getAll() {
+
+        // 加入參數驗證
+        try {
+            List<ProductRes> products = productService.getAll();
+            if (products.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(ResponseUtils.success(200, "無類別", new ArrayList<>()));
+            }
+
+            // 處理每個商品的詳情
+            CompletableFuture<List<ProductDetailRes>> futureDetails = CompletableFuture.supplyAsync(() -> {
+                List<Long> productIds = products.stream()
+                        .map(product -> Long.valueOf(product.getProductId()))
+                        .collect(Collectors.toList());
+                return productService.getProductDetailsByProductIds(productIds);
+            });
+
+            // 等待詳情處理完成（如果需要的話）
+            // List<ProductDetailRes> details = futureDetails.get();  // 如果需要等待結果
+
+            return ResponseEntity.ok(ResponseUtils.success(200, null, products));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseUtils.failure(500, "系統錯誤", null));
+        }
+    }
+
 
     @Operation(summary = "獲取產品詳情", description = "通過產品 ID 獲取產品的詳細信息")
     @GetMapping("/query/{id}")

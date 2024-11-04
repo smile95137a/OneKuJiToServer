@@ -81,4 +81,7 @@ public interface ProductRepository {
     ProductRes getProductByCId(Long categoryId);
     @Select("select * from product where product_type = #{type}")
     List<ProductRes> getProductByType(String type);
+
+    @Select("SELECT * FROM product")
+    List<ProductRes> getAll();
 }

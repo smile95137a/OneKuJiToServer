@@ -57,4 +57,8 @@ public class ProductService {
         // 根据枚举值从数据库获取相应类型的商品
         return productRepository.getProductByType(productType.name());
     }
+
+    public List<ProductRes> getAll() {
+        return productRepository.getAll();
+    }
 }
