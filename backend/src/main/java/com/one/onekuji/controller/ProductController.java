@@ -167,4 +167,16 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/{productId}/duplicate")
+    public ResponseEntity<ApiResponse<Void>> duplicateProduct(@PathVariable Long productId) {
+        ProductRes originalProduct = productService.getProductById(productId);
+        if (originalProduct == null) {
+            return ResponseEntity.notFound().build();
+        }
+        productService.duplicateProduct(originalProduct);
+
+        ApiResponse<Void> response = ResponseUtils.success(200, "複製成功", null);
+        return ResponseEntity.ok(response);
+    }
+
 }

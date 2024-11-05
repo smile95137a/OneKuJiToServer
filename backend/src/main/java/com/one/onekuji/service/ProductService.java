@@ -1,18 +1,23 @@
 package com.one.onekuji.service;
 
 import com.one.onekuji.eenum.PrizeCategory;
+import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.eenum.ProductType;
 import com.one.onekuji.model.Product;
+import com.one.onekuji.model.ProductDetail;
 import com.one.onekuji.repository.PrizeNumberMapper;
 import com.one.onekuji.repository.ProductDetailRepository;
 import com.one.onekuji.repository.ProductRepository;
 import com.one.onekuji.repository.UserRepository;
+import com.one.onekuji.request.DetailReq;
 import com.one.onekuji.request.ProductReq;
 import com.one.onekuji.response.ProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,5 +142,73 @@ public class ProductService {
                 .replace("&lt;br/&gt;", "<br/>");
     }
 
+
+    public void duplicateProduct(ProductRes originalProduct) {
+        Product duplicatedProduct = new Product();
+        duplicatedProduct.setProductName(originalProduct.getProductName());
+        duplicatedProduct.setDescription(originalProduct.getDescription());
+        duplicatedProduct.setPrice(originalProduct.getPrice());
+        duplicatedProduct.setSliverPrice(originalProduct.getSliverPrice());
+        duplicatedProduct.setImageUrls(originalProduct.getImageUrls());
+        duplicatedProduct.setCreatedAt(LocalDateTime.now());
+        duplicatedProduct.setProductType(originalProduct.getProductType());
+        duplicatedProduct.setPrizeCategory(originalProduct.getPrizeCategory());
+        duplicatedProduct.setStatus(ProductStatus.UNAVAILABLE); // 設置為未上架
+        duplicatedProduct.setBonusPrice(originalProduct.getBonusPrice());
+        duplicatedProduct.setSpecification(originalProduct.getSpecification());
+        duplicatedProduct.setCategoryId(originalProduct.getCategoryId());
+
+        int result = productRepository.duplicateProduct(duplicatedProduct);
+
+        if (result <= 0) {
+            throw new RuntimeException("Failed to duplicate product");
+        }
+
+        // 從對象中獲取生成的 ID
+        Long newProductId = Long.valueOf(duplicatedProduct.getProductId());
+
+        if (newProductId == null || newProductId == 0) {
+            throw new RuntimeException("Failed to get generated product ID");
+        }
+
+        // 獲取原始產品的詳細資料
+        List<ProductDetail> productDetails = productDetailRepository.getProductDetailByProductId(
+                Long.valueOf(originalProduct.getProductId())
+        );
+
+        // 使用生成的 ID
+        List<DetailReq> detailReqs = convertToDetailReqList(productDetails, newProductId);
+
+        // 插入每個詳細資料
+        for (DetailReq detailReq : detailReqs) {
+            productDetailRepository.insert(detailReq);
+        }
+    }
+
+
+    public List<DetailReq> convertToDetailReqList(List<ProductDetail> productDetails , Long id) {
+        List<DetailReq> detailReqs = new ArrayList<>();
+        for (ProductDetail detail : productDetails) {
+            DetailReq detailReq = new DetailReq();
+            detailReq.setProductId(Math.toIntExact(id));
+            detailReq.setDescription(detail.getDescription());
+            detailReq.setNote(detail.getNote());
+            detailReq.setSize(detail.getSize());
+            detailReq.setQuantity(0);
+            detailReq.setStockQuantity(0);
+            detailReq.setProductName(detail.getProductName());
+            detailReq.setGrade(detail.getGrade());
+            detailReq.setPrice(detail.getPrice());
+            detailReq.setSliverPrice(detail.getSliverPrice());
+            detailReq.setImageUrls(detail.getImageUrls());
+            detailReq.setLength(detail.getLength());
+            detailReq.setWidth(detail.getWidth());
+            detailReq.setHeight(detail.getHeight());
+            detailReq.setSpecification(detail.getSpecification());
+            detailReq.setProbability(detail.getProbability());
+            detailReqs.add(detailReq);
+        }
+        return detailReqs;
+    }
 
 }

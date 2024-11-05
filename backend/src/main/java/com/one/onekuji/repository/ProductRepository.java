@@ -70,5 +70,11 @@ public interface ProductRepository {
     void updateTotalQua(int totalQuantity , Integer id);
     @Select("select * from product where category_id = #{categoryId}")
     ProductRes getProductByCategoryId(Long categoryId);
+
+    @Insert("INSERT INTO product (product_name, description, price, sliver_price, image_urls, created_at, product_type, prize_category, status, bonus_price, specification, category_id) " +
+            "VALUES (#{productName}, #{description}, #{price}, #{sliverPrice}, #{imageUrls}, #{createdAt}, #{productType}, #{prizeCategory}, #{status}, #{bonusPrice}, #{specification}, #{categoryId})")
+    @Options(useGeneratedKeys = true, keyProperty = "productId", keyColumn = "product_id")
+    int duplicateProduct(Product duplicatedProduct);
+
     //ENUM('FIGURE', 'BONUS', 'C3')
 }
