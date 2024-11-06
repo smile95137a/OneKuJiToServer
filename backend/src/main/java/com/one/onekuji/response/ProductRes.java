@@ -28,4 +28,5 @@ public class ProductRes {
     private BigDecimal bonusPrice;
     private String specification;
     private Long categoryId;
+    private List<String> bannerImageUrl;
 }

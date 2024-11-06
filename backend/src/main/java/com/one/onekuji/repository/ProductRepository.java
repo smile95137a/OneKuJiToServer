@@ -12,10 +12,10 @@ import java.util.List;
 public interface ProductRepository {
     @Insert("INSERT INTO product (" +
             "product_name, description, price, sliver_price, stock_quantity, image_urls, " +
-            "product_type, prize_category, status, bonus_price, specification , category_id) " +
+            "product_type, prize_category, status, bonus_price, specification , category_id , banner_image_url) " +
             "VALUES (" +
             "#{productName}, #{description}, #{price}, #{sliverPrice}, #{stockQuantity}, #{imageUrls}, " +
-            "#{productType}, #{prizeCategory}, #{status}, #{bonusPrice}, #{specification} , #{categoryId})")
+            "#{productType}, #{prizeCategory}, #{status}, #{bonusPrice}, #{specification} , #{categoryId} , #{bannerImageUrl})")
     @Options(useGeneratedKeys = true, keyProperty = "productId")
     int insertProduct(Product product);
 
@@ -42,7 +42,8 @@ public interface ProductRepository {
             "status = #{status}, " +
             "bonus_price = #{bonusPrice}, " +
             "specification = #{specification}, " +
-            "category_id = #{categoryId} " +
+            "category_id = #{categoryId}, " +
+            "banner_image_url = #{bannerImageUrl} " +
             "WHERE product_id = #{productId}")
     void updateProduct(Product product);
 

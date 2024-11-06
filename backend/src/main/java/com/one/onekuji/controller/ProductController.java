@@ -97,11 +97,15 @@ public class ProductController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<ProductRes>> createProduct(
             @RequestPart("productReq") String productReqJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart(value = "bannerImageUrl", required = false) List<MultipartFile> bannerImage) throws IOException {
+
+        // 将 productReqJson 反序列化为 ProductReq 对象
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS , true);
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         ProductReq storeProductReq = objectMapper.readValue(productReqJson, ProductReq.class);
 
+        // 处理 images 列表并获取每个图片的 URL
         List<String> fileUrls = new ArrayList<>();
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
@@ -112,12 +116,25 @@ public class ProductController {
             }
         }
 
+        // 将 images 的 URL 列表设置到 ProductReq 中
         storeProductReq.setImageUrls(fileUrls);
 
+        List<String> bfileUrls = new ArrayList<>();
+        if (bannerImage != null && !bannerImage.isEmpty()) {
+            for (MultipartFile image : bannerImage) {
+                if (!image.isEmpty()) {
+                    String fileUrl = ImageUtil.uploadRectangle(image);
+                    bfileUrls.add(fileUrl);
+                }
+            }
+        }
+        storeProductReq.setBannerImageUrl(bfileUrls);
+        // 调用 service 创建产品
         ProductRes productRes = productService.createProduct(storeProductReq);
         ApiResponse<ProductRes> response = ResponseUtils.success(201, "產品創建成功", productRes);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
 
 
     @Operation(summary = "更新產品", description = "更新現有產品的詳細信息")
@@ -125,14 +142,19 @@ public class ProductController {
     public ResponseEntity<ApiResponse<ProductRes>> updateProduct(
             @PathVariable Long id,
             @RequestPart("productReq") String productReqJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+            @RequestPart(value = "images", required = false) List<MultipartFile> images,
+            @RequestPart(value = "bannerImageUrl", required = false) List<MultipartFile> bannerImage) throws IOException {
+
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS , true);
+        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         ProductReq storeProductReq = objectMapper.readValue(productReqJson, ProductReq.class);
+
         if (storeProductReq == null) {
             ApiResponse<ProductRes> response = ResponseUtils.failure(404, "產品不存在", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+
+        // 处理 images 列表并获取每个图片的 URL
         List<String> fileUrls = new ArrayList<>();
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
@@ -141,18 +163,37 @@ public class ProductController {
                     fileUrls.add(fileUrl);
                 }
             }
-        }else{
+        } else {
+            // 如果没有新上传的 images，使用现有的图片 URL
             ProductRes storeProductRes = productService.getProductById(id);
-            List<String> list = storeProductRes.getImageUrls();
-            fileUrls.addAll(list);
+            List<String> existingImageUrls = storeProductRes.getImageUrls();
+            fileUrls.addAll(existingImageUrls);
         }
-
         storeProductReq.setImageUrls(fileUrls);
+
+        List<String> bfileUrls = new ArrayList<>();
+        if (bannerImage != null && !bannerImage.isEmpty()) {
+            for (MultipartFile image : bannerImage) {
+                if (!image.isEmpty()) {
+                    String fileUrl = ImageUtil.uploadRectangle(image); // 使用 ImageUtil 上传文件
+                    bfileUrls.add(fileUrl);
+                }
+            }
+        } else {
+            // 如果没有新上传的 images，使用现有的图片 URL
+            ProductRes storeProductRes = productService.getProductById(id);
+            List<String> existingImageUrls = storeProductRes.getBannerImageUrl();
+            bfileUrls.addAll(existingImageUrls);
+        }
+        storeProductReq.setBannerImageUrl(bfileUrls);
+
+        // 调用 service 更新产品
         ProductRes productRes = productService.updateProduct(id, storeProductReq);
 
         ApiResponse<ProductRes> response = ResponseUtils.success(200, "產品更新成功", productRes);
         return ResponseEntity.ok(response);
     }
+
 
     @Operation(summary = "刪除產品", description = "根據產品 ID 刪除產品")
     @DeleteMapping("/delete/{id}")

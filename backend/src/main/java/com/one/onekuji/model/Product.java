@@ -100,4 +100,7 @@ public class Product{
 
     @Column(name = "category_id")
     private Long categoryId;
+
+    @Column(name = "banner_image_url")
+    private List<String> bannerImageUrl;
 }

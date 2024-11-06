@@ -100,6 +100,7 @@ public class ProductService {
         product.setStatus(req.getStatus());
         product.setBonusPrice(req.getBonusPrice());
         product.setSpecification(escapeTextForHtml(req.getSpecification()));
+        product.setBannerImageUrl(req.getBannerImageUrl());
         if(req.getProductType().equals(ProductType.GACHA)){
             product.setCategoryId(0L);
         }else{
@@ -123,7 +124,8 @@ public class ProductService {
                 product.getStatus(),
                 product.getBonusPrice(),
                 product.getSpecification(),
-                product.getCategoryId()
+                product.getCategoryId(),
+                product.getBannerImageUrl()
         );
     }
 
