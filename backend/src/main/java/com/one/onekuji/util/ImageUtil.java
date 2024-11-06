@@ -28,7 +28,7 @@ public class ImageUtil {
     private static String staticPicturePathMapping;
     private static final int TARGET_SIZE = 400;
     private static final int RECT_WIDTH = 600;
-    private static final int RECT_HEIGHT = 500;
+    private static final int RECT_HEIGHT = 400;
     private static final float OUTPUT_QUALITY = 0.85f;
 
     @PostConstruct
