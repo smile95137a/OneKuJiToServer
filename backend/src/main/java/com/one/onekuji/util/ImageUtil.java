@@ -49,7 +49,13 @@ public class ImageUtil {
         }
 
         String originalFileName = file.getOriginalFilename();
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + originalFileName;
+        String uniqueFileName = UUID.randomUUID().toString() + "_" + (originalFileName != null ? originalFileName : "image");
+        String fileExtension = getFileExtension(originalFileName);
+
+        if (fileExtension == null) {
+            throw new IllegalArgumentException("Invalid file extension");
+        }
+
         String filePath = staticPicturePath + uniqueFileName;
         File dest = new File(filePath);
 
@@ -67,7 +73,7 @@ public class ImageUtil {
                         .toFile(dest);
             } else {
                 BufferedImage processedImage = processImageWithAspectRatio(originalImage);
-                ImageIO.write(processedImage, getFileExtension(originalFileName), dest);
+                ImageIO.write(processedImage, fileExtension, dest);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -81,40 +87,33 @@ public class ImageUtil {
         int originalWidth = originalImage.getWidth();
         int originalHeight = originalImage.getHeight();
 
-        // 計算縮放比例
         double scale = Math.min(
                 (double) TARGET_SIZE / originalWidth,
                 (double) TARGET_SIZE / originalHeight
         );
 
-        // 計算縮放後的尺寸
         int scaledWidth = (int) (originalWidth * scale);
         int scaledHeight = (int) (originalHeight * scale);
 
-        // 創建一個 400x400 的白色背景圖片
         BufferedImage finalImage = new BufferedImage(
                 TARGET_SIZE,
                 TARGET_SIZE,
-                BufferedImage.TYPE_INT_ARGB
+                BufferedImage.TYPE_INT_RGB
         );
 
-        // 獲取繪圖上下文並設置白色背景
         Graphics2D g2d = finalImage.createGraphics();
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
 
         try {
-            // 縮放原圖
             BufferedImage scaledImage = Thumbnails.of(originalImage)
                     .size(scaledWidth, scaledHeight)
                     .outputQuality(OUTPUT_QUALITY)
                     .asBufferedImage();
 
-            // 計算居中位置
             int x = (TARGET_SIZE - scaledWidth) / 2;
             int y = (TARGET_SIZE - scaledHeight) / 2;
 
-            // 在白色背景上繪製縮放後的圖片
             g2d.drawImage(scaledImage, x, y, null);
         } catch (IOException e) {
             throw new RuntimeException("Failed to process image", e);
@@ -126,6 +125,9 @@ public class ImageUtil {
     }
 
     private static String getFileExtension(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        if (fileName != null && fileName.contains(".")) {
+            return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        }
+        return null;
     }
 }
