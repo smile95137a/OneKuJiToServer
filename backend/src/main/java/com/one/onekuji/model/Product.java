@@ -102,5 +102,7 @@ public class Product{
     private Long categoryId;
 
     @Column(name = "banner_image_url")
+    @Convert(converter = StringListConverter.class)
     private List<String> bannerImageUrl;
+
 }

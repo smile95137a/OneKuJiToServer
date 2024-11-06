@@ -11,7 +11,7 @@ public interface BannerRepository {
     @Select("SELECT * FROM banner WHERE banner_uid = #{bannerUid}")
     Banner findById(@Param("bannerId") String bannerUid);
 
-    @Select("SELECT * , b.product_id , b.image_urls FROM banner a left join product b on a.product_id = b.product_id")
+    @Select("SELECT * , b.product_id , b.banner_image_url as imageUrls FROM banner a left join product b on a.product_id = b.product_id")
     List<Banner> findAll();
 
     @Insert("INSERT INTO banner (banner_uid, banner_image_urls, product_id, status, created_at, updated_at , product_type)\n" +
