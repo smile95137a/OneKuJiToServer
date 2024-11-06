@@ -32,7 +32,7 @@ public class BannerService {
         try{
             Product productById = productRepository.getProductById(banner.getProductId());
             banner.setProductType(productById.getProductType());
-            banner.setImageUrls(productById.getImageUrls());
+            banner.setImageUrls(productById.getBannerImageUrl());
             banner.setBannerUid(UUID.randomUUID().toString());
             banner.setCreatedAt(LocalDateTime.now());
             banner.setUpdatedAt(LocalDateTime.now());
@@ -47,7 +47,7 @@ public class BannerService {
         Banner reqBanner = bannerRepository.findById(bannerUid);
         Product productById = productRepository.getProductById(banner.getProductId());
         reqBanner.setProductType(productById.getProductType());
-        reqBanner.setImageUrls(productById.getImageUrls());
+        reqBanner.setImageUrls(productById.getBannerImageUrl());
         reqBanner.setProductId(banner.getBannerId());
         reqBanner.setStatus(banner.getStatus());
         reqBanner.setUpdatedAt(LocalDateTime.now());
