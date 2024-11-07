@@ -88,7 +88,7 @@ public class ProductCategoryService {
 
             if (sortExists) {
                 // 如果 sort 已存在，可以选择抛出异常，或自动调整排序号
-                throw new IllegalArgumentException("排序号已存在，请选择一个不同的排序号。");
+                throw new IllegalArgumentException("排序號已存在，別輸入別的排序號");
             }
 
             // 更新类别信息

@@ -14,7 +14,7 @@ public interface ProductCategoryMapper {
             "        FROM onekuji.product_category \n" +
             "        WHERE category_id != 40) AS max_product_sort\n" +
             "FROM onekuji.product_category \n" +
-            "WHERE category_id != 40;")
+            "order by product_sort asc")
     List<ProductCategory> getAllCategories();
 
 
@@ -28,7 +28,7 @@ public interface ProductCategoryMapper {
     void createCategory(ProductCategory category);
 
     // 更新類別
-    @Update("UPDATE product_category SET category_name = #{categoryName}, category_UUid = #{categoryUUid} WHERE category_id = #{categoryId}")
+    @Update("UPDATE product_category SET category_name = #{categoryName}, category_UUid = #{categoryUUid} , product_sort = #{productSort} WHERE category_id = #{categoryId}")
     void updateCategory(ProductCategory category);
 
     // 刪除類別
