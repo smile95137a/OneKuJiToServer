@@ -1,5 +1,6 @@
 package com.one.onekuji.controller;
 
+import com.one.onekuji.dto.ProductCategoryResponse;
 import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.model.ProductCategory;
 import com.one.onekuji.service.ProductCategoryService;
@@ -8,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/productCategory")
@@ -20,9 +19,9 @@ public class ProductCategoryController {
 
     // 查詢所有類別
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<ProductCategory>>> getAllCategories() {
-        List<ProductCategory> categories = productCategoryService.getAllCategories();
-        if (categories.isEmpty()) {
+    public ResponseEntity<ApiResponse<ProductCategoryResponse>> getAllCategories() {
+        ProductCategoryResponse categories = productCategoryService.getAllCategories();
+        if (categories == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ResponseUtils.failure(404, "無類別", null));
         }
@@ -43,9 +42,14 @@ public class ProductCategoryController {
     // 創建新類別
     @PostMapping
     public ResponseEntity<ApiResponse<ProductCategory>> createCategory(@RequestBody ProductCategory category) {
-        ProductCategory createdCategory = productCategoryService.createCategory(category);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResponseUtils.success(201, "創建成功", createdCategory));
+        try{
+            ProductCategory createdCategory = productCategoryService.createCategory(category);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(ResponseUtils.success(201, "創建成功", createdCategory));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     // 更新類別

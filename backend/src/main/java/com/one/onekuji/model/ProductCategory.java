@@ -22,4 +22,9 @@ public class ProductCategory{
 
     @Column(name = "category_UUid")
     private String categoryUUid;
+
+    @Column(name = "product_sort")
+    private Long productSort;
+
+    private Long maxProductSort;
 }

@@ -9,7 +9,7 @@ import java.util.List;
 public interface ProductCategoryMapper {
 
     // 查詢所有類別
-    @Select("SELECT * FROM product_category")
+    @Select("SELECT * FROM product_category ORDER BY product_sort ASC")
     List<ProductCategory> getAllCategories();
 
     // 根據ID查詢類別
