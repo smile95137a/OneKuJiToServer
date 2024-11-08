@@ -384,17 +384,34 @@ return null;
     /**
      * 记录储值交易
      */
-    public String recordDeposit(Long userId, BigDecimal amount , String orderId) {
+    public String recordDeposit(Long userId, BigDecimal amount , String orderId) throws MessagingException {
         System.out.println("Send_Type: " + userId);
         System.out.println("Send_Type: " + amount);
         System.out.println("Send_Type: " + orderId);
         int amountInCents = amount.intValue(); // 转为整数分
         userRepository.updateBalance(userId, amountInCents);
         userTransactionRepository.updateByTop(orderId);
+        UserRes userById = userRepository.getUserById(userId);
+
+        //訂單成立開立發票並且傳送至email
+        ReceiptReq invoiceRequest = new ReceiptReq();
+        invoiceRequest.setEmail(userById.getUsername());
+        invoiceRequest.setTotalFee(String.valueOf(amount));
+        List<ReceiptReq.Item> items = new ArrayList<>();
+        ReceiptReq.Item item = new ReceiptReq.Item();
+        item.setName("代幣");
+        item.setNumber(1);
+        item.setMoney(amount.intValue());
+        items.add(item);
+        invoiceRequest.setItems(items);
+
+        ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
+        ReceiptRes receiptRes = res.getBody();
+        invoiceService.getInvoicePicture(receiptRes.getCode() , userById.getId());
         return orderId;
     }
 
-    public String recordDeposit3(Long userId, BigDecimal amount) {
+    public String recordDeposit3(Long userId, BigDecimal amount) throws MessagingException {
         String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
         int amountInCents = amount.intValue(); // 转为整数分
         userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount, orderNumber);
@@ -574,7 +591,7 @@ return null;
         ).collect(Collectors.toList());
     }
 
-    public Boolean recordDeposit2(CreditDto creditDto) {
+    public Boolean recordDeposit2(CreditDto creditDto) throws MessagingException {
         String status = userTransactionRepository.findByOrderNumber(creditDto.getOrderNumber());
         UserTransaction userTransaction = userTransactionRepository.findByOrderNumber2(creditDto.getOrderNumber());
         if(status == null){
@@ -589,6 +606,22 @@ return null;
             int amount = amountDecimal.intValue();
             userRepository.updateBalance(userTransaction.getUserId(), amount);
             userTransactionRepository.updateStatus(creditDto);
+            //訂單成立開立發票並且傳送至email
+            UserRes userById = userRepository.getUserById(userTransaction.getUserId());
+            ReceiptReq invoiceRequest = new ReceiptReq();
+            invoiceRequest.setEmail(userById.getUsername());
+            invoiceRequest.setTotalFee(String.valueOf(amount));
+            List<ReceiptReq.Item> items = new ArrayList<>();
+            ReceiptReq.Item item = new ReceiptReq.Item();
+            item.setName("代幣");
+            item.setNumber(1);
+            item.setMoney(amount);
+            items.add(item);
+            invoiceRequest.setItems(items);
+
+            ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
+            ReceiptRes receiptRes = res.getBody();
+            invoiceService.getInvoicePicture(receiptRes.getCode() , userById.getId());
             return true;
         }
     }
