@@ -100,6 +100,14 @@ public class ProductController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @RequestPart(value = "bannerImageUrl", required = false) List<MultipartFile> bannerImage) throws IOException {
 
+        if (images == null) {
+            images = new ArrayList<>();
+        }
+        if (bannerImage == null) {
+            bannerImage = new ArrayList<>();
+        }
+
+
         // 将 productReqJson 反序列化为 ProductReq 对象
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
@@ -144,6 +152,15 @@ public class ProductController {
             @RequestPart("productReq") String productReqJson,
             @RequestPart(value = "images", required = false) List<MultipartFile> images,
             @RequestPart(value = "bannerImageUrl", required = false) List<MultipartFile> bannerImage) throws IOException {
+try {
+
+
+        if (images == null) {
+            images = new ArrayList<>();
+        }
+        if (bannerImage == null) {
+            bannerImage = new ArrayList<>();
+        }
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
@@ -167,7 +184,10 @@ public class ProductController {
             // 如果没有新上传的 images，使用现有的图片 URL
             ProductRes storeProductRes = productService.getProductById(id);
             List<String> existingImageUrls = storeProductRes.getImageUrls();
-            fileUrls.addAll(existingImageUrls);
+            if(existingImageUrls != null){
+                fileUrls.addAll(existingImageUrls);
+
+            }
         }
         storeProductReq.setImageUrls(fileUrls);
 
@@ -183,7 +203,10 @@ public class ProductController {
             // 如果没有新上传的 images，使用现有的图片 URL
             ProductRes storeProductRes = productService.getProductById(id);
             List<String> existingImageUrls = storeProductRes.getBannerImageUrl();
-            bfileUrls.addAll(existingImageUrls);
+            if(existingImageUrls != null){
+                bfileUrls.addAll(existingImageUrls);
+            }
+
         }
         storeProductReq.setBannerImageUrl(bfileUrls);
 
@@ -192,6 +215,10 @@ public class ProductController {
 
         ApiResponse<ProductRes> response = ResponseUtils.success(200, "產品更新成功", productRes);
         return ResponseEntity.ok(response);
+}catch (Exception e){
+    e.printStackTrace();
+}
+return null;
     }
 
 
