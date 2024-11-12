@@ -13,7 +13,6 @@ import com.one.onekuji.response.ProductDetailRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,51 +31,54 @@ public class ProductDetailService {
         return productDetailMapper.findAll();
     }
 
-    public List addProductDetails(List<DetailReq> detailReqs) {
+    /**
+     * 添加产品细节，并生成奖品编号。
+     * @param detailReqs 包含产品详细信息的请求列表。
+     * @return 返回插入后的详细响应列表。
+     */
+    public List<DetailRes> addProductDetails(List<DetailReq> detailReqs) {
         List<DetailRes> detailResList = new ArrayList<>();
         List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
         int totalQuantity = 0;
 
-        // 计算总数量，排除 grade 为 "LAST" 的项
+        // 1. 计算总数量，排除等级为 "LAST" 的项。
         for (DetailReq detailReq : detailReqs) {
-            if (shouldIncludeInPrizeNumbers(detailReq)) {
+            if (shouldIncludeInPrizeNumbers(detailReq)) { // 判断是否要包含在奖品编号列表中
                 totalQuantity += detailReq.getQuantity();
             }
         }
 
-        // 更新产品总数量
+        // 2. 更新产品总数量
         productRepository.updateTotalQua(totalQuantity, detailReqs.get(0).getProductId());
-        // 4. 删除当前产品下所有的奖品编号
+
+        // 3. 删除当前产品下所有的奖品编号，避免重复
         prizeNumberMapper.deleteProductById(Long.valueOf(detailReqs.get(0).getProductId()));
 
-        // 创建并打乱奖品编号
+        // 4. 创建并打乱奖品编号
         List<Integer> shuffledNumbers = new ArrayList<>();
         for (int i = 1; i <= totalQuantity; i++) {
             shuffledNumbers.add(i);
         }
-        Collections.shuffle(shuffledNumbers);
+        Collections.shuffle(shuffledNumbers); // 打乱奖品编号
 
         int currentIndex = 0;
         for (DetailReq detailReq : detailReqs) {
-            // 转义 HTML 字符
+            // 5. 转义 HTML 字符，确保安全
             detailReq.setDescription(escapeTextForHtml(detailReq.getDescription()));
             detailReq.setSpecification(escapeTextForHtml(detailReq.getSpecification()));
             detailReq.setStockQuantity(detailReq.getQuantity());
 
-            // 计算尺寸
-            BigDecimal size = detailReq.getHeight()
-                    .multiply(detailReq.getWidth())
-                    .multiply(detailReq.getLength());
-            detailReq.setSize(size.toString());
+            // 6. 计算尺寸，并将结果存入 detailReq
+            detailReq.setSize(detailReq.getSize());
 
-            // 插入产品细节，不排除 "LAST" 等级
+            // 7. 插入产品细节，不排除 "LAST" 等级
             productDetailMapper.insert(detailReq);
             Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
 
-            // 排除 grade 为 "LAST" 的项，不进行任何 prizeNumber 处理
+            // 8. 排除等级为 "LAST" 的项，不进行奖品编号处理
             if (shouldIncludeInPrizeNumbers(detailReq)) {
-                // 为每个数量创建奖品编号
                 List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
+                // 为每个数量创建奖品编号
                 for (int i = 0; i < detailReq.getQuantity(); i++) {
                     PrizeNumber prizeNumber = new PrizeNumber();
                     prizeNumber.setProductId(detailReq.getProductId());
@@ -93,18 +95,20 @@ public class ProductDetailService {
                 allPrizeNumbers.addAll(detailPrizeNumbers);
             }
 
-            // 获取并添加详细响应
+            // 9. 获取并添加详细响应数据
             DetailRes detailRes = productDetailMapper.findById(productDetailId);
             detailResList.add(detailRes);
         }
 
-        // 批量插入所有奖品编号，确保插入不包括 "LAST" 等级的奖品
+        // 10. 批量插入所有奖品编号，确保插入不包括 "LAST" 等级的奖品
         if (!allPrizeNumbers.isEmpty()) {
             prizeNumberMapper.insertBatch(allPrizeNumbers);
         }
 
+        // 11. 返回生成的详细响应列表
         return detailResList;
     }
+
 
     // 判断是否应将该项包括在奖品编号中
     private boolean shouldIncludeInPrizeNumbers(DetailReq detailReq) {
@@ -139,10 +143,8 @@ public class ProductDetailService {
         productDetailReq.setSpecification(escapeTextForHtml(productDetailReq.getSpecification()));
 
         // 计算尺寸
-        BigDecimal size = productDetailReq.getHeight()
-                .multiply(productDetailReq.getWidth())
-                .multiply(productDetailReq.getLength());
-        productDetailReq.setSize(size.toString());
+
+        productDetailReq.setSize(productDetailReq.getSize());
 
         // 更新商品细节
         productDetailMapper.update(productDetailReq);
