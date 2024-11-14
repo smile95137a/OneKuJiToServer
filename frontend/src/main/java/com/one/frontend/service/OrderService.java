@@ -143,6 +143,18 @@ public class OrderService {
 		// 計算所有購物車商品的總價格
 		BigDecimal totalProductAmount = cartItemList.stream().map(CartItem::getTotalPrice).reduce(BigDecimal.ZERO,
 				BigDecimal::add);
+		for (CartItem item : cartItemList) {
+			Long productId = item.getStoreProductId();
+
+			// 查询数据库获取当前商品库存量
+			StoreProduct product = storeProductRepository.findById(productId);
+
+			// 检查库存是否足够
+			if (product == null || product.getStockQuantity() < item.getQuantity()) {
+				return null; // 库存不足，返回false表示订单不能成立
+			}
+		}
+
 
 		// 計算運費，根據運輸方式動態設置
 		BigDecimal shippingCost = shippingMethodRepository.getShippingPrice(payCartRes.getShippingMethod());
