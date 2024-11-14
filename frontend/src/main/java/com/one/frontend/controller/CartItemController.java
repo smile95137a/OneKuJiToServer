@@ -63,7 +63,7 @@ public class CartItemController {
         } catch (Exception e) {
             e.printStackTrace();
             var response = ResponseUtils.failure(200, "已達商品數量上限", false);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 

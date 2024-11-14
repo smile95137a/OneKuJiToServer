@@ -95,7 +95,7 @@ public class OrderController {
 		var orderNumber = orderService.createOrder(payCartRes, cartItemList, userId);
 
 		if(orderNumber == null){
-			ResponseEntity.ok(ResponseUtils.failure(200, "訂單失敗,商品已無庫存", null));
+				ResponseEntity.ok(ResponseUtils.failure(200, "訂單失敗,商品已無庫存", null));
 		}
 
 		return ResponseEntity.ok(ResponseUtils.success(200, "支付成功，订单已创建", orderNumber));
