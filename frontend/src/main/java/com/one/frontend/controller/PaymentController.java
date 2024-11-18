@@ -86,8 +86,6 @@ public class PaymentController {
 
     @PostMapping("/creditMP")
     public ResponseEntity<ApiResponse<?>> creditpaymentCallback(@RequestBody CreditDto creditDto) {
-        var userDetails = SecurityUtils.getCurrentUserPrinciple();
-        var userId = userDetails.getId();
         try {
             String s = paymentService.transferOrderFromTemp(creditDto.getOrderNumber());
             ApiResponse<Object> sc = ResponseUtils.success(200, null, s);

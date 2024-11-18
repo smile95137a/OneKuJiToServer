@@ -511,58 +511,60 @@ return null;
 
 
 
-        //訂單成立開立發票並且傳送至email
+        // 訂單成立開立發票並且傳送至email
         ReceiptReq invoiceRequest = new ReceiptReq();
-        if(order.getVehicle() != null){
+        if (order.getVehicle() != null) {
             invoiceRequest.setOrderCode(order.getVehicle());
+        } else {
+            // 如果 order.getVehicle() 为空，可以选择使用订单号或其他标识符
+            invoiceRequest.setOrderCode(order.getId().toString());
         }
         invoiceRequest.setEmail(userById.getUsername());
-        if(order.getState() != null){
+        if (order.getState() != null) {
             invoiceRequest.setState(1);
             invoiceRequest.setDonationCode(order.getDonationCode());
-        }else{
+        } else {
             invoiceRequest.setState(0);
         }
+
+// 确保金额是正确的格式，并将 BigDecimal 转换为字符串
         BigDecimal amountToSend = order.getTotalAmount();
-        invoiceRequest.setTotalFee(String.valueOf(amountToSend));
+        invoiceRequest.setTotalFee(amountToSend != null ? amountToSend.toPlainString() : "0");
+
         List<ReceiptReq.Item> items = new ArrayList<>();
-        for(OrderDetailRes cartItem : orderDetailsByOrderId){
+        for (OrderDetailRes cartItem : orderDetailsByOrderId) {
             ReceiptReq.Item item = new ReceiptReq.Item();
-            ProductDetailRes byId = productDetailRepository.getProductDetailById(cartItem.getProductDetailRes().getProductDetailId());
-            StoreProductRes resById = storeProductRepository.findResById(cartItem.getStoreProduct().getStoreProductId());
-            if(byId != null){
-                if(byId.getProductName() != null){
-                    item.setName(byId.getProductName());
-                }else{
-                    item.setName("商品");
-                }
+
+            // 确保获取到有效的产品详细信息
+            ProductDetailRes productDetail = productDetailRepository.getProductDetailById(cartItem.getProductDetailRes().getProductDetailId());
+            StoreProductRes storeProduct = storeProductRepository.findResById(cartItem.getStoreProduct().getStoreProductId());
+
+            if (productDetail != null) {
+                // 使用产品名称，如果没有则使用“商品”
+                item.setName(productDetail.getProductName() != null ? productDetail.getProductName() : "商品");
                 item.setNumber(cartItem.getQuantity());
-                if(cartItem.getUnitPrice() != null){
-                    item.setMoney(cartItem.getUnitPrice().intValue());
-                }else{
-                    item.setMoney(cartItem.getTotalPrice().intValue());
-                }
+                item.setMoney(cartItem.getUnitPrice() != null ? cartItem.getUnitPrice().intValue() : cartItem.getTotalPrice().intValue());
                 items.add(item);
-            }else if(resById != null){
-                if(resById.getProductName() != null){
-                    item.setName(resById.getProductName());
-                }else{
-                    item.setName("商品");
-                }
+            } else if (storeProduct != null) {
+                // 如果没有找到 ProductDetail，则使用 StoreProduct 信息
+                item.setName(storeProduct.getProductName() != null ? storeProduct.getProductName() : "商品");
                 item.setNumber(cartItem.getQuantity());
-                if(cartItem.getUnitPrice() != null){
-                    item.setMoney(cartItem.getUnitPrice().intValue());
-                }else{
-                    item.setMoney(cartItem.getTotalPrice().intValue());
-                }
+                item.setMoney(cartItem.getUnitPrice() != null ? cartItem.getUnitPrice().intValue() : cartItem.getTotalPrice().intValue());
+                items.add(item);
+            } else {
+                // 如果都没有找到相关商品信息，可以记录日志或处理异常
+                item.setName("未知商品");
+                item.setNumber(cartItem.getQuantity());
+                item.setMoney(0);  // 默认金额为 0
                 items.add(item);
             }
-
         }
+
         invoiceRequest.setItems(items);
 
         ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
         ReceiptRes receiptRes = res.getBody();
+        System.out.println(receiptRes);
         invoiceService.getInvoicePicture(receiptRes.getCode() , userById.getId());
 
         return order.getType();
