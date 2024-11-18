@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface StoreProductMapper {
 
-    @Select("SELECT * FROM store_product")
+    @Select("SELECT * FROM store_product order by created_at desc")
     List<StoreProduct> findAll();
 
     @Select("SELECT * FROM store_product WHERE store_product_id = #{id}")

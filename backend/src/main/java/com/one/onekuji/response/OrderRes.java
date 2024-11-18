@@ -27,6 +27,7 @@ public class OrderRes {
 	private String paymentMethod;
 	private String shippingMethod;
 	private String shippingName;
+	private String shippingEmail;
 	private String shippingZipCode;
 	private String shippingCity;
 	private String shippingArea;
@@ -42,6 +43,11 @@ public class OrderRes {
 	private String shopId;
 	private String shippingPhone;
 	private List<OrderDetailRes> orderDetails;
-
+	private Long orderCount;
+	private String billNumber;
+	private String shippingMethodId;
+	private String shippingMethodName;
+	private String shopName;
+	private String shopAddress;
 
 }

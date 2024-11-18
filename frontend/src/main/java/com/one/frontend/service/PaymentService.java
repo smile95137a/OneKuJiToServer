@@ -63,8 +63,8 @@ public class PaymentService {
 
     public PaymentResponse creditCard(PaymentRequest paymentRequest) {
 
-       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-        // String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+//       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+         String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("0".trim())  // 傳送型態，寫死去除空白
@@ -474,15 +474,38 @@ return null;
         if("1".equals(order.getType())){
             // 獲取所有購物車項的ID並移除
             List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+            if(!cartItemIds.isEmpty()){
+                cartItemList.forEach(cartItem -> {
+                    // 查詢目前的商品數據
+                    StoreProduct storeProduct = storeProductRepository.findById(cartItem.getStoreProductId());
 
-            // 移除購物車項
-            cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+                    // 更新庫存和已售數量
+                    int newStockQuantity = storeProduct.getStockQuantity() - cartItem.getQuantity();
+                    int newSoldQuantity = (storeProduct.getSoldQuantity() == null ? 0 : storeProduct.getSoldQuantity()) + cartItem.getQuantity();
+
+                    // 判斷是否需要更新為 SOLD_OUT 狀態
+                    String newStatus = (newStockQuantity <= 0) ? "SOLD_OUT" : storeProduct.getStatus();
+
+                    // 更新商品信息
+                    storeProductRepository.updateStoreProduct(
+                            storeProduct.getStoreProductId(),
+                            Math.max(newStockQuantity, 0), // 確保庫存不為負
+                            newSoldQuantity,
+                            newStatus
+                    );
+                });
+                // 移除購物車項
+                cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+            }
+
+
+
         }else if("2".equals(order.getType())){
 // 獲取所有購物車項的ID並移除
             List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
-
-            // 移除購物車項
-            prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+            if(!cartItemIds.isEmpty()){
+                prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+            }
         }
 
 
@@ -602,14 +625,38 @@ return null;
         if ("IS_PAY".equals(status)) {
             return false;
         } else {
+
+            OrderRes order = orderMapper.findOrderByOrderNumber(creditDto.getOrderId());
+            UserRes userById = userRepository.getUserById(order.getUserId());
+            List<OrderDetailRes> orderDetailsByOrderId = orderDetailRepository.findOrderDetailsByOrderId(order.getId());
+            Long cartIdByUserId = cartRepository.getCartIdByUserId(order.getUserId());
+            List<CartItem> cartItemList = cartItemRepository.find(cartIdByUserId);
+            Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(order.getUserId());
+            List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId1);
+            if("1".equals(order.getType())){
+                // 獲取所有購物車項的ID並移除
+                List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+
+                // 移除購物車項
+                cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+            }else if("2".equals(order.getType())){
+// 獲取所有購物車項的ID並移除
+                List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+
+                // 移除購物車項
+                prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+            }
+
+
+
             BigDecimal amountDecimal = userTransaction.getAmount();
             int amount = amountDecimal.intValue();
             userRepository.updateBalance(userTransaction.getUserId(), amount);
             userTransactionRepository.updateStatus(creditDto);
             //訂單成立開立發票並且傳送至email
-            UserRes userById = userRepository.getUserById(userTransaction.getUserId());
+            UserRes userById2 = userRepository.getUserById(userTransaction.getUserId());
             ReceiptReq invoiceRequest = new ReceiptReq();
-            invoiceRequest.setEmail(userById.getUsername());
+            invoiceRequest.setEmail(userById2.getUsername());
             invoiceRequest.setTotalFee(String.valueOf(amount));
             List<ReceiptReq.Item> items = new ArrayList<>();
             ReceiptReq.Item item = new ReceiptReq.Item();
@@ -634,5 +681,40 @@ return null;
                 .quantity(cartItem.getQuantity()).unitPrice(cartItem.getUnitPrice()).totalPrice(totalPrice) // 新增
                 .billNumber(billNumber)																						// totalPrice
                 .build();
+    }
+
+    public void rePrizeCart(String orderID) {
+        OrderRes orderByOrderNumber = orderMapper.findOrderByOrderNumber(orderID);
+        orderMapper.updateStatusByFail(orderByOrderNumber.getId());
+        List<OrderDetailRes> orderDetailsByOrderId = orderDetailMapper.findOrderDetailsByOrderId(orderByOrderNumber.getId());
+        Long cartIdByUserId = cartRepository.getCartIdByUserId(orderByOrderNumber.getUserId());
+        Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(orderByOrderNumber.getUserId());
+        if("1".equals(orderByOrderNumber.getType())){
+            for(OrderDetailRes detailRes:orderDetailsByOrderId){
+                CartItem cartItem = new CartItem();
+                cartItem.setCartId(cartIdByUserId);
+                cartItem.setStoreProductId(detailRes.getStoreProduct().getStoreProductId());
+                cartItem.setQuantity(detailRes.getQuantity());
+                cartItem.setUnitPrice(detailRes.getUnitPrice());
+                cartItem.setTotalPrice(BigDecimal.valueOf(detailRes.getTotalPrice()));
+                cartItem.setSize(detailRes.getStoreProduct().getSize());
+                cartItem.setIsSelected(true);
+                cartItemRepository.addCartItem(cartItem);
+            }
+        }else if("2".equals(orderByOrderNumber.getType())){
+            List<PrizeCartItem> prizeCartItemList = new ArrayList<>();
+            for(OrderDetailRes detailRes:orderDetailsByOrderId) {
+                PrizeCartItem prizeCartItem = new PrizeCartItem();
+                prizeCartItem.setCartId(cartIdByUserId1);
+                prizeCartItem.setProductDetailId(detailRes.getProductDetailRes().getProductDetailId());
+                prizeCartItem.setQuantity(detailRes.getQuantity());
+                prizeCartItem.setSliverPrice(detailRes.getProductDetailRes().getSliverPrice());
+                prizeCartItem.setIsSelected(true);
+                prizeCartItem.setSize(detailRes.getProductDetailRes().getSize());
+                prizeCartItemList.add(prizeCartItem);
+            }
+            prizeCartItemRepository.insertBatch(prizeCartItemList);
+        }
+
     }
 }

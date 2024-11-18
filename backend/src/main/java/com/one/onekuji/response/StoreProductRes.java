@@ -28,5 +28,6 @@ public class StoreProductRes {
     private BigDecimal height;
     private String specification;
     private String details; // 商品详情，包含更详细的商品信息
+    private Integer soldQuantity;
 
 }

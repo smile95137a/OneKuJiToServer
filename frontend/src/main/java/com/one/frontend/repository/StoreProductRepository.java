@@ -70,4 +70,19 @@ public interface StoreProductRepository {
             "WHERE pk.store_product_id = #{storeProductId}")
     List<StoreKeyword> findKeywordsByProductId(@Param("storeProductId") Long storeProductId);
 
+
+	@Update("""
+    UPDATE store_product 
+    SET 
+        stock_quantity = #{stockQuantity}, 
+        sold_quantity = #{soldQuantity}, 
+        status = #{status} 
+    WHERE store_product_id = #{storeProductId}
+""")
+	void updateStoreProduct(
+			@Param("storeProductId") Long storeProductId,
+			@Param("stockQuantity") int stockQuantity,
+			@Param("soldQuantity") int soldQuantity,
+			@Param("status") String status
+	);
 }

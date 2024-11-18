@@ -53,7 +53,7 @@ public interface OrderDetailRepository {
             "    COALESCE(sp.product_name, pd.product_name) AS productName,",
             "    COALESCE(sp.image_urls, pd.image_urls) AS imageUrls,",
             "    sp.store_product_id, sp.description, sp.price, sp.stock_quantity,",
-            "    pd.product_detail_id",
+            "    pd.product_detail_id , pd.sliver_price , pd.size",
             "FROM order_detail od",
             "LEFT JOIN store_product sp ON od.store_product_id = sp.store_product_id",
             "LEFT JOIN product_detail pd ON od.product_detail_id = pd.product_detail_id",
@@ -80,14 +80,16 @@ public interface OrderDetailRepository {
             // Product detail mapping
             @Result(property = "productDetailRes.productDetailId", column = "product_detail_id"),
             @Result(property = "productDetailRes.productName", column = "productName"),
-            @Result(property = "productDetailRes.imageUrls", column = "imageUrls")
+            @Result(property = "productDetailRes.imageUrls", column = "imageUrls"),
+            @Result(property = "productDetailRes.sliverPrice", column = "sliver_price"),
+            @Result(property = "productDetailRes.size", column = "size")
     })
     List<OrderDetailRes> findOrderDetailsByOrderId(Long orderId);
 
 
 
 
-    @Select("SELECT od.* , sp.product_detail_id , sp.product_name , sp.description , sp.sliver_price , sp.image_urls" +
+    @Select("SELECT od.* , sp.product_detail_id , sp.product_name , sp.description , sp.sliver_price , sp.image_urls " +
             "FROM order_detail od " +
             "LEFT JOIN product_detail sp ON od.product_detail_id = sp.product_detail_id " +
             "WHERE od.order_id = #{orderId}")
@@ -102,7 +104,7 @@ public interface OrderDetailRepository {
             @Result(property = "ProductDetail.productName", column = "product_name"),
             @Result(property = "ProductDetail.description", column = "description"),
             @Result(property = "ProductDetail.sliverPrice", column = "sliver_price"),
-            @Result(property = "storeProduct.imageUrls", column = "image_urls"),
+            @Result(property = "ProductDetail.imageUrls", column = "image_urls"),
     })
     List<OrderDetailRes> findPrizeOrderDetailsByOrderId(Long orderId);
 

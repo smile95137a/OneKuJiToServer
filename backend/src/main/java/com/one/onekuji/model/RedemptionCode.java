@@ -2,7 +2,8 @@ package com.one.onekuji.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.util.Date;
+
 @Entity
 @Table(name = "redemption_codes")
 public class RedemptionCode {
@@ -18,12 +19,11 @@ public class RedemptionCode {
     private boolean isRedeemed = false;
 
     @Column(name = "redeemed_at")
-    private LocalDateTime redeemedAt;
+    private Date redeemedAt;
 
     @Column(name = "user_id")
     private Long userId;
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -48,11 +48,11 @@ public class RedemptionCode {
         isRedeemed = redeemed;
     }
 
-    public LocalDateTime getRedeemedAt() {
+    public Date getRedeemedAt() {
         return redeemedAt;
     }
 
-    public void setRedeemedAt(LocalDateTime redeemedAt) {
+    public void setRedeemedAt(Date redeemedAt) {
         this.redeemedAt = redeemedAt;
     }
 

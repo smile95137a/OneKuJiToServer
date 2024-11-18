@@ -22,8 +22,22 @@ public class UserService {
     private RoleRepository roleRepository;
 
     public List<UserRes> getAllUsers() {
-        return userRepository.findAll();
+        List<UserRes> all = userRepository.findAll();
+
+        // 使用 `forEach` 来直接修改每个对象的地址
+        all.forEach(x -> x.setAddress(x.getCity() + x.getArea() + x.getAddress()));
+
+        // 修改用户名：如果 provider 不是 "LOCAL"，则设置为 email
+        all.forEach(x -> {
+            if (!"local".equals(x.getProvider())) {
+                x.setUsername(x.getEmail());
+            }
+        });
+
+        return all;
     }
+
+
 
     public UserRes getUserById(Long userId) {
         return userRepository.findById(userId);

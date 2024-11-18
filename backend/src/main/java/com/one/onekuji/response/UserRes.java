@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -39,7 +39,11 @@ public class UserRes {
     private BigDecimal bonus;
     private BigDecimal sliverCoin;
     private String googleId;
-
-    private LocalDateTime updatedAt;
+    private Date createdAt;
+    private Date updatedAt;
     private Long drawCount;
+    private String addressName;
+    private String city;
+    private String area;
+    private String provider;
 }

@@ -75,8 +75,8 @@ public class PaymentController {
         try {
             if("已付款".equals(ret_msg)){
                 paymentService.transferOrderFromTemp(OrderID);
-            }else if("0".equals(Send_Type) && "true".equals(result)){
-
+            } else {
+                paymentService.rePrizeCart(OrderID);
             }
         }catch (Exception e){
             e.printStackTrace();

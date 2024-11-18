@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface UserRepository {
 
-    @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin, updated_at, draw_count FROM user")
+    @Select("SELECT * FROM user")
     List<UserRes> findAll();
 
     @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin,, updated_at, draw_count FROM user WHERE id = #{userId}")

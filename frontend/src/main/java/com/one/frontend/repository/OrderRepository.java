@@ -17,12 +17,12 @@ public interface OrderRepository {
 			+ "bonus_points_earned, bonus_points_used, created_at, updated_at, paid_at, result_status, "
 			+ "payment_method, shipping_method, shipping_name, shipping_zip_code, shipping_city, shipping_area, "
 			+ "shipping_address, billing_zip_code, billing_name, billing_city, billing_area, "
-			+ "billing_address, invoice, tracking_number , shipping_phone , shop_id , OPMode , e_payaccount , bill_number , state , donation_code , type) "
+			+ "billing_address, invoice, tracking_number , shipping_phone , shop_id , OPMode , e_payaccount , bill_number , state , donation_code , type , shipping_email , shop_name , shop_address) "
 			+ "VALUES (#{orderNumber}, #{userId}, #{totalAmount}, #{shippingCost}, #{isFreeShipping}, "
 			+ "#{bonusPointsEarned}, #{bonusPointsUsed}, #{createdAt}, #{updatedAt}, #{paidAt}, #{resultStatus}, "
 			+ "#{paymentMethod}, #{shippingMethod}, #{shippingName}, #{shippingZipCode}, #{shippingCity}, #{shippingArea}, "
 			+ "#{shippingAddress}, #{billingZipCode}, #{billingName}, #{billingCity}, #{billingArea}, "
-			+ "#{billingAddress}, #{invoice}, #{trackingNumber} , #{shippingPhone} , #{shopId} , #{OPMode} , #{ePayAccount} , #{billNumber} , #{state} , #{donationCode} , #{type})")
+			+ "#{billingAddress}, #{invoice}, #{trackingNumber} , #{shippingPhone} , #{shopId} , #{OPMode} , #{ePayAccount} , #{billNumber} , #{state} , #{donationCode} , #{type} , #{shippingEmail} , #{shopName} , #{shopAddress})")
 	void insertOrder(Order order);
 
 	@Select("SELECT id FROM `order` WHERE order_number = #{orderNumber}")
@@ -88,5 +88,6 @@ public interface OrderRepository {
 									   @Param("endDate") Object endDate);
 	@Update("UPDATE `order` SET result_status = 'PREPARING_SHIPMENT' WHERE id = #{orderNumber}")
 	void updateStatus(@Param("orderNumber") Long orderNumber);
-
+	@Update("UPDATE `order` SET result_status = 'FAILED_PAYMENT' WHERE id = #{orderNumber}")
+	void updateStatusByFail(@Param("orderNumber") Long orderNumber);
 }

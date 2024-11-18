@@ -25,6 +25,8 @@ public class OrderDetailRes {
 	private StoreRes storeProduct;
 	private ProductDetailRes productDetailRes;
 	private List<String> imageUrls;
+	private DetailRes detailRes;
+	private String pName;
 
 
 }

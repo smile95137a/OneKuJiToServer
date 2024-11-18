@@ -26,6 +26,7 @@ public class ShippingMethodService {
     public void createShippingMethod(ShippingMethodReq shippingMethodReq) {
         shippingMethodReq.setUpdateDate(LocalDateTime.now());
         shippingMethodReq.setCreateDate(LocalDateTime.now());
+        shippingMethodReq.setCode(shippingMethodReq.getName());
         shippingMethodRepository.insert(shippingMethodReq);
     }
 

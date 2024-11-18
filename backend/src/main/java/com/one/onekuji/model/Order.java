@@ -132,5 +132,11 @@ public class Order {
 
     @Column(name = "OPMode")
     private String OPMode;
+    @Column(name = "shipping_mehtod_id")
+    private String shippingMethodId;
 
+    @Column(name = "shop_name")
+    private String shopName; //門市名稱
+    @Column(name = "shop_address")
+    private String shopAddress;
 }

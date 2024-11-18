@@ -6,7 +6,10 @@ public enum OrderStatus {
 
     SOLD_OUT("售罄"),
 
-    NO_PAY("未付款");
+    NO_PAY("未付款"),
+
+    FAILED_PAYMENT("付款失敗");
+
 
     private final String description;
 

@@ -8,7 +8,7 @@ import java.util.List;
 @Mapper
 public interface ProductRecommendationMappingMapper {
 
-    @Select("SELECT a.id , a.store_product_id , a.store_product_recommendation_id , a.created_date , b.product_name , c.recommendation_name FROM product_recommendation_mapping a join store_product b on a.store_product_id = b.store_product_id join store_product_recommendation c on a.store_product_recommendation_id = c.id")
+    @Select("SELECT a.id , a.store_product_id , a.store_product_recommendation_id , a.created_date , b.product_name , c.recommendation_name , b.image_urls FROM product_recommendation_mapping a join store_product b on a.store_product_id = b.store_product_id join store_product_recommendation c on a.store_product_recommendation_id = c.id")
     List<ProductRecommendationMapping> getAllMappings();
 
     @Select("SELECT * FROM product_recommendation_mapping WHERE id = #{id}")

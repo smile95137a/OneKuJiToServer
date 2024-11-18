@@ -71,14 +71,15 @@ public class ExpressController {
 
         // 提取 code 值
         String code = codeRequest.getCode();
-        System.out.println("711".equals(code));
 
         // 設定 POST 的參數
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         if("1".equals(codeRequest.getX())){ //1是mall 2是賞品盒S
-            params.add("Url", "https://onemorelottery.tw/mall-checkout");
+//            params.add("Url", "https://onemorelottery.tw/mall-checkout");
+            params.add("Url", "http://localhost:5173/mall-checkout");
         }else if ("2".equals(codeRequest.getX())){
-            params.add("Url", "https://onemorelottery.tw/member-center/prize-checkout");
+//            params.add("Url", "https://onemorelottery.tw/member-center/prize-checkout");
+            params.add("Url", "http://localhost:5173/member-center/prize-checkout");
         }
 
         params.add("Opmode", "711".equals(code) ? "3" : ("family".equals(code) ? "1" : "0"));

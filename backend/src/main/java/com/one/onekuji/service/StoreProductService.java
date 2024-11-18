@@ -45,6 +45,7 @@ public class StoreProductService {
         StoreProduct storeProduct = convertToEntity(storeProductReq);
         storeProduct.setCreatedAt(LocalDateTime.now());
         storeProduct.setUpdatedAt(LocalDateTime.now());
+        storeProduct.setSoldQuantity(0);
         storeProductMapper.insert(storeProduct);
         return convertToResponse(storeProduct);
     }
@@ -66,9 +67,19 @@ public class StoreProductService {
         BigDecimal height = storeProductReq.getHeight() != null ? storeProductReq.getHeight() : BigDecimal.ZERO;
         BigDecimal width = storeProductReq.getWidth() != null ? storeProductReq.getWidth() : BigDecimal.ZERO;
         BigDecimal length = storeProductReq.getLength() != null ? storeProductReq.getLength() : BigDecimal.ZERO;
+        BigDecimal size = storeProductReq.getSize() != null ? storeProductReq.getSize() : BigDecimal.ZERO;
+        if (size.compareTo(BigDecimal.ZERO) > 0) {
+            // 保證當 size 小於 10 時，不會計算出 0，維持最小尺寸為 1
+            BigDecimal dimension = size.subtract(BigDecimal.TEN).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
+            // 設置長度、寬度和高度
+            length = dimension.max(BigDecimal.ONE);  // 最小為 1
+            width = dimension.max(BigDecimal.ONE);   // 最小為 1
+            height = BigDecimal.valueOf(2);  // 高度固定為 2
+        }
+
 
         // Perform the multiplication using BigDecimal methods
-        BigDecimal size = height.multiply(width).multiply(length);
+        BigDecimal calculatedSize  = height.multiply(width).multiply(length);
         // Update fields from request
         storeProduct.setProductName(storeProductReq.getProductName());
         storeProduct.setDescription(description);
@@ -83,7 +94,7 @@ public class StoreProductService {
         storeProduct.setSpecialPrice(storeProductReq.getSpecialPrice());
         storeProduct.setShippingMethod(storeProductReq.getShippingMethod());
         storeProduct.setShippingPrice(storeProductReq.getShippingPrice());
-        storeProduct.setSize(size);
+        storeProduct.setSize(calculatedSize);
         storeProduct.setSpecification(specification);
         storeProduct.setUpdatedAt(LocalDateTime.now());
         storeProduct.setDetails(formatTextToHtml(storeProductReq.getDetails()));
@@ -125,7 +136,9 @@ public class StoreProductService {
                 storeProduct.getWidth(),
                 storeProduct.getHeight(),
                 storeProduct.getSpecification(),
-                storeProduct.getDetails()
+                storeProduct.getDetails(),
+                storeProduct.getSoldQuantity()
+
         );
     }
 
@@ -133,9 +146,18 @@ public class StoreProductService {
         BigDecimal height = storeProductReq.getHeight() != null ? storeProductReq.getHeight() : BigDecimal.ZERO;
         BigDecimal width = storeProductReq.getWidth() != null ? storeProductReq.getWidth() : BigDecimal.ZERO;
         BigDecimal length = storeProductReq.getLength() != null ? storeProductReq.getLength() : BigDecimal.ZERO;
+        BigDecimal size = storeProductReq.getSize() != null ? storeProductReq.getSize() : BigDecimal.ZERO;
+        if (size.compareTo(BigDecimal.ZERO) > 0) {
+            // 保證當 size 小於 10 時，不會計算出 0，維持最小尺寸為 1
+            BigDecimal dimension = size.subtract(BigDecimal.TEN).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
+            // 設置長度、寬度和高度
+            length = dimension.max(BigDecimal.ONE);  // 最小為 1
+            width = dimension.max(BigDecimal.ONE);   // 最小為 1
+            height = BigDecimal.valueOf(2);  // 高度固定為 2
+        }
         String description = formatTextToHtml(storeProductReq.getDescription());
         String specification = formatTextToHtml(storeProductReq.getSpecification());
-        BigDecimal size = height.multiply(width).multiply(length);
+        BigDecimal calculatedSize  = height.multiply(width).multiply(length);
         StoreProduct storeProduct = new StoreProduct();
         storeProduct.setProductCode(UUID.randomUUID().toString());
         storeProduct.setHeight(height);
@@ -149,7 +171,7 @@ public class StoreProductService {
         storeProduct.setCategoryId(storeProductReq.getCategoryId());
         storeProduct.setStatus(String.valueOf(storeProductReq.getStatus()));
         storeProduct.setSpecialPrice(storeProductReq.getSpecialPrice());
-        storeProduct.setSize(size);
+        storeProduct.setSize(calculatedSize);
         storeProduct.setShippingMethod(storeProductReq.getShippingMethod());
         storeProduct.setShippingPrice(storeProductReq.getShippingPrice());
         storeProduct.setSpecification(specification);

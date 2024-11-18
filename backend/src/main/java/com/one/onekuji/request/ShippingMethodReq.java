@@ -22,4 +22,5 @@ public class ShippingMethodReq {
     private LocalDateTime createDate;
 
     private LocalDateTime updateDate;
+    private String code;
 }

@@ -147,4 +147,12 @@ public class Order {
 
     @Column(name = "type")
     private String type;
+
+    @Column(name = "shipping_method_id")
+    private String shippingMethodId;
+
+    @Column(name = "shop_name")
+    private String shopName; //門市名稱
+    @Column(name = "shop_address")
+    private String shopAddress;
 }

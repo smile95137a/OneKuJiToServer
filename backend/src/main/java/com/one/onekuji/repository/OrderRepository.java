@@ -48,7 +48,9 @@ public interface OrderRepository {
             @Result(property = "bonusPointsEarned", column = "bonus_points_earned"),
             @Result(property = "bonusPointsUsed", column = "bonus_points_used"),
             @Result(property = "resultStatus", column = "result_status"),
-            @Result(property = "createdAt", column = "created_at"), })
+            @Result(property = "createdAt", column = "created_at"),
+            @Result(property = "shippingMethodId", column = "shipping_method_id"),
+    })
     @Select("SELECT o.* FROM `order` o WHERE o.order_number = #{orderNumber}")
     OrderRes findOrderByOrderNumber(String orderNumber);
 
@@ -58,19 +60,23 @@ public interface OrderRepository {
 
         var sql = new SQL() {
             {
-                SELECT("*");
-                FROM("`order`");
+                SELECT("o.*, sm.shipping_method_id, sm.name"); // 這裡選擇了運輸方式的 ID 和名稱
+                FROM("`order` o");
+                LEFT_OUTER_JOIN("shipping_method sm ON o.shipping_method_id = sm.shipping_method_id"); // 假設 `order` 表有 `shipping_method_id` 字段
                 if (startDate != null) {
-                    WHERE("created_at >= #{startDate}");
+                    WHERE("o.created_at >= #{startDate}");
                 }
                 if (endDate != null) {
-                    WHERE("created_at <= #{endDate}");
+                    WHERE("o.created_at <= #{endDate}");
                 }
+                // 使用正確的 SQL 語法 ORDER BY
+                ORDER_BY("o.created_at DESC");  // 注意這裡的修正
             }
         }.toString();
 
         return sql;
     }
+
 
     @SelectProvider(type = OrderRepository.class, method = "buildFindOrdersByDateRange")
     @ResultMap("orderResultMap")

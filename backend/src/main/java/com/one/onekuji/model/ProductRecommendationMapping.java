@@ -1,10 +1,12 @@
 package com.one.onekuji.model;
 
+import com.one.onekuji.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Schema(description = "商品與推薦類別關聯模型")
@@ -45,4 +47,6 @@ public class ProductRecommendationMapping {
     private String productName;
 
     private String recommendationName;
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrls;
 }

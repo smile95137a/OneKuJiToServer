@@ -27,10 +27,11 @@ public interface OrderDetailMapper {
             "    COALESCE(sp.product_name, pd.product_name) AS productName,",
             "    COALESCE(sp.image_urls, pd.image_urls) AS imageUrls,",
             "    sp.store_product_id, sp.description, sp.price, sp.stock_quantity,",
-            "    pd.product_detail_id",
+            "    pd.product_detail_id , pd.grade , p.product_name as pName",
             "FROM order_detail od",
             "LEFT JOIN store_product sp ON od.store_product_id = sp.store_product_id",
             "LEFT JOIN product_detail pd ON od.product_detail_id = pd.product_detail_id",
+            "LEFT JOIN product p ON p.product_id = pd.product_id",
             "WHERE od.order_id = #{orderId}",
             "</script>"
     })
@@ -54,7 +55,8 @@ public interface OrderDetailMapper {
             // Product detail mapping
             @Result(property = "productDetailRes.productDetailId", column = "product_detail_id"),
             @Result(property = "productDetailRes.productName", column = "productName"),
-            @Result(property = "productDetailRes.imageUrls", column = "imageUrls")
+            @Result(property = "productDetailRes.imageUrls", column = "imageUrls"),
+            @Result(property = "productDetailRes.grade" , column = "grade")
     })
     List<OrderDetailRes> findOrderDetailsByOrderId(Long orderId);
 }

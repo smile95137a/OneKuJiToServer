@@ -42,16 +42,7 @@ public class OrderService {
 	@Autowired
 	private PrizeCartItemService prizeCartItemService;
 	@Autowired
-	private OrderTempMapper orderTempMapper;
-	@Autowired
-	private OrderDetailTempMapper orderDetailTempMapper;
-	@Autowired
-	private InvoiceService invoiceService;
-	@Autowired
 	private StoreProductRepository storeProductRepository;
-	@Autowired
-	private ProductDetailRepository productDetailRepository;
-
 	@Autowired
 	private ShippingMethodRepository shippingMethodRepository;
 	public String ecpayCheckout(Integer userId) {
@@ -215,6 +206,9 @@ public class OrderService {
 						.shopId(payCartRes.getShopId())
 						.OPMode("711".equals(payCartRes.getShippingMethod()) ? "3" : "family".equals(payCartRes.getShippingMethod()) ? "1" : "0")
 						.type("1")
+						.shippingMethodId(payCartRes.getShippingMethodId())
+						.shopName(payCartRes.getShopName())
+						.shopAddress(payCartRes.getShopAddress())
 						.build();
 			if(paymentResponse.getEPayAccount() != null){
 				orderEntity.setBillNumber(paymentResponse.getEPayAccount());
@@ -228,12 +222,11 @@ public class OrderService {
 			PaymentResponse finalPaymentResponse = paymentResponse;
 				if("1".equals(payCartRes.getPaymentMethod())) {
 					// 插入訂單到資料庫
-					orderEntity.setResultStatus(OrderStatus.PREPARING_SHIPMENT);
+					orderEntity.setResultStatus(OrderStatus.NO_PAY);
 					orderRepository.insertOrder(orderEntity);
 
 					// 根據訂單號查詢訂單ID
 					Long orderId = orderRepository.getOrderIdByOrderNumber(paymentResponse.getOrderId());
-
 					// 轉換購物車項目到訂單詳情並保存
 					cartItemList.stream().map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId , finalPaymentResponse.getEPayAccount())) // 映射購物車項目為訂單詳情
 							.forEach(orderDetail -> orderDetailRepository.saveOrderDetail(orderDetail)); // 保存訂單詳情
@@ -250,6 +243,11 @@ public class OrderService {
 
 					cartItemList.stream().map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId , finalPaymentResponse.getEPayAccount())) // 映射購物車項目為訂單詳情
 							.forEach(orderDetail -> orderDetailRepository.saveOrderDetail(orderDetail)); // 保存訂單詳情
+
+					List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+
+					// 移除購物車項
+					cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
 
 				}
 
@@ -323,6 +321,9 @@ public class OrderService {
 					.shopId(payCartRes.getShopId())
 					.OPMode("711".equals(payCartRes.getShippingMethod()) ? "3" : "family".equals(payCartRes.getShippingMethod()) ? "1" : "0")
 					.type("2")
+					.shippingMethodId(payCartRes.getShippingMethodId())
+					.shopName(payCartRes.getShopName())
+					.shopAddress(payCartRes.getShopAddress())
 					.build();
 			if(paymentResponse.getEPayAccount() != null){
 				orderEntity.setBillNumber(paymentResponse.getEPayAccount());
@@ -335,7 +336,7 @@ public class OrderService {
 			PaymentResponse finalPaymentResponse = paymentResponse;
 			if("1".equals(payCartRes.getPaymentMethod())) {
 				// 插入訂單到資料庫
-				orderEntity.setResultStatus(OrderStatus.PREPARING_SHIPMENT);
+				orderEntity.setResultStatus(OrderStatus.NO_PAY);
 				orderRepository.insertOrder(orderEntity);
 
 				// 根據訂單號查詢訂單ID
@@ -402,6 +403,12 @@ public class OrderService {
 				if (!orderDetails.isEmpty()) {
 					orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
 				}
+
+				// 獲取所有購物車項的ID並移除
+				List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+
+				// 移除購物車項
+				prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
 
 			}
 			this.recordConsume(userId , shippingCost);

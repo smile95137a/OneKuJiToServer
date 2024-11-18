@@ -25,4 +25,14 @@ public interface OrderDetailTempMapper {
 
     @Delete("DELETE FROM order_detail_temp WHERE order_id = #{id}")
     void deleteOrderDetail(Long id);
+
+    @Insert({
+            "<script>",
+            "INSERT INTO order_detail_temp (order_id, product_detail_id, quantity, total_price , bill_number) VALUES ",
+            "<foreach collection='orderDetails' item='orderDetail' separator=','>",
+            "(#{orderDetail.orderId}, #{orderDetail.productDetailId}, #{orderDetail.quantity}, #{orderDetail.totalPrice} , #{orderDetail.billNumber})",
+            "</foreach>",
+            "</script>"
+    })
+    void savePrizeOrderDetailBatch(@Param("orderDetails") List<OrderDetail> orderDetails);
 }

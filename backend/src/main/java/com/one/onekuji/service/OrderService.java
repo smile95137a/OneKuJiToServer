@@ -3,6 +3,7 @@ package com.one.onekuji.service;
 import com.one.onekuji.model.Order;
 import com.one.onekuji.repository.OrderDetailMapper;
 import com.one.onekuji.repository.OrderRepository;
+import com.one.onekuji.repository.ShippingMethodRepository;
 import com.one.onekuji.request.OrderQueryReq;
 import com.one.onekuji.response.OrderRes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class OrderService {
 
     @Autowired
     private OrderDetailMapper orderDetailMapper;
+
+    @Autowired
+    private ShippingMethodRepository shippingMethodRepository;
 
     public void createOrder(Order order) {
         orderMapper.insertOrder(order);
@@ -59,6 +63,10 @@ public class OrderService {
                 .map(order -> {
                     System.out.println(order);
                     order.setOrderDetails(orderDetailMapper.findOrderDetailsByOrderId(order.getId()));
+                    order.setOrderCount(orderDetailMapper.findOrderDetailsByOrderId(order.getId()).stream().count());
+                    if(order.getShippingMethodId() != null){
+                        order.setShippingMethodName(shippingMethodRepository.findById(Long.valueOf(order.getShippingMethodId())).getName());
+                    }
                     return order;
                 })
                 .collect(Collectors.toList());

@@ -1,5 +1,6 @@
 package com.one.frontend.request;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,6 +51,9 @@ public class PayCartRes {
     private String shopId;
     private Boolean cardResult;
     private String orderId;
+    private String shippingMethodId;
+    private String shopName; //門市名稱
+    private String shopAddress;
 }
 
 
