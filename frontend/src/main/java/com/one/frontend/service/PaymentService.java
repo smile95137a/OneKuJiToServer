@@ -512,64 +512,62 @@ return null;
 
 
         // 訂單成立開立發票並且傳送至email
-        // 构建发票请求
         ReceiptReq invoiceRequest = new ReceiptReq();
-
-// 设置订单号，如果有车辆信息，则使用车辆作为订单号，否则使用订单ID
         if (order.getVehicle() != null) {
             invoiceRequest.setOrderCode(order.getVehicle());
         } else {
+            // 如果 order.getVehicle() 为空，可以选择使用订单号或其他标识符
             invoiceRequest.setOrderCode(order.getId().toString());
         }
-
-// 设置电子邮件
         invoiceRequest.setEmail(userById.getUsername());
-
-// 设置发票状态和捐赠信息
         if (order.getState() != null) {
-            invoiceRequest.setState(1);  // 发票捐赠
-            invoiceRequest.setDonationCode(order.getDonationCode()); // 捐赠码
+            invoiceRequest.setState(1);
+            invoiceRequest.setDonationCode(order.getDonationCode());
         } else {
-            invoiceRequest.setState(0);  // 非捐赠
+            invoiceRequest.setState(0);
         }
 
-// 设置总金额（确保BigDecimal转换为字符串格式）
-        BigDecimal amountToSend = order.getTotalAmount();
-        invoiceRequest.setTotalFee(amountToSend != null ? amountToSend.toPlainString() : "0");
+// 确保金额是正确的格式，并将 BigDecimal 转换为字符串
+        String amountToSend = String.valueOf(order.getTotalAmount());
+        invoiceRequest.setTotalFee(amountToSend != null ? amountToSend : "0");
 
-// 设置商品项
         List<ReceiptReq.Item> items = new ArrayList<>();
         for (OrderDetailRes cartItem : orderDetailsByOrderId) {
             ReceiptReq.Item item = new ReceiptReq.Item();
 
-            // 获取产品详细信息和商店产品信息
+            // 确保获取到有效的产品详细信息
             ProductDetailRes productDetail = productDetailRepository.getProductDetailById(cartItem.getProductDetailRes().getProductDetailId());
             StoreProductRes storeProduct = storeProductRepository.findResById(cartItem.getStoreProduct().getStoreProductId());
 
             if (productDetail != null) {
-                // 使用产品名称、数量、单价
+                // 使用产品名称，如果没有则使用“商品”
                 item.setName(productDetail.getProductName() != null ? productDetail.getProductName() : "商品");
                 item.setNumber(cartItem.getQuantity());
                 item.setMoney(cartItem.getUnitPrice() != null ? cartItem.getUnitPrice().intValue() : cartItem.getTotalPrice().intValue());
+                item.setTaxType(null);
+                item.setRemark(null);
+                items.add(item);
             } else if (storeProduct != null) {
                 // 如果没有找到 ProductDetail，则使用 StoreProduct 信息
                 item.setName(storeProduct.getProductName() != null ? storeProduct.getProductName() : "商品");
                 item.setNumber(cartItem.getQuantity());
                 item.setMoney(cartItem.getUnitPrice() != null ? cartItem.getUnitPrice().intValue() : cartItem.getTotalPrice().intValue());
+                item.setTaxType(null);
+                item.setRemark(null);
+                items.add(item);
             } else {
-                // 如果没有找到相关商品信息，可以记录日志或处理异常
-                item.setName("未知商品");
+                // 如果都没有找到相关商品信息，可以记录日志或处理异常
+                item.setName("商品");
                 item.setNumber(cartItem.getQuantity());
                 item.setMoney(0);  // 默认金额为 0
+                item.setTaxType(null);
+                item.setRemark(null);
+                items.add(item);
             }
-
-            items.add(item);
         }
 
-// 设置发票商品项列表
         invoiceRequest.setItems(items);
 
-// 发送请求调用发票接口
         ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
         ReceiptRes receiptRes = res.getBody();
         System.out.println(receiptRes);

@@ -104,30 +104,9 @@ public class InvoiceService {
         String formattedDate = currentDate.format(formatter);
         String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
 //        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
-//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("47075614").idno("eason")
-//                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
-        ReceiptReq req = ReceiptReq.builder()
-                .timeStamp(date)
-                .uncode("47075614") // 统一编号
-                .idno("eason")   // API账号
-                .sign(md5)     // MD5签名
-                .customerName(null)
-                .phone(null)
-                .orderCode(invoiceRequest.getOrderCode())
-                .datetime(formattedDate)
-                .email(invoiceRequest.getEmail())
-                .state(invoiceRequest.getState())
-                .donationCode(invoiceRequest.getDonationCode())
-                .taxType(0)    // 默认为0
-                .companyCode(null)
-                .freeAmount(0) // 默认为0
-                .zeroAmount(0) // 默认为0
-                .sales(0)      // 默认为0
-                .totalFee(invoiceRequest.getTotalFee())
-                .content("再來一抽備註")
-                .items(invoiceRequest.getItems()) // 确保items符合接口要求
-                .build();
-        //        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
+        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("47075614").idno("eason")
+                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
+//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
 //                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
 
         // 发送 POST 请求
