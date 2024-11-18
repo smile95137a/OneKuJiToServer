@@ -659,6 +659,7 @@ return null;
         if ("IS_PAY".equals(status)) {
             return false;
         } else {
+
             BigDecimal amountDecimal = userTransaction.getAmount();
             int amount = amountDecimal.intValue();
             userRepository.updateBalance(userTransaction.getUserId(), amount);
@@ -678,7 +679,7 @@ return null;
 
             ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
             ReceiptRes receiptRes = res.getBody();
-            invoiceService.getInvoicePicture(receiptRes.getCode() , userById.getId());
+            invoiceService.getInvoicePicture(receiptRes.getCode() , userTransaction.getUserId());
             return true;
         }
     }
