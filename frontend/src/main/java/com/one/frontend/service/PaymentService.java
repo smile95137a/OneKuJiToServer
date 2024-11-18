@@ -534,7 +534,7 @@ return null;
         }
 
 // 确保金额格式正确，并将 BigDecimal 转换为字符串
-        String amountToSend = order.getTotalAmount() != null ? order.getTotalAmount().toPlainString() : "0";
+        String amountToSend = order.getTotalAmount() != null ? order.getTotalAmount().toPlainString() : "1";
         invoiceRequest.setTotalFee(amountToSend);
 
 // 设置时间戳（当前时间）和其他缺失字段
