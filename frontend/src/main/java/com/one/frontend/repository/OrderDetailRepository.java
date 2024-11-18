@@ -57,7 +57,7 @@ public interface OrderDetailRepository {
             "FROM order_detail od",
             "LEFT JOIN store_product sp ON od.store_product_id = sp.store_product_id",
             "LEFT JOIN product_detail pd ON od.product_detail_id = pd.product_detail_id",
-            "WHERE od.order_id = #{orderId}",
+            "WHERE od.order_id = #{orderId} order by created_at desc",
             "</script>"
     })
     @Results({

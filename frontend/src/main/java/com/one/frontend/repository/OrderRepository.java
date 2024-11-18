@@ -63,6 +63,7 @@ public interface OrderRepository {
 				if (endDate != null) {
 					WHERE("created_at <= #{endDate}");
 				}
+				ORDER_BY("created_at desc");
 			}
 		}.toString();
 

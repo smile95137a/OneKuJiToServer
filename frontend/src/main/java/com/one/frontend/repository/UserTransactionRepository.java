@@ -38,13 +38,13 @@ public interface UserTransactionRepository {
                                              @Param("endDate") LocalDate endDate);
 
     @Select("SELECT * FROM user_transaction WHERE user_id = #{userId} " +
-            "AND transaction_date BETWEEN #{startDate} AND #{endDate}")
+            "AND transaction_date BETWEEN #{startDate} AND #{endDate} order by transaction_date desc")
     List<UserTransaction> findTransactionsByUserIdAndDateRange(
             @Param("userId") Long userId,
             @Param("startDate") Date startDate,
             @Param("endDate") Date endDate);
 
-    @Select("SELECT * FROM user_transaction WHERE user_id = #{userId}")
+    @Select("SELECT * FROM user_transaction WHERE user_id = #{userId} order by transaction_date desc")
     List<UserTransaction> findAllTransactionsByUserId(@Param("userId") Long userId);
     @Update("UPDATE user_transaction SET status = 'IS_PAY', order_id = #{creditDto.orderId} WHERE order_number = #{creditDto.orderNumber}")
     void updateStatus(@Param("creditDto") CreditDto creditDto);
