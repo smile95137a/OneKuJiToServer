@@ -68,18 +68,24 @@ public class StoreProductService {
         BigDecimal width = storeProductReq.getWidth() != null ? storeProductReq.getWidth() : BigDecimal.ZERO;
         BigDecimal length = storeProductReq.getLength() != null ? storeProductReq.getLength() : BigDecimal.ZERO;
         BigDecimal size = storeProductReq.getSize() != null ? storeProductReq.getSize() : BigDecimal.ZERO;
+
         if (size.compareTo(BigDecimal.ZERO) > 0) {
-            // 保證當 size 小於 10 時，不會計算出 0，維持最小尺寸為 1
+            // 计算dimension，最小值为1
             BigDecimal dimension = size.subtract(BigDecimal.TEN).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
-            // 設置長度、寬度和高度
-            length = dimension.max(BigDecimal.ONE);  // 最小為 1
-            width = dimension.max(BigDecimal.ONE);   // 最小為 1
-            height = BigDecimal.valueOf(2);  // 高度固定為 2
+            length = dimension.max(BigDecimal.ONE);
+            width = dimension.max(BigDecimal.ONE);
+            height = BigDecimal.valueOf(2);  // 高度固定为2
         }
 
 
-        // Perform the multiplication using BigDecimal methods
-        BigDecimal calculatedSize  = height.multiply(width).multiply(length);
+        // 使用length + width + 10的计算方式（前端逻辑一致）
+        BigDecimal calculatedSize = length.add(width).add(BigDecimal.TEN);
+
+// 如果计算结果小于20，返回10
+        if (calculatedSize.compareTo(BigDecimal.valueOf(20)) < 0) {
+            calculatedSize = BigDecimal.valueOf(10);
+        }
+
         // Update fields from request
         storeProduct.setProductName(storeProductReq.getProductName());
         storeProduct.setDescription(description);
@@ -147,17 +153,20 @@ public class StoreProductService {
         BigDecimal width = storeProductReq.getWidth() != null ? storeProductReq.getWidth() : BigDecimal.ZERO;
         BigDecimal length = storeProductReq.getLength() != null ? storeProductReq.getLength() : BigDecimal.ZERO;
         BigDecimal size = storeProductReq.getSize() != null ? storeProductReq.getSize() : BigDecimal.ZERO;
+
         if (size.compareTo(BigDecimal.ZERO) > 0) {
-            // 保證當 size 小於 10 時，不會計算出 0，維持最小尺寸為 1
+            // 计算dimension，最小值为1
             BigDecimal dimension = size.subtract(BigDecimal.TEN).divide(BigDecimal.valueOf(2), BigDecimal.ROUND_HALF_UP);
-            // 設置長度、寬度和高度
-            length = dimension.max(BigDecimal.ONE);  // 最小為 1
-            width = dimension.max(BigDecimal.ONE);   // 最小為 1
-            height = BigDecimal.valueOf(2);  // 高度固定為 2
+            length = dimension.max(BigDecimal.ONE);
+            width = dimension.max(BigDecimal.ONE);
+            height = BigDecimal.valueOf(2);  // 高度固定为2
         }
         String description = formatTextToHtml(storeProductReq.getDescription());
         String specification = formatTextToHtml(storeProductReq.getSpecification());
-        BigDecimal calculatedSize  = height.multiply(width).multiply(length);
+        BigDecimal calculatedSize = length.add(width).add(BigDecimal.TEN);
+        if (calculatedSize.compareTo(BigDecimal.valueOf(20)) < 0) {
+            calculatedSize = BigDecimal.valueOf(10);
+        }
         StoreProduct storeProduct = new StoreProduct();
         storeProduct.setProductCode(UUID.randomUUID().toString());
         storeProduct.setHeight(height);
