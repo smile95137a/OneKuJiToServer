@@ -518,7 +518,7 @@ return null;
         if (order.getVehicle() != null) {
             invoiceRequest.setOrderCode(order.getVehicle());
         } else {
-            invoiceRequest.setOrderCode(order.getId().toString());  // 使用订单ID作为备用
+            invoiceRequest.setOrderCode(null);  // 使用订单ID作为备用
         }
 
 // 设置电子邮件
@@ -548,6 +548,7 @@ return null;
         invoiceRequest.setZeroAmount(null);  // 如果有零金额，设置
         invoiceRequest.setSales(null);  // 销售人员设置，如果有的话
         invoiceRequest.setContent(null);  // 可能是发票的详细内容，如果有可以填充
+        invoiceRequest.setAmount(null);
 
 // 创建并设置商品项列表
         List<ReceiptReq.Item> items = new ArrayList<>();
