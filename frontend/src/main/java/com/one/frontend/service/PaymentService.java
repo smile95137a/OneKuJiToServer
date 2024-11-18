@@ -659,30 +659,6 @@ return null;
         if ("IS_PAY".equals(status)) {
             return false;
         } else {
-
-            OrderRes order = orderMapper.findOrderByOrderNumber(creditDto.getOrderId());
-            UserRes userById = userRepository.getUserById(order.getUserId());
-            List<OrderDetailRes> orderDetailsByOrderId = orderDetailRepository.findOrderDetailsByOrderId(order.getId());
-            Long cartIdByUserId = cartRepository.getCartIdByUserId(order.getUserId());
-            List<CartItem> cartItemList = cartItemRepository.find(cartIdByUserId);
-            Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(order.getUserId());
-            List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId1);
-            if("1".equals(order.getType())){
-                // 獲取所有購物車項的ID並移除
-                List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
-
-                // 移除購物車項
-                cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
-            }else if("2".equals(order.getType())){
-// 獲取所有購物車項的ID並移除
-                List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
-
-                // 移除購物車項
-                prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
-            }
-
-
-
             BigDecimal amountDecimal = userTransaction.getAmount();
             int amount = amountDecimal.intValue();
             userRepository.updateBalance(userTransaction.getUserId(), amount);
