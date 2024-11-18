@@ -511,31 +511,49 @@ return null;
 
 
 
-        // 訂單成立開立發票並且傳送至email
+        // 生成发票请求对象
         ReceiptReq invoiceRequest = new ReceiptReq();
+
+// 设置订单号，如果有车辆信息，则使用车辆作为订单号，否则使用订单ID
         if (order.getVehicle() != null) {
             invoiceRequest.setOrderCode(order.getVehicle());
         } else {
-            // 如果 order.getVehicle() 为空，可以选择使用订单号或其他标识符
-            invoiceRequest.setOrderCode(order.getId().toString());
+            invoiceRequest.setOrderCode(order.getId().toString());  // 使用订单ID作为备用
         }
+
+// 设置电子邮件
         invoiceRequest.setEmail(userById.getUsername());
+
+// 设置发票状态和捐赠信息
         if (order.getState() != null) {
-            invoiceRequest.setState(1);
-            invoiceRequest.setDonationCode(order.getDonationCode());
+            invoiceRequest.setState(1);  // 发票捐赠
+            invoiceRequest.setDonationCode(order.getDonationCode());  // 设置捐赠码
         } else {
-            invoiceRequest.setState(0);
+            invoiceRequest.setState(0);  // 非捐赠
         }
 
-// 确保金额是正确的格式，并将 BigDecimal 转换为字符串
-        String amountToSend = String.valueOf(order.getTotalAmount());
-        invoiceRequest.setTotalFee(amountToSend != null ? amountToSend : "0");
+// 确保金额格式正确，并将 BigDecimal 转换为字符串
+        String amountToSend = order.getTotalAmount() != null ? order.getTotalAmount().toPlainString() : "0";
+        invoiceRequest.setTotalFee(amountToSend);
 
+// 设置时间戳（当前时间）和其他缺失字段
+        invoiceRequest.setTimeStamp(String.valueOf(System.currentTimeMillis()));  // 当前时间戳
+        invoiceRequest.setCustomerName(null);  // 可以根据需要设置客户名
+        invoiceRequest.setPhone(null);  // 可以根据需要设置客户电话
+        invoiceRequest.setDatetime("2024-09-27 12:34:56");  // 设定日期时间
+        invoiceRequest.setTaxType(null);  // 设置税种，如果没有可以为 null
+        invoiceRequest.setCompanyCode(null);  // 如果有公司代码，设置
+        invoiceRequest.setFreeAmount(null);  // 如果有免费金额，设置
+        invoiceRequest.setZeroAmount(null);  // 如果有零金额，设置
+        invoiceRequest.setSales(null);  // 销售人员设置，如果有的话
+        invoiceRequest.setContent(null);  // 可能是发票的详细内容，如果有可以填充
+
+// 创建并设置商品项列表
         List<ReceiptReq.Item> items = new ArrayList<>();
         for (OrderDetailRes cartItem : orderDetailsByOrderId) {
             ReceiptReq.Item item = new ReceiptReq.Item();
 
-            // 确保获取到有效的产品详细信息
+            // 获取产品详细信息和商店产品信息
             ProductDetailRes productDetail = productDetailRepository.getProductDetailById(cartItem.getProductDetailRes().getProductDetailId());
             StoreProductRes storeProduct = storeProductRepository.findResById(cartItem.getStoreProduct().getStoreProductId());
 
@@ -544,8 +562,8 @@ return null;
                 item.setName(productDetail.getProductName() != null ? productDetail.getProductName() : "商品");
                 item.setNumber(cartItem.getQuantity());
                 item.setMoney(cartItem.getUnitPrice() != null ? cartItem.getUnitPrice().intValue() : cartItem.getTotalPrice().intValue());
-                item.setTaxType(null);
-                item.setRemark(null);
+                item.setTaxType(null);  // 如果有税种信息可以填充
+                item.setRemark(null);   // 如果有备注信息可以填充
                 items.add(item);
             } else if (storeProduct != null) {
                 // 如果没有找到 ProductDetail，则使用 StoreProduct 信息
@@ -566,10 +584,12 @@ return null;
             }
         }
 
+// 设置商品项列表
         invoiceRequest.setItems(items);
 
+// 调用发票服务生成发票并返回结果
         ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
-        ReceiptRes receiptRes = res.getBody();
+        ReceiptRes receiptRes = res.getBody();  // 获取发票响应结果
         System.out.println(receiptRes);
         invoiceService.getInvoicePicture(receiptRes.getCode() , userById.getId());
 
