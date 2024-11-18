@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -534,8 +535,11 @@ return null;
         }
 
 // 确保金额格式正确，并将 BigDecimal 转换为字符串
-        String amountToSend = order.getTotalAmount() != null ? order.getTotalAmount().toPlainString() : "1";
+        String amountToSend = order.getTotalAmount() != null
+                ? order.getTotalAmount().setScale(0, RoundingMode.DOWN).toPlainString()  // 强制去掉小数部分
+                : "1";
         invoiceRequest.setTotalFee(amountToSend);
+
 
 // 设置时间戳（当前时间）和其他缺失字段
         invoiceRequest.setTimeStamp(String.valueOf(System.currentTimeMillis()));  // 当前时间戳

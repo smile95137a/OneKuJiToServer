@@ -108,7 +108,7 @@ public class InvoiceService {
                 .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
 //        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
 //                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
-
+        System.out.println(req);
         // 发送 POST 请求
         try {
             // 直接发送 JSON 对象
