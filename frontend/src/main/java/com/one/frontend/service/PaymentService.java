@@ -588,7 +588,7 @@ return null;
 
 // 设置商品项列表
         invoiceRequest.setItems(items);
-
+        System.out.println(invoiceRequest);
 // 调用发票服务生成发票并返回结果
         ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
         ReceiptRes receiptRes = res.getBody();  // 获取发票响应结果
