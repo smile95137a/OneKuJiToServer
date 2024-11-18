@@ -530,6 +530,7 @@ return null;
             invoiceRequest.setDonationCode(order.getDonationCode());  // 设置捐赠码
         } else {
             invoiceRequest.setState(0);  // 非捐赠
+            invoiceRequest.setDonationCode(null);
         }
 
 // 确保金额格式正确，并将 BigDecimal 转换为字符串
