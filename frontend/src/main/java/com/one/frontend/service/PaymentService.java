@@ -138,8 +138,8 @@ return null;
 
 
     public PaymentResponse webATM(PaymentRequest paymentRequest) {
-//       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-         String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+//         String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("4".trim())  // 傳送型態，去除空白
@@ -198,8 +198,8 @@ return null;
     }
 
     public PaymentResponse webATM2(PaymentRequest paymentRequest) {
-//       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
-         String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
+       String url = "https://n.gomypay.asia/ShuntClass.aspx";  //正式
+//         String url = "https://n.gomypay.asia/TestShuntClass.aspx";  //測試
 
         PaymentRequest req = PaymentRequest.builder()
                 .sendType("4".trim())  // 傳送型態，去除空白
