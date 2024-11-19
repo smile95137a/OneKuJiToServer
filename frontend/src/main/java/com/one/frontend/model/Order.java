@@ -155,4 +155,7 @@ public class Order {
     private String shopName; //門市名稱
     @Column(name = "shop_address")
     private String shopAddress;
+
+    @Column(name = "vehicle")
+    private String vehicle;
 }

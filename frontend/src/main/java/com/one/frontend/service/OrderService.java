@@ -219,6 +219,10 @@ public class OrderService {
 				orderEntity.setDonationCode(payCartRes.getDonationCode());
 			}
 
+			if(payCartRes.getVehicle() != null){
+				orderEntity.setVehicle(payCartRes.getVehicle());
+			}
+
 			PaymentResponse finalPaymentResponse = paymentResponse;
 				if("1".equals(payCartRes.getPaymentMethod())) {
 					// 插入訂單到資料庫
@@ -327,6 +331,10 @@ public class OrderService {
 					.build();
 			if(paymentResponse.getEPayAccount() != null){
 				orderEntity.setBillNumber(paymentResponse.getEPayAccount());
+			}
+
+			if(payCartRes.getVehicle() != null){
+				orderEntity.setVehicle(payCartRes.getVehicle());
 			}
 
 			if(payCartRes.getState() != null){

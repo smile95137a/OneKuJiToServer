@@ -544,7 +544,9 @@ return null;
 // 设置时间戳（当前时间）和其他缺失字段
         invoiceRequest.setTimeStamp(String.valueOf(System.currentTimeMillis()));  // 当前时间戳
         invoiceRequest.setCustomerName(null);  // 可以根据需要设置客户名
-        invoiceRequest.setPhone(null);  // 可以根据需要设置客户电话
+        if(order.getVehicle() != null){
+            invoiceRequest.setPhone(order.getVehicle());
+        }
         invoiceRequest.setDatetime("2024-09-27 12:34:56");  // 设定日期时间
         invoiceRequest.setTaxType(null);  // 设置税种，如果没有可以为 null
         invoiceRequest.setCompanyCode(null);  // 如果有公司代码，设置
