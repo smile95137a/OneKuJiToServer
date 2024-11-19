@@ -44,7 +44,8 @@ public class DrawResultService {
 
 	@Autowired
 	private SimpMessagingTemplate messagingTemplate;
-
+	
+	private final MarqueeService marqueeService; 
 
 	// 本地锁，用于锁定抽奖资源
 	private final ConcurrentHashMap<Long, Lock> productLockMap = new ConcurrentHashMap<>();
@@ -287,6 +288,7 @@ public class DrawResultService {
 		int totalDrawCount = drawnPrizeNumbers.size();
 		int remainingDrawCount = totalDrawCount;
 		UserRes user = userRepository.getUserById(userId);
+		var marqueeId = marqueeService.createMarquee(userId);
 
 		for (PrizeNumber drawnPrizeNumber : drawnPrizeNumbers) {
 			prizeNumberMapper.markPrizeNumberAsDrawn(drawnPrizeNumber.getPrizeNumberId(),
@@ -298,9 +300,11 @@ public class DrawResultService {
 			DrawResult drawResult = createDrawResult(userId, productId, prizeDetail, product, payMethod,
 					drawnPrizeNumber.getNumber(), totalDrawCount, remainingDrawCount);
 			drawResults.add(drawResult);
-
+			marqueeService.addMarqueeDetail(marqueeId, prizeDetail.getGrade(), prizeDetail.getProductName());
 			// 发送抽奖结果消息
-			sendGachaMessage(user, prizeDetail);
+//			sendGachaMessage(user, prizeDetail);
+			
+			
 
 			remainingDrawCount--;
 		}
