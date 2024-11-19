@@ -25,7 +25,7 @@ public interface ProductRepository {
             "FROM product p " +
             "LEFT JOIN product_summary ps ON p.product_id = ps.product_id " +
             "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
-            "ORDER BY p.product_id " +
+            "ORDER BY p.product_id desc" +
             "LIMIT #{size} OFFSET #{offset}")
 	List<ProductRes> getAllProduct(@Param("offset") int offset, @Param("size") int size);
 
