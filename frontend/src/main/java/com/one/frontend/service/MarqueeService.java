@@ -2,6 +2,8 @@ package com.one.frontend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -51,7 +53,11 @@ public class MarqueeService {
      * 
      * @return 跑馬燈及其明細的列表
      */
-    public List<MarqueeWithDetailsRes> getAllMarqueeWithDetailsAndUser() {
-        return marqueeMapper.findAllWithDetailsAndUser();
+    public Map<Long, List<MarqueeWithDetailsRes>> getAllMarqueeWithDetailsGroupedByMarqueeId() {
+        List<MarqueeWithDetailsRes> marqueeWithDetails = marqueeMapper.findAllWithDetailsAndUser();
+
+        return marqueeWithDetails.stream()
+                .collect(Collectors.groupingBy(MarqueeWithDetailsRes::getMarqueeId));
     }
+
 }
