@@ -27,10 +27,16 @@ public class MarqueeService {
      * @return 插入的跑馬燈 ID
      */
     public Long createMarquee(Long userId) {
+        // 創建 Marquee 對象
         Marquee marquee = new Marquee();
         marquee.setUserId(userId);
         marquee.setCreateDate(LocalDateTime.now());
-        return marqueeMapper.addMarqueeAndReturnId(marquee);
+
+        // 插入數據，主鍵自動設置到 marquee 對象中
+        marqueeMapper.addMarquee(marquee);
+
+        // 返回主鍵 ID
+        return marquee.getId();
     }
 
     /**

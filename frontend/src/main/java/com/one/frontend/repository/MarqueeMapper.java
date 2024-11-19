@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 import com.one.frontend.model.Marquee;
@@ -14,8 +15,10 @@ import com.one.frontend.response.MarqueeWithDetailsRes;
 public interface MarqueeMapper {
 
 	@Insert("INSERT INTO `marquee` (user_id, create_date) " +
-	        "VALUES (#{userId}, #{createDate}) RETURNING id")
-	Long addMarqueeAndReturnId(Marquee marquee);
+	        "VALUES (#{userId}, #{createDate})")
+	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+	void addMarquee(Marquee marquee);
+
 
 	@Insert("INSERT INTO `marquee_detail` (marquee_id, grade, name) " +
 	        "VALUES (#{marqueeId}, #{grade}, #{name})")
