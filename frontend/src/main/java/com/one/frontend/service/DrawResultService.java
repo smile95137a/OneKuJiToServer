@@ -302,7 +302,7 @@ public class DrawResultService {
 			drawResults.add(drawResult);
 			marqueeService.addMarqueeDetail(marqueeId, prizeDetail.getGrade(), prizeDetail.getProductName());
 			// 发送抽奖结果消息
-//			sendGachaMessage(user, prizeDetail);
+			sendGachaMessage(user, prizeDetail);
 			
 			
 
