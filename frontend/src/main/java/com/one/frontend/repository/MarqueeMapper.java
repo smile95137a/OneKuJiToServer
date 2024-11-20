@@ -1,15 +1,14 @@
 package com.one.frontend.repository;
 
-import java.util.List;
-
+import com.one.frontend.model.Marquee;
+import com.one.frontend.model.MarqueeDetail;
+import com.one.frontend.response.MarqueeWithDetailsRes;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
-import com.one.frontend.model.Marquee;
-import com.one.frontend.model.MarqueeDetail;
-import com.one.frontend.response.MarqueeWithDetailsRes;
+import java.util.List;
 
 @Mapper
 public interface MarqueeMapper {
@@ -28,7 +27,7 @@ public interface MarqueeMapper {
         SELECT 
             m.id AS marqueeId,
             m.user_id AS userId,
-            u.username,
+            u.nickname as username,
             m.create_date AS createDate,
             d.grade AS grade,
             d.name AS name
