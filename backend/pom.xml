@@ -94,6 +94,11 @@
 
         <!-- 如果使用 XML 相关功能（可选） -->
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
 
         <!-- 如果需要压缩支持（如 Excel 文件中嵌入图片等，通常为可选） -->
