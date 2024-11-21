@@ -52,4 +52,15 @@ public interface UserRepository {
     })
     void updateSliverCoinBatch(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus);
 
+
+    @Insert({
+            "<script>",
+            "INSERT INTO user_update_log (user_ids, sliver_coin_delta, bonus_delta)",
+            "VALUES",
+            "<foreach item='userId' collection='userIdList' separator=','>",
+            "(#{userId}, #{sliverCoin}, #{bonus})",
+            "</foreach>",
+            "</script>"
+    })
+    void logUpdate(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus);
 }

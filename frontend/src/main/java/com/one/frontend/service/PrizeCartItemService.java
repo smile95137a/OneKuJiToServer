@@ -27,6 +27,9 @@ public class PrizeCartItemService {
             prizeCartItemRepository.deleteCartItem(cartId, prizeCartItemId);
 
             userRepository.updateSliverCoin(userId , sliverPrice);
+
+            // 记录回收日志
+            prizeCartItemRepository.logPrizeRecycle(userId, prizeCartItem.getProductDetailId(), sliverPrice, String.valueOf(userId));
             return true;
         } catch (Exception e) {
             throw new RuntimeException("Failed to remove cart item", e);

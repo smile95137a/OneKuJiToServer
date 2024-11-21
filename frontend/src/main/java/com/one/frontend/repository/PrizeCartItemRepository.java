@@ -3,6 +3,7 @@ package com.one.frontend.repository;
 import com.one.frontend.model.PrizeCartItem;
 import org.apache.ibatis.annotations.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Mapper
@@ -49,4 +50,12 @@ public interface PrizeCartItemRepository {
             "select * from prize_cart_item WHERE cart_id = #{cartId} "
     )
     List<PrizeCartItem> find(Long cartId);
+
+    @Insert("INSERT INTO prize_recycle_log (user_id, product_detail_id, sliver_coin, recycle_time, operator) " +
+            "VALUES (#{userId}, #{productDetailId}, #{sliverCoin}, NOW(), #{operator})")
+    void logPrizeRecycle(@Param("userId") Long userId,
+                         @Param("productDetailId") Long productDetailId,
+                         @Param("sliverCoin") BigDecimal sliverCoin,
+                         @Param("operator") String operator);
+
 }
