@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 // BackendApplication.java
 @SpringBootApplication
-@MapperScan(basePackages = {"com.one.onekuji.repository"})
+@MapperScan(basePackages = {"com.one.onekuji.repository" , "com.one.onekuji.Report"})
 public class BackendApplication{
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
