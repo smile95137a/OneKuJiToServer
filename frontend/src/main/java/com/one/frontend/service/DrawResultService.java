@@ -539,17 +539,17 @@ public class DrawResultService {
 					throw new RuntimeException("所有奖品已被抽完");
 				}
 
-				// 2. 动态计算总概率（基于剩余数量调整）
+				// 2. 动态计算总概率
 				double totalRemainingQuantity = availableProductDetails.stream()
 						.mapToDouble(ProductDetailRes::getQuantity)
 						.sum();
 
 				double totalAdjustedProbability = availableProductDetails.stream()
 						.mapToDouble(detail -> {
+							// 动态调整概率：结合库存比例和非线性函数
 							double baseProbability = detail.getProbability();
-							double dynamicAdjustment = detail.getQuantity() / totalRemainingQuantity;
-							double penaltyFactor = calculatePenaltyFactor(baseProbability); // 惩罚系数
-							return baseProbability * dynamicAdjustment * penaltyFactor;
+							double dynamicAdjustment = 1 + detail.getQuantity() / totalRemainingQuantity; // 库存动态调整
+							return Math.pow(baseProbability, 1.5) * dynamicAdjustment; // 使用非线性幂次
 						})
 						.sum();
 
@@ -561,9 +561,8 @@ public class DrawResultService {
 				boolean prizeSelected = false;
 				for (ProductDetailRes detail : availableProductDetails) {
 					double baseProbability = detail.getProbability();
-					double dynamicAdjustment = detail.getQuantity() / totalRemainingQuantity;
-					double penaltyFactor = calculatePenaltyFactor(baseProbability);
-					double adjustedProbability = baseProbability * dynamicAdjustment * penaltyFactor;
+					double dynamicAdjustment = 1 + detail.getQuantity() / totalRemainingQuantity;
+					double adjustedProbability = Math.pow(baseProbability, 1.5) * dynamicAdjustment;
 
 					cumulativeProbability += adjustedProbability;
 
@@ -633,21 +632,6 @@ public class DrawResultService {
 				}
 			}
 		}
-
-	/**
-	 * 根据概率值计算惩罚系数
-	 * @param probability 原始概率
-	 * @return 惩罚系数
-	 */
-	private double calculatePenaltyFactor(double probability) {
-		if (probability > 0.5) {
-			return 1.0; // 高概率奖品不惩罚
-		} else if (probability > 0.1) {
-			return 0.8; // 中概率奖品轻微惩罚
-		} else {
-			return 0.5; // 低概率奖品重度惩罚
-		}
-	}
 
 
 
