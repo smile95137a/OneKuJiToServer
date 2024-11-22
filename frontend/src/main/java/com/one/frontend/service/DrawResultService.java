@@ -530,68 +530,69 @@ public class DrawResultService {
 			List<PrizeNumber> toUpdatePrizeNumbers = new ArrayList<>();
 
 			while (true) {
-				// 1. 過濾並排序可用獎品（按概率從小到大排序，讓小概率的後面再判斷）
+				// 1. 过滤出可用奖品
 				List<ProductDetailRes> availableProductDetails = productDetails.stream()
 						.filter(detail -> detail.getQuantity() > 0)
-//						.sorted((o1, o2) -> Double.compare(o1.getProbability(), o2.getProbability()))
 						.collect(Collectors.toList());
 
 				if (availableProductDetails.isEmpty()) {
-					throw new RuntimeException("獎品已抽完");
+					throw new RuntimeException("所有奖品已被抽完");
 				}
 
-				// 2. 計算總概率並進行指數平滑處理
-				double totalProbability = availableProductDetails.stream()
-						.mapToDouble(ProductDetailRes::getProbability) // 使用平方處理增加差異
+				// 2. 动态计算总概率（基于剩余数量调整）
+				double totalRemainingQuantity = availableProductDetails.stream()
+						.mapToDouble(ProductDetailRes::getQuantity)
 						.sum();
-				// 3. 生成隨機數，使用更精確的範圍
-				double randomNumber = random.nextDouble() * totalProbability;
+
+				double totalAdjustedProbability = availableProductDetails.stream()
+						.mapToDouble(detail -> {
+							double baseProbability = detail.getProbability();
+							double dynamicAdjustment = detail.getQuantity() / totalRemainingQuantity;
+							double penaltyFactor = calculatePenaltyFactor(baseProbability); // 惩罚系数
+							return baseProbability * dynamicAdjustment * penaltyFactor;
+						})
+						.sum();
+
+				// 3. 随机数生成
+				double randomNumber = random.nextDouble() * totalAdjustedProbability;
 				double cumulativeProbability = 0.0;
 
-				// 4. 改進的抽獎邏輯
+				// 4. 逐个奖品计算动态概率并判断中奖
 				boolean prizeSelected = false;
 				for (ProductDetailRes detail : availableProductDetails) {
-					// 使用平方處理概率，增加低概率獎品的難度
-					double adjustedProbability = detail.getProbability();
+					double baseProbability = detail.getProbability();
+					double dynamicAdjustment = detail.getQuantity() / totalRemainingQuantity;
+					double penaltyFactor = calculatePenaltyFactor(baseProbability);
+					double adjustedProbability = baseProbability * dynamicAdjustment * penaltyFactor;
+
 					cumulativeProbability += adjustedProbability;
 
-					// 額外的隨機性檢查，降低低概率獎品的中獎機會
+					// 判断是否中奖
 					if (randomNumber <= cumulativeProbability) {
-//						// 對於低概率獎品增加額外的隨機性檢查
-//						if (detail.getProbability() < 0.5) {  // 可以調整這個閾值
-//							// 再次生成隨機數，必須小於原始概率才能中獎
-//							if (random.nextDouble() > detail.getProbability()) {
-//								continue;  // 未通過額外檢查，跳過這個獎品
-//							}
-//						}
-
-						// 5. 二次檢查庫存（防止並發）
 						if (detail.getQuantity() > 0) {
-							// 6. 更新中獎號碼信息
+							// 设置中奖信息
 							selectedPrizeNumber.setLevel(detail.getGrade());
 							selectedPrizeNumber.setIsDrawn(true);
 							selectedPrizeNumber.setProductDetailId(detail.getProductDetailId());
 
-							// 7. 更新庫存
+							// 更新库存
 							int newQuantity = detail.getQuantity() - 1;
-							if (newQuantity >= 0) {
-								detail.setQuantity(newQuantity);
+							detail.setQuantity(newQuantity);
 
-								// 8. 添加到批量更新列表
-								toUpdateProductDetails.add(new ProductDetail(
-										detail.getProductDetailId(),
-										newQuantity,
-										detail.getDrawnNumbers()
-								));
-								toUpdatePrizeNumbers.add(selectedPrizeNumber);
-								prizeSelected = true;
-								break;
-							}
+							// 添加到更新列表
+							toUpdateProductDetails.add(new ProductDetail(
+									detail.getProductDetailId(),
+									newQuantity,
+									detail.getDrawnNumbers()
+							));
+							toUpdatePrizeNumbers.add(selectedPrizeNumber);
+							prizeSelected = true;
+							break;
 						}
 					}
 				}
 
-				// 如果沒有選中獎品，默認選擇最高概率的獎品
+				// 5. 如果未选择奖品，默认选择最高概率的奖品
 				if (!prizeSelected && !availableProductDetails.isEmpty()) {
 					ProductDetailRes highestProbabilityPrize = availableProductDetails.get(availableProductDetails.size() - 1);
 					if (highestProbabilityPrize.getQuantity() > 0) {
@@ -611,16 +612,14 @@ public class DrawResultService {
 					}
 				}
 
-				// 9. 批量更新數據
+				// 6. 批量更新中奖信息与库存
 				if (!toUpdatePrizeNumbers.isEmpty()) {
 					try {
-						// 更新中獎號碼
 						prizeNumberMapper.updatePrizeNumberBatch(
 								toUpdatePrizeNumbers,
 								selectedPrizeNumber.getProductId()
 						);
 
-						// 更新獎品庫存
 						if (!toUpdateProductDetails.isEmpty()) {
 							productDetailRepository.updateProductDetailQuantityAndDrawnNumbersBatch(
 									toUpdateProductDetails
@@ -629,11 +628,26 @@ public class DrawResultService {
 
 						return selectedPrizeNumber;
 					} catch (Exception e) {
-						throw new RuntimeException("抽獎過程中發生錯誤", e);
+						throw new RuntimeException("抽奖过程中发生错误", e);
 					}
 				}
 			}
 		}
+
+	/**
+	 * 根据概率值计算惩罚系数
+	 * @param probability 原始概率
+	 * @return 惩罚系数
+	 */
+	private double calculatePenaltyFactor(double probability) {
+		if (probability > 0.5) {
+			return 1.0; // 高概率奖品不惩罚
+		} else if (probability > 0.1) {
+			return 0.8; // 中概率奖品轻微惩罚
+		} else {
+			return 0.5; // 低概率奖品重度惩罚
+		}
+	}
 
 
 
