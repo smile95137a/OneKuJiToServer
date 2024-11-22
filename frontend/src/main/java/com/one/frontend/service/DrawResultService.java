@@ -526,112 +526,115 @@ public class DrawResultService {
 		@Transactional
 		public PrizeNumber drawPrizeForNumber(PrizeNumber selectedPrizeNumber, List<ProductDetailRes> productDetails) {
 			Random random = new Random();
-			List<ProductDetail> toUpdateProductDetails = new ArrayList<>();
-			List<PrizeNumber> toUpdatePrizeNumbers = new ArrayList<>();
 
-			while (true) {
-				// 1. 过滤出可用奖品
-				List<ProductDetailRes> availableProductDetails = productDetails.stream()
-						.filter(detail -> detail.getQuantity() > 0)
-						.collect(Collectors.toList());
+			// 过滤库存大于0的奖品
+			List<ProductDetailRes> availableProductDetails = productDetails.stream()
+					.filter(detail -> detail.getQuantity() > 0)
+					.collect(Collectors.toList());
 
-				if (availableProductDetails.isEmpty()) {
-					throw new RuntimeException("所有奖品已被抽完");
-				}
+			if (availableProductDetails.isEmpty()) {
+				throw new RuntimeException("所有奖品已被抽完");
+			}
 
-				// 2. 动态计算总概率
-				double totalRemainingQuantity = availableProductDetails.stream()
-						.mapToDouble(ProductDetailRes::getQuantity)
-						.sum();
+			// 计算总权重（动态调整概率）
+			double totalWeight = calculateTotalWeight(availableProductDetails);
 
-				double totalAdjustedProbability = availableProductDetails.stream()
-						.mapToDouble(detail -> {
-							// 动态调整概率：结合库存比例和非线性函数
-							double baseProbability = detail.getProbability();
-							double dynamicAdjustment = 1 + detail.getQuantity() / totalRemainingQuantity; // 库存动态调整
-							return Math.pow(baseProbability, 1.5) * dynamicAdjustment; // 使用非线性幂次
-						})
-						.sum();
+			// 随机数生成
+			double randomNumber = random.nextDouble() * totalWeight;
 
-				// 3. 随机数生成
-				double randomNumber = random.nextDouble() * totalAdjustedProbability;
-				double cumulativeProbability = 0.0;
+			// 按动态概率选中奖品
+			ProductDetailRes selectedProduct = selectProductByProbability(availableProductDetails, randomNumber, totalWeight);
 
-				// 4. 逐个奖品计算动态概率并判断中奖
-				boolean prizeSelected = false;
-				for (ProductDetailRes detail : availableProductDetails) {
+			// 设置中奖信息
+			updateSelectedPrize(selectedPrizeNumber, selectedProduct);
+
+			// 批量更新数据库
+			updateDatabase(selectedPrizeNumber, availableProductDetails);
+
+			return selectedPrizeNumber;
+		}
+
+	/**
+	 * 计算所有可用奖品的总权重
+	 */
+	private double calculateTotalWeight(List<ProductDetailRes> productDetails) {
+		double totalRemainingQuantity = productDetails.stream()
+				.mapToDouble(ProductDetailRes::getQuantity)
+				.sum();
+
+		return productDetails.stream()
+				.mapToDouble(detail -> {
 					double baseProbability = detail.getProbability();
-					double dynamicAdjustment = 1 + detail.getQuantity() / totalRemainingQuantity;
-					double adjustedProbability = Math.pow(baseProbability, 1.5) * dynamicAdjustment;
+					double dynamicAdjustment = 1 + detail.getQuantity() / totalRemainingQuantity; // 库存动态调整
+					return Math.pow(baseProbability, 1.5) * dynamicAdjustment;
+				})
+				.sum();
+	}
 
-					cumulativeProbability += adjustedProbability;
+	/**
+	 * 根据随机数选择一个奖品
+	 */
+	private ProductDetailRes selectProductByProbability(
+			List<ProductDetailRes> productDetails,
+			double randomNumber,
+			double totalWeight
+	) {
+		double cumulativeProbability = 0.0;
 
-					// 判断是否中奖
-					if (randomNumber <= cumulativeProbability) {
-						if (detail.getQuantity() > 0) {
-							// 设置中奖信息
-							selectedPrizeNumber.setLevel(detail.getGrade());
-							selectedPrizeNumber.setIsDrawn(true);
-							selectedPrizeNumber.setProductDetailId(detail.getProductDetailId());
+		for (ProductDetailRes detail : productDetails) {
+			double baseProbability = detail.getProbability();
+			double dynamicAdjustment = 1 + detail.getQuantity() / totalWeight;
+			double adjustedProbability = Math.pow(baseProbability, 1.5) * dynamicAdjustment;
 
-							// 更新库存
-							int newQuantity = detail.getQuantity() - 1;
-							detail.setQuantity(newQuantity);
+			cumulativeProbability += adjustedProbability;
 
-							// 添加到更新列表
-							toUpdateProductDetails.add(new ProductDetail(
-									detail.getProductDetailId(),
-									newQuantity,
-									detail.getDrawnNumbers()
-							));
-							toUpdatePrizeNumbers.add(selectedPrizeNumber);
-							prizeSelected = true;
-							break;
-						}
-					}
-				}
-
-				// 5. 如果未选择奖品，默认选择最高概率的奖品
-				if (!prizeSelected && !availableProductDetails.isEmpty()) {
-					ProductDetailRes highestProbabilityPrize = availableProductDetails.get(availableProductDetails.size() - 1);
-					if (highestProbabilityPrize.getQuantity() > 0) {
-						selectedPrizeNumber.setLevel(highestProbabilityPrize.getGrade());
-						selectedPrizeNumber.setIsDrawn(true);
-						selectedPrizeNumber.setProductDetailId(highestProbabilityPrize.getProductDetailId());
-
-						int newQuantity = highestProbabilityPrize.getQuantity() - 1;
-						highestProbabilityPrize.setQuantity(newQuantity);
-
-						toUpdateProductDetails.add(new ProductDetail(
-								highestProbabilityPrize.getProductDetailId(),
-								newQuantity,
-								highestProbabilityPrize.getDrawnNumbers()
-						));
-						toUpdatePrizeNumbers.add(selectedPrizeNumber);
-					}
-				}
-
-				// 6. 批量更新中奖信息与库存
-				if (!toUpdatePrizeNumbers.isEmpty()) {
-					try {
-						prizeNumberMapper.updatePrizeNumberBatch(
-								toUpdatePrizeNumbers,
-								selectedPrizeNumber.getProductId()
-						);
-
-						if (!toUpdateProductDetails.isEmpty()) {
-							productDetailRepository.updateProductDetailQuantityAndDrawnNumbersBatch(
-									toUpdateProductDetails
-							);
-						}
-
-						return selectedPrizeNumber;
-					} catch (Exception e) {
-						throw new RuntimeException("抽奖过程中发生错误", e);
-					}
-				}
+			if (randomNumber <= cumulativeProbability) {
+				return detail;
 			}
 		}
+
+		// 如果随机数未命中任何奖品（极小概率情况），返回概率最高的奖品
+		return productDetails.get(productDetails.size() - 1);
+	}
+
+	/**
+	 * 更新中奖信息
+	 */
+	private void updateSelectedPrize(PrizeNumber selectedPrizeNumber, ProductDetailRes selectedProduct) {
+		selectedPrizeNumber.setLevel(selectedProduct.getGrade());
+		selectedPrizeNumber.setIsDrawn(true);
+		selectedPrizeNumber.setProductDetailId(selectedProduct.getProductDetailId());
+
+		// 更新奖品库存
+		int newQuantity = selectedProduct.getQuantity() - 1;
+		selectedProduct.setQuantity(newQuantity);
+	}
+
+	/**
+	 * 批量更新中奖信息和奖品库存
+	 */
+	private void updateDatabase(PrizeNumber selectedPrizeNumber, List<ProductDetailRes> productDetails) {
+		try {
+			// 更新中奖号码
+			prizeNumberMapper.updatePrizeNumber(selectedPrizeNumber);
+
+			// 转换为数据库更新对象并更新库存
+			List<ProductDetail> toUpdateProductDetails = productDetails.stream()
+					.filter(detail -> detail.getQuantity() >= 0)
+					.map(detail -> new ProductDetail(
+							detail.getProductDetailId(),
+							detail.getQuantity(),
+							detail.getDrawnNumbers()
+					))
+					.collect(Collectors.toList());
+
+			if (!toUpdateProductDetails.isEmpty()) {
+				productDetailRepository.updateProductDetailQuantityAndDrawnNumbersBatch(toUpdateProductDetails);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("抽奖过程中发生错误", e);
+		}
+	}
 
 
 
