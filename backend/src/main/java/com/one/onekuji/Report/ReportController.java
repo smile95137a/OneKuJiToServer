@@ -206,7 +206,7 @@ public class ReportController {
             case "TOTAL_CONSUMPTION":
                 return Arrays.asList("time_group", "total_amount");
             case "TOTAL_DEPOSIT":
-                return Arrays.asList("time_group", "total_amount");
+                return Arrays.asList("time_group", "total_amount", "nickname", "phone_number");
             case "USER_UPDATE_LOG":
                 return Arrays.asList("time_group", "total_sliver_coin", "total_bonus");
             case "DAILY_SIGN_IN":
@@ -214,14 +214,15 @@ public class ReportController {
             case "SLIVER_COIN_RECYCLE":
                 return Arrays.asList("time_group", "total_sliver_coin");
             case "PRIZE_RECYCLE_REPORT":
-                return Arrays.asList("time_group", "p_product_name",  "product_detail_name" , "grade", "total_sliver_coin");
+                return Arrays.asList("time_group", "p_product_name", "product_detail_name", "grade", "total_sliver_coin");
             case "DRAW_RESULT_SUMMARY":
-                return Arrays.asList("time_group", "product_name", "product_detail_name", "image_urls", "nickname");
+                return Arrays.asList("time_group", "product_name", "product_detail_name", "nickname", "amount_with_type");
             default:
                 // 如果沒有定義的字段順序，返回一個默認值
                 return Arrays.asList("time_group", "total_amount", "product_name", "nickname");
         }
     }
+
 
 
 

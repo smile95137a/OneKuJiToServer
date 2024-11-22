@@ -30,6 +30,8 @@ public class FieldTranslator {
         fieldMapping.put("total_sliver_coin" , "銀幣總額");
         fieldMapping.put("p_product_name" , "產品名稱");
         fieldMapping.put("total_bonus" , "紅利總額");
+        fieldMapping.put("phone_number" , "電話號碼");
+        fieldMapping.put("amount_with_type" , "金幣與幣種");
     }
 
     public static String translate(String fieldName) {

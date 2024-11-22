@@ -100,28 +100,49 @@ public interface StoreConsumptionRepository {
 
 
     @Select("<script>" +
-            "SELECT 'day' AS group_type, DATE_FORMAT(created_at, '%Y-%m-%d') AS time_group, SUM(amount) AS total_amount " +
-            "FROM user_transaction " +
-            "WHERE transaction_type = 'DEPOSIT' " +
-            "GROUP BY time_group " +
+            "SELECT 'day' AS group_type, " +
+            "       DATE_FORMAT(ut.created_at, '%Y-%m-%d') AS time_group, " +
+            "       SUM(ut.amount) AS total_amount, " +
+            "       u.nickname, " +
+            "       u.phone_number " +
+            "FROM user_transaction ut " +
+            "LEFT JOIN `user` u ON ut.user_id = u.id " +
+            "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
-            "SELECT 'week' AS group_type, CONCAT(YEAR(created_at), '-', WEEK(created_at)) AS time_group, SUM(amount) AS total_amount " +
-            "FROM user_transaction " +
-            "WHERE transaction_type = 'DEPOSIT' " +
-            "GROUP BY time_group " +
+            "SELECT 'week' AS group_type, " +
+            "       CONCAT(YEAR(ut.created_at), '-', WEEK(ut.created_at)) AS time_group, " +
+            "       SUM(ut.amount) AS total_amount, " +
+            "       u.nickname, " +
+            "       u.phone_number " +
+            "FROM user_transaction ut " +
+            "LEFT JOIN `user` u ON ut.user_id = u.id " +
+            "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
-            "SELECT 'month' AS group_type, DATE_FORMAT(created_at, '%Y-%m') AS time_group, SUM(amount) AS total_amount " +
-            "FROM user_transaction " +
-            "WHERE transaction_type = 'DEPOSIT' " +
-            "GROUP BY time_group " +
+            "SELECT 'month' AS group_type, " +
+            "       DATE_FORMAT(ut.created_at, '%Y-%m') AS time_group, " +
+            "       SUM(ut.amount) AS total_amount, " +
+            "       u.nickname, " +
+            "       u.phone_number " +
+            "FROM user_transaction ut " +
+            "LEFT JOIN `user` u ON ut.user_id = u.id " +
+            "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
-            "SELECT 'year' AS group_type, YEAR(created_at) AS time_group, SUM(amount) AS total_amount " +
-            "FROM user_transaction " +
-            "WHERE transaction_type = 'DEPOSIT' " +
-            "GROUP BY time_group " +
-            "ORDER BY group_type, time_group DESC" +
+            "SELECT 'year' AS group_type, " +
+            "       YEAR(ut.created_at) AS time_group, " +
+            "       SUM(ut.amount) AS total_amount, " +
+            "       u.nickname, " +
+            "       u.phone_number " +
+            "FROM user_transaction ut " +
+            "LEFT JOIN `user` u ON ut.user_id = u.id " +
+            "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "GROUP BY time_group, u.nickname, u.phone_number " +
+            "ORDER BY group_type, time_group DESC " +
             "</script>")
     List<Map<String, Object>> getTotalDepositByTimeGroup(@Param("groupType") String groupType);
+
 
     @Select({
             "<script>",
@@ -263,17 +284,25 @@ public interface StoreConsumptionRepository {
             "    COALESCE(p.product_name, 'Unknown Product') AS product_name,",
             "    COALESCE(pd.product_name, 'Unknown Product Detail') AS product_detail_name,",
             "    COALESCE(pd.image_urls, 'No Image') AS image_urls,",
-            "    COALESCE(u.nickname, 'Anonymous') AS nickname",
+            "    COALESCE(u.nickname, 'Anonymous') AS nickname,",
+            "    CONCAT(dr.amount, ' (',",
+            "        CASE",
+            "            WHEN dr.pay_type = 1 THEN '金幣'",
+            "            WHEN dr.pay_type = 2 THEN '銀幣'",
+            "            WHEN dr.pay_type = 3 THEN '紅利'",
+            "            ELSE '未知類型'",
+            "        END, ')') AS amount_with_type",
             "FROM draw_result dr",
             "LEFT JOIN product_detail pd ON dr.product_detail_id = pd.product_detail_id",
             "LEFT JOIN product p ON dr.product_id = p.product_id",
             "LEFT JOIN `user` u ON dr.user_id = u.id",
+            "WHERE dr.pay_type IS NOT NULL",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
-            "       GROUP BY time_group, p.product_name, pd.product_name, pd.image_urls, u.nickname",
+            "       GROUP BY time_group, p.product_name, pd.product_name, pd.image_urls, u.nickname, dr.amount, dr.pay_type",
             "   </when>",
             "   <otherwise>",
-            "       GROUP BY time_group, p.product_name, pd.product_name, pd.image_urls, u.nickname",
+            "       GROUP BY time_group, p.product_name, pd.product_name, pd.image_urls, u.nickname, dr.amount, dr.pay_type",
             "   </otherwise>",
             "</choose>",
             "ORDER BY time_group DESC",
@@ -282,6 +311,9 @@ public interface StoreConsumptionRepository {
     List<Map<String, Object>> getDrawResultSummary(
             @Param("groupType") String groupType
     );
+
+
+
 
 
 }
