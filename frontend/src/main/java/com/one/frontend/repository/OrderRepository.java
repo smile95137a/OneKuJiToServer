@@ -91,4 +91,13 @@ public interface OrderRepository {
 	void updateStatus(@Param("orderNumber") Long orderNumber);
 	@Update("UPDATE `order` SET result_status = 'FAILED_PAYMENT' WHERE id = #{orderNumber}")
 	void updateStatusByFail(@Param("orderNumber") Long orderNumber);
+
+	@Select("SELECT * FROM `order` " +
+			"WHERE result_status = 'NO_PAY' " +
+			"AND created_at < NOW() - INTERVAL 1 DAY")
+	List<Order> findPendingOrdersOver24Hours();
+
+	@Update("UPDATE `order` SET result_status = 'FAILED_PAYMENT' WHERE id = #{orderNumber}")
+	void updateStatusByFail2(@Param("orderNumber") String orderNumber);
+
 }

@@ -14,6 +14,7 @@ import com.one.frontend.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -21,10 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +43,18 @@ public class OrderService {
 	private StoreProductRepository storeProductRepository;
 	@Autowired
 	private ShippingMethodRepository shippingMethodRepository;
+	@Autowired
+	private CartRepository cartRepository;
+
+	@Autowired
+	private CartItemRepository cartItemRepository;
+
+	@Autowired
+	private PrizeCartRepository prizeCartRepository;
+
+	@Autowired
+	private PrizeCartItemRepository prizeCartItemRepository;
+
 	public String ecpayCheckout(Integer userId) {
 
 		String uuId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 20);
@@ -618,6 +628,51 @@ public class OrderService {
 		ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
 
 		return response.getBody();
+	}
+
+	@Autowired
+	private OrderDetailRepository orderDetailMapper;
+	@Scheduled(cron = "0 0 0 * * ?")  // 每天午夜運行
+	public void checkPendingOrders() {
+		LocalDateTime now = LocalDateTime.now();
+		List<Order> pendingOrders = orderRepository.findPendingOrdersOver24Hours(); // 查找所有未付款的訂單
+
+		for (Order order : pendingOrders) {
+			if (Duration.between(order.getCreatedAt(), now).toHours() > 24) {  // 超過24小時未付款
+				orderRepository.updateStatusByFail2(order.getOrderNumber());  // 設置訂單狀態為付款失敗
+			}
+
+
+		List<OrderDetailRes> orderDetailsByOrderId = orderDetailMapper.findOrderDetailsByOrderId(Long.valueOf(order.getId()));
+		Long cartIdByUserId = cartRepository.getCartIdByUserId(order.getUserId());
+		Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(order.getUserId());
+		if("1".equals(order.getType())){
+			for(OrderDetailRes detailRes:orderDetailsByOrderId){
+				CartItem cartItem = new CartItem();
+				cartItem.setCartId(cartIdByUserId);
+				cartItem.setStoreProductId(detailRes.getStoreProduct().getStoreProductId());
+				cartItem.setQuantity(detailRes.getQuantity());
+				cartItem.setUnitPrice(detailRes.getUnitPrice());
+				cartItem.setTotalPrice(BigDecimal.valueOf(detailRes.getTotalPrice()));
+				cartItem.setSize(detailRes.getStoreProduct().getSize());
+				cartItem.setIsSelected(true);
+				cartItemRepository.addCartItem(cartItem);
+			}
+		}else if("2".equals(order.getType())){
+			List<PrizeCartItem> prizeCartItemList = new ArrayList<>();
+			for(OrderDetailRes detailRes:orderDetailsByOrderId) {
+				PrizeCartItem prizeCartItem = new PrizeCartItem();
+				prizeCartItem.setCartId(cartIdByUserId1);
+				prizeCartItem.setProductDetailId(detailRes.getProductDetailRes().getProductDetailId());
+				prizeCartItem.setQuantity(detailRes.getQuantity());
+				prizeCartItem.setSliverPrice(detailRes.getProductDetailRes().getSliverPrice());
+				prizeCartItem.setIsSelected(true);
+				prizeCartItem.setSize(detailRes.getProductDetailRes().getSize());
+				prizeCartItemList.add(prizeCartItem);
+			}
+			prizeCartItemRepository.insertBatch(prizeCartItemList);
+		}
+		}
 	}
 
 }
