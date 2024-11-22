@@ -98,5 +98,6 @@ public interface ProductRepository {
             "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
             "ORDER BY p.product_id desc")
     List<ProductRes> getAll();
-
+    @Update("update product set status = 'NOT_AVAILABLE_YET' where product_id = #{productId}")
+    void updateProductStatus(Long productId);
 }

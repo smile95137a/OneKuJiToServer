@@ -20,8 +20,8 @@ public interface ProductDetailRepository {
     @Select("SELECT * FROM product_detail WHERE product_detail_id = #{id}")
     ProductDetailRes findById2(@Param("id") Long id);
 
-    @Insert("INSERT INTO product_detail (product_id, description, note, size, quantity, stock_quantity, product_name, grade, price, sliver_price, image_urls, length, width, height, specification , probability) " +
-            "VALUES (#{productId}, #{description}, #{note}, #{size}, #{quantity}, #{stockQuantity}, #{productName}, #{grade}, #{price}, #{sliverPrice}, #{imageUrls}, #{length}, #{width}, #{height}, #{specification} , #{probability})")
+    @Insert("INSERT INTO product_detail (product_id, description, note, size, quantity, stock_quantity, product_name, grade, price, sliver_price, image_urls, length, width, height, specification , probability , is_prize) " +
+            "VALUES (#{productId}, #{description}, #{note}, #{size}, #{quantity}, #{stockQuantity}, #{productName}, #{grade}, #{price}, #{sliverPrice}, #{imageUrls}, #{length}, #{width}, #{height}, #{specification} , #{probability} , #{isPrize})")
     @Options(useGeneratedKeys = true, keyProperty = "productDetailId")
     int insert(DetailReq productDetailReq);
 
@@ -41,6 +41,7 @@ public interface ProductDetailRepository {
             "length = #{length}, " +
             "width = #{width}, " +
             "height = #{height}, " +
+            "is_prize = #{isPrize}, " +
             "specification = #{specification}, " +  // 这里加上逗号
             "probability = #{probability} " +
             "WHERE product_detail_id = #{productDetailId}")

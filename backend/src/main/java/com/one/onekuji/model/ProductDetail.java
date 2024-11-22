@@ -102,4 +102,6 @@ public class ProductDetail{
     @Column(name = "probability")
     private Double probability;
 
+    @Column(name = "is_prize")
+    private String isPrize;
 }

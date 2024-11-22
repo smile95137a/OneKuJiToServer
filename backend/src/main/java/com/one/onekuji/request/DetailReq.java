@@ -29,4 +29,5 @@ public class DetailReq {
     private BigDecimal height;
     private String specification;
     private Double probability;
+    private String isPrize;
 }

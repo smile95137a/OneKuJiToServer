@@ -239,7 +239,8 @@ public class ProductDetailService {
                 detailReq.getWidth(),
                 detailReq.getHeight(),
                 escapeTextForHtml(detailReq.getSpecification()),
-                detailReq.getProbability()
+                detailReq.getProbability(),
+                detailReq.getIsPrize()
         );
     }
 

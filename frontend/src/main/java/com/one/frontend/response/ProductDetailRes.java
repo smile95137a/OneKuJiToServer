@@ -31,4 +31,5 @@ public class ProductDetailRes {
     private String prizeNumber;
     private String drawnNumbers;
     private Double probability;
+    private String isPrize;
 }

@@ -83,5 +83,6 @@ public interface ProductDetailRepository {
     })
     void updateProductDetailQuantityAndDrawnNumbersBatch(@Param("list") List<ProductDetail> productDetails);
 
-
+    @Update("update product_detail set is_prize = 'false'")
+    void updateIsPrize();
 }

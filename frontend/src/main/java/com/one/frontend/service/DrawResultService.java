@@ -125,7 +125,7 @@ public class DrawResultService {
 		String prizeNumber = number.get(randomIndex).toString();
 		List<String> prizeNumbers = new ArrayList<>();
 		prizeNumbers.add(prizeNumber);
-		return handleDraw2(userId , productId , prizeNumbers , "1");
+			return handleDraw2(userId , productId , prizeNumbers , "1");
 	}
 
 	public DrawResponse getAllPrizes(Long productId, Long userId) {
@@ -375,6 +375,16 @@ public class DrawResultService {
 
 		// 检查并更新产品状态
 		List<ProductDetailRes> remainingDetails = productDetailRepository.getProductDetailByProductId(productId);
+
+		// 检查是否所有 isPrize 都为 false
+		boolean allPrizesFalse = remainingDetails.stream()
+				.noneMatch(detail -> "true".equalsIgnoreCase(detail.getIsPrize())); // 检查 isPrize 是否存在 "true"
+
+		if (allPrizesFalse) {
+			// 更新产品状态为 NOT_AVAILABLE_YET
+			productRepository.updateProductStatus(productId);
+		}
+
 		int totalRemainingQuantity = remainingDetails.stream().mapToInt(ProductDetailRes::getQuantity).sum();
 		if (totalRemainingQuantity == 0) {
 			productRepository.updateStatus(productId);
@@ -597,6 +607,10 @@ public class DrawResultService {
 									detail.getDrawnNumbers()
 							));
 							toUpdatePrizeNumbers.add(selectedPrizeNumber);
+
+							if("true".equals(detail.getIsPrize())){
+								productDetailRepository.updateIsPrize();
+							}
 							prizeSelected = true;
 							break;
 						}

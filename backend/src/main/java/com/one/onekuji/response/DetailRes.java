@@ -28,4 +28,5 @@ public class DetailRes {
     private BigDecimal height;
     private String specification;
     private Double probability;
+    private String isPrize;
 }
