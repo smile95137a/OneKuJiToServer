@@ -542,9 +542,8 @@ public class DrawResultService {
 
 				// 2. 計算總概率並進行指數平滑處理
 				double totalProbability = availableProductDetails.stream()
-						.mapToDouble(detail -> Math.pow(detail.getProbability(), 2)) // 使用平方處理增加差異
+						.mapToDouble(ProductDetailRes::getProbability) // 使用平方處理增加差異
 						.sum();
-
 				// 3. 生成隨機數，使用更精確的範圍
 				double randomNumber = random.nextDouble() * totalProbability;
 				double cumulativeProbability = 0.0;
@@ -553,7 +552,7 @@ public class DrawResultService {
 				boolean prizeSelected = false;
 				for (ProductDetailRes detail : availableProductDetails) {
 					// 使用平方處理概率，增加低概率獎品的難度
-					double adjustedProbability = Math.pow(detail.getProbability(), 2);
+					double adjustedProbability = detail.getProbability();
 					cumulativeProbability += adjustedProbability;
 
 					// 額外的隨機性檢查，降低低概率獎品的中獎機會
