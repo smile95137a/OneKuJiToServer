@@ -618,7 +618,11 @@ public class DrawResultService {
 
 						// 更新库存
 						int newQuantity = detail.getQuantity() - 1;
-
+						if(newQuantity == 0){
+							if("true".equals(detail.getIsPrize())){
+								productDetailRepository.updateIsPrize();
+							}
+						}
 						if (newQuantity >= 0) {
 							detail.setQuantity(newQuantity);
 
@@ -630,11 +634,7 @@ public class DrawResultService {
 							));
 							toUpdatePrizeNumbers.add(selectedPrizeNumber);
 
-							if(newQuantity == 0){
-								if("true".equals(detail.getIsPrize())){
-									productDetailRepository.updateIsPrize();
-								}
-							}
+
 							prizeSelected = true;
 							break;
 						}
