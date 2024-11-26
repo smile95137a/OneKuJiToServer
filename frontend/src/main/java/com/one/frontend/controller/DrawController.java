@@ -30,18 +30,25 @@ public class DrawController {
 	private DrawResultService drawResultService;
 
 	@PostMapping("/redeem")
-	public ResponseEntity<ApiResponse<?>> redeemCode(@RequestBody DrawDto drawDto) throws Exception {
+	public ResponseEntity<ApiResponse<List<DrawResult>>> redeemCode(@RequestBody DrawDto drawDto) throws Exception {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
-		String s = redemptionCodeService.redeemCode(userId , drawDto);
-		if("兌換成功".equals(s)){
-			drawResultService.handleDraw2(userId , drawDto.getProductId() , drawDto.getPrizeNumbers() , "1");
+		String s = null;
+		if(drawResultService.checkPrize(userId)){
+			s = redemptionCodeService.redeemCode(userId , drawDto);
+
 		}else{
-			ApiResponse<?> response1 = ResponseUtils.failure(200, s, null);
+			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+			return ResponseEntity.ok(response);
+		}
+		if("兌換成功".equals(s)){
+			List<DrawResult> results = drawResultService.handleDraw2(userId, drawDto.getProductId(), drawDto.getPrizeNumbers(), "1");
+			ApiResponse<List<DrawResult>> response1 = ResponseUtils.success(200, s, results);
+			return ResponseEntity.ok(response1);
+		}else{
+			ApiResponse<List<DrawResult>> response1 = ResponseUtils.failure(200, s, null);
 			return ResponseEntity.ok(response1);
 		}
-		ApiResponse<?> response1 = ResponseUtils.success(200, s, null);
-		return ResponseEntity.ok(response1);
 	}
 
 
@@ -55,13 +62,18 @@ public class DrawController {
 			 userId = userDetails.getId();
 		}
 		try {
-			List<DrawResult> result = drawResultService.handleDraw(userId , gachaDrawDto.getProductId());
-			ApiResponse<List<DrawResult>> response = ResponseUtils.success(200, null, result);
-			return ResponseEntity.ok(response);
+			if(drawResultService.checkPrize(userId)){
+				List<DrawResult> result = drawResultService.handleDraw(userId , gachaDrawDto.getProductId());
+				ApiResponse<List<DrawResult>> response = ResponseUtils.success(200, null, result);
+				return ResponseEntity.ok(response);
+			}else{
+				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+				return ResponseEntity.ok(response);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "抽獎失敗", null);
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+			return ResponseEntity.ok(response);
 		}
 	}
 
@@ -85,9 +97,14 @@ public class DrawController {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		try {
+			if(drawResultService.checkPrize(userId)){
 			List<DrawResult> drawResult = drawResultService.handleDraw2(userId, drawDto.getProductId(), drawDto.getPrizeNumbers() , drawDto.getExchangeType());
 			ApiResponse<List<DrawResult>> response = ResponseUtils.success(200, null, drawResult);
 			return ResponseEntity.ok(response);
+			}else{
+				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+				return ResponseEntity.ok(response);
+			}
 		} catch (Exception e) {
 			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, e.getMessage(), null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -96,17 +113,23 @@ public class DrawController {
 
 	@PostMapping("/random/{productId}")
 	@Operation(summary = "紅利抽獎(隨機制)", description = "为特定产品和用户执行随机抽奖")
-	public ResponseEntity<ApiResponse<DrawResult>> executeRandom(@PathVariable Long productId,
+	public ResponseEntity<ApiResponse<?>> executeRandom(@PathVariable Long productId,
 			@RequestParam String userUid) {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		try {
+			if(drawResultService.checkPrize(userId)){
 			DrawResult drawResult = drawResultService.handleDrawRandom(userId, productId);
 			ApiResponse<DrawResult> response = ResponseUtils.success(200, null, drawResult);
 			return ResponseEntity.ok(response);
+		}else{
+			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+			return ResponseEntity.ok(response);
+		}
 		} catch (Exception e) {
 			ApiResponse<DrawResult> response = ResponseUtils.failure(400, "抽奖失败", null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
+
 }

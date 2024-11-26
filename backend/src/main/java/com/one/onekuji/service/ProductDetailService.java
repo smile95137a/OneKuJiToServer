@@ -41,12 +41,13 @@ public class ProductDetailService {
         List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
         int totalQuantity = 0;
 
+        // 计算总数量，排除 grade 为 "LAST" 的项
         // 1. 计算总数量，排除等级为 "LAST" 的项。
         for (DetailReq detailReq : detailReqs) {
-            if (shouldIncludeInPrizeNumbers(detailReq)) { // 判断是否要包含在奖品编号列表中
-                totalQuantity += detailReq.getQuantity();
+                if (shouldIncludeInPrizeNumbers(detailReq)) { // 判断是否要包含在奖品编号列表中
+                    totalQuantity += detailReq.getQuantity();
+                }
             }
-        }
 
         // 2. 更新产品总数量
         productRepository.updateTotalQua(totalQuantity, detailReqs.get(0).getProductId());

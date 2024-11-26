@@ -22,12 +22,15 @@ public class RedemptionCode {
     private String code;
 
     @Column(name = "is_redeemed", nullable = false)
-    private boolean redeemed = false;
+    private Boolean isRedeemed;
 
     @Column(name = "redeemed_at")
     private LocalDateTime redeemedAt;
 
     @Column(name = "user_id")
     private Long userId;
+
+    private Long productId;
+
 
 }

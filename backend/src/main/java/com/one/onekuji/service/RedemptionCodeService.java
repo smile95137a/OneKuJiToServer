@@ -5,7 +5,6 @@ import com.one.onekuji.repository.RedemptionCodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +15,7 @@ public class RedemptionCodeService {
     private RedemptionCodeMapper redemptionCodeMapper;
 
     // 生成兌換碼
-    public String generateRedemptionCode() {
+    public String generateRedemptionCode(Long productId) {
         String code = UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
 
         // 確保兌換碼唯一
@@ -26,7 +25,8 @@ public class RedemptionCodeService {
 
         RedemptionCode redemptionCode = new RedemptionCode();
         redemptionCode.setCode(code);
-        redemptionCode.setRedeemed(false);  // 未兌換
+        redemptionCode.setIsRedeemed(false);  // 未兌換
+        redemptionCode.setProductId(productId);
         redemptionCodeMapper.insertRedemptionCode(redemptionCode);
 
         return code;

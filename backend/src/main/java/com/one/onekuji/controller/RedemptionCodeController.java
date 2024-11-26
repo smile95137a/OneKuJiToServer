@@ -4,9 +4,7 @@ import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.service.RedemptionCodeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/redemption")
@@ -16,9 +14,9 @@ public class RedemptionCodeController {
     private RedemptionCodeService redemptionCodeService;
 
     // 生成新的兌換碼
-    @PostMapping("/generate")
-    public String generateRedemptionCode() {
-        return redemptionCodeService.generateRedemptionCode();
+    @PostMapping("/generate/{productId}")
+    public String generateRedemptionCode(@PathVariable Long productId) {
+        return redemptionCodeService.generateRedemptionCode(productId);
     }
 
     // 兌換兌換碼

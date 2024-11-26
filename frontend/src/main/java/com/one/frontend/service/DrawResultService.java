@@ -47,6 +47,9 @@ public class DrawResultService {
 
 	private final MarqueeService marqueeService;
 
+	@Autowired
+	private MailService mailService;
+
 	// 本地锁，用于锁定抽奖资源
 	private final ConcurrentHashMap<Long, Lock> productLockMap = new ConcurrentHashMap<>();
 	// 存储用户的锁
@@ -63,7 +66,6 @@ public class DrawResultService {
 			this.userId = userId;
 		}
 	}
-
 	private Lock getLockForUser(Long userId) {
 		return userLockMap.computeIfAbsent(userId, k -> new ReentrantLock());
 	}
@@ -72,6 +74,13 @@ public class DrawResultService {
 	private long getDrawProtectionTime(int drawCount) {
 		long protectionTime = 300 + (30 * (drawCount - 1)); // 初始保护时间300秒，每多抽一次加30秒
 		return Math.min(protectionTime, 600); // 最大保护时间为600秒
+	}
+
+	public Boolean checkPrize(Long userId){
+		Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
+		List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
+		int totalQuantity = prizeCartItemList.size();
+		return !(totalQuantity >= 150);
 	}
 
 	// 抽奖操作，处理锁机制和保护期
@@ -234,6 +243,15 @@ public class DrawResultService {
 
 			// 计算并更新用户红利
 			updateUserBonus(userId, totalAmount, prizeNumbers.size(), payMethod);
+
+			Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
+			List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
+			int total = prizeCartItemList.size();
+			UserRes userById = userRepository.getUserById(userId);
+
+			if(total >= 100){
+				mailService.sendPrizeMail(userById.getUsername());
+			}
 
 			return drawResults;
 		} catch (Exception e) {
@@ -416,15 +434,16 @@ public class DrawResultService {
 		DrawResult drawResult = null; // 初始为 null
 		// 获取所有产品细节
 		List<ProductDetailRes> productDetails = productDetailRepository.getProductDetailByProductId(productId);
-		int totalQuantity = productDetails.stream().mapToInt(ProductDetailRes::getQuantity).sum();
+		int totalQuantity = productDetails.stream()
+				.filter(detail -> !"LAST".equals(detail.getGrade())) // 排除 grade 为 "LAST" 的奖品
+				.mapToInt(ProductDetailRes::getQuantity)
+				.sum();
+
 
 		// 获取 "LAST" 奖品的细节
 		ProductDetailRes LastPrize = productDetailRepository.getProductDetailSpPrizeByProductId(productId);
 
 		// Debugging output
-		System.out.println("Total Quantity: " + totalQuantity);
-		System.out.println("Last Prize: " + LastPrize);
-
 		// 检查条件
 		if (totalQuantity == 0 && LastPrize != null) {
 			PrizeCartItem spCartItem = new PrizeCartItem();
@@ -570,11 +589,11 @@ public class DrawResultService {
 		while (true) {
 			// 过滤并排序可用奖品（按概率从小到大排序，让小概率的后面再判断）
 			List<ProductDetailRes> availableProductDetails = productDetails.stream()
-					.filter(detail -> detail.getQuantity() > 0)
+					.filter(detail -> detail.getQuantity() > 0 && !"LAST".equals(detail.getGrade())) // 排除 "LAST"
 					.collect(Collectors.toList());
 
 			if (availableProductDetails.isEmpty()) {
-				throw new RuntimeException("奖品已抽完");
+				throw new RuntimeException("獎品已抽完");
 			}
 
 			// 计算总概率
@@ -597,6 +616,7 @@ public class DrawResultService {
 
 						// 更新库存
 						int newQuantity = detail.getQuantity() - 1;
+
 						if (newQuantity >= 0) {
 							detail.setQuantity(newQuantity);
 
@@ -608,12 +628,18 @@ public class DrawResultService {
 							));
 							toUpdatePrizeNumbers.add(selectedPrizeNumber);
 
-							if("true".equals(detail.getIsPrize())){
-								productDetailRepository.updateIsPrize();
+							if(newQuantity == 0){
+								if("true".equals(detail.getIsPrize())){
+									productDetailRepository.updateIsPrize();
+								}
 							}
 							prizeSelected = true;
 							break;
 						}
+
+
+
+
 					}
 				}
 			}

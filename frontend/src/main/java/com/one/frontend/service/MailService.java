@@ -61,4 +61,24 @@ public class MailService {
             e.printStackTrace(); // 处理邮件发送异常
         }
     }
+
+
+    public void sendPrizeMail(String to) {
+        // 创建 MIME 邮件
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+
+        try {
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("賞品盒數量達標通知");
+            // 将邮件内容设置为 HTML 格式
+            String htmlContent = "<p>賞品盒數量已達100個，請盡快整理賞品盒，如達到150個後則不能進行抽獎</p>";
+            helper.setText(htmlContent, true); // 第二个参数设为 true 表示内容为 HTML
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            e.printStackTrace(); // 处理邮件发送异常
+        }
+    }
 }

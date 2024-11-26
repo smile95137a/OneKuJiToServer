@@ -78,7 +78,7 @@ public interface ProductRepository {
     Long getProductByCategoryId(String uuid);
     @Select("SELECT * FROM product WHERE category_id = #{categoryId}")
     ProductRes getProductByCId(Long categoryId);
-    @Select("select * from product where product_type = #{type}")
+    @Select("select p.* , p.stock_quantity as detailQuantity from product p where product_type = #{type}")
     List<ProductRes> getProductByType(String type);
 
     @Select("WITH product_summary AS ( " +

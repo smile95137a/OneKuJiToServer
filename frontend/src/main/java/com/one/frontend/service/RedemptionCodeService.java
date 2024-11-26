@@ -20,17 +20,24 @@ public class RedemptionCodeService {
         Optional<RedemptionCode> redemptionCodeOpt = redemptionCodeMapper.findByCode(drawDto.getCode());
 
         if (redemptionCodeOpt.isPresent()) {
+            if (!redemptionCodeOpt.get().getProductId().equals(drawDto.getProductId())) {
+                return "此兌換碼並非此商品";
+            }
+        }
+
+        if (redemptionCodeOpt.isPresent()) {
             RedemptionCode redemptionCode = redemptionCodeOpt.get();
-            if (redemptionCode.isRedeemed()) {
+            if (redemptionCode.getIsRedeemed()) {
                 return "兌換碼已被使用";
             }
+
 
             // 更新兌換碼狀態
             redemptionCode.setRedeemedAt(LocalDateTime.now());
             redemptionCode.setUserId(userId);
             redemptionCodeMapper.updateRedemptionCode(redemptionCode);
 
-            return "兌換成功！";
+            return "兌換成功";
         } else {
             return "兌換碼無效";
         }
