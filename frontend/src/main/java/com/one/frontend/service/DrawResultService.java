@@ -76,11 +76,13 @@ public class DrawResultService {
 		return Math.min(protectionTime, 600); // 最大保护时间为600秒
 	}
 
-	public Boolean checkPrize(Long userId){
+	public Boolean checkPrize(Long userId) {
 		Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
 		List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
 		int totalQuantity = prizeCartItemList.size();
-		return !(totalQuantity >= 150);
+
+		// 如果 totalQuantity >= 150，返回 false；否则返回 true
+		return totalQuantity < 150;
 	}
 
 	// 抽奖操作，处理锁机制和保护期
