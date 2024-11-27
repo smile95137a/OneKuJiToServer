@@ -78,8 +78,14 @@ public interface ProductRepository {
     Long getProductByCategoryId(String uuid);
     @Select("SELECT * FROM product WHERE category_id = #{categoryId}")
     ProductRes getProductByCId(Long categoryId);
-    @Select("select p.* , p.stock_quantity as detailQuantity from product p where product_type = #{type}")
+    @Select("SELECT p.*, " +
+            "       p.stock_quantity AS detailQuantity " +
+            "FROM product p " +
+            "WHERE product_type = #{type} " +
+            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "         p.product_id DESC")
     List<ProductRes> getProductByType(String type);
+
 
     @Select("WITH product_summary AS ( " +
             "  SELECT product_id, " +
@@ -96,8 +102,10 @@ public interface ProductRepository {
             "FROM product p " +
             "LEFT JOIN product_summary ps ON p.product_id = ps.product_id " +
             "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
-            "ORDER BY p.product_id desc")
+            "ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "         p.product_id DESC")
     List<ProductRes> getAll();
+
     @Update("update product set status = 'NOT_AVAILABLE_YET' where product_id = #{productId}")
     void updateProductStatus(Long productId);
 }

@@ -24,8 +24,11 @@ public interface ProductRepository {
     @Select("SELECT * FROM product WHERE product_id = #{id}")
     Product selectProductById(Long id);
 
-    @Select("SELECT * FROM product")
+    @Select("SELECT * FROM product " +
+            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "         product_id DESC")
     List<Product> selectAllProducts();
+
 
     @Select("SELECT * FROM product WHERE product_id = #{productId}")
     Product getProductById(@Param("productId") Long productId);

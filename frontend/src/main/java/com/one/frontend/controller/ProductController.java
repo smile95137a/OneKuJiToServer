@@ -84,9 +84,6 @@ public class ProductController {
                 return productService.getProductDetailsByProductIds(productIds);
             });
 
-            // 等待詳情處理完成（如果需要的話）
-            // List<ProductDetailRes> details = futureDetails.get();  // 如果需要等待結果
-
             return ResponseEntity.ok(ResponseUtils.success(200, null, products));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -80,8 +80,6 @@ public class DrawResultService {
 		Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
 		List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
 		int totalQuantity = prizeCartItemList.size();
-
-		// 如果 totalQuantity >= 150，返回 false；否则返回 true
 		return totalQuantity < 150;
 	}
 
