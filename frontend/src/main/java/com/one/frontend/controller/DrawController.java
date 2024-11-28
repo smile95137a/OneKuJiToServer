@@ -34,12 +34,18 @@ public class DrawController {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		String s = null;
-		if(drawResultService.checkPrize(userId)){
+		if(drawResultService.checkPrize(userId) && drawResultService.checkStatus(drawDto.getProductId())){
 			s = redemptionCodeService.redeemCode(userId , drawDto);
 
 		}else{
-			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
-			return ResponseEntity.ok(response);
+			if(!drawResultService.checkPrize(userId)){
+				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+				return ResponseEntity.ok(response);
+			}else if(!drawResultService.checkStatus(drawDto.getProductId())){
+				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "大賞已完售，不可再次抽獎", null);
+				return ResponseEntity.ok(response);
+			}
+
 		}
 		if("兌換成功".equals(s)){
 			List<DrawResult> results = drawResultService.handleDraw2(userId, drawDto.getProductId(), drawDto.getPrizeNumbers(), "1");
@@ -62,20 +68,27 @@ public class DrawController {
 			 userId = userDetails.getId();
 		}
 		try {
-			if(drawResultService.checkPrize(userId)){
+			if(drawResultService.checkPrize(userId) && drawResultService.checkStatus(gachaDrawDto.getProductId())){
 				List<DrawResult> result = drawResultService.handleDraw(userId , gachaDrawDto.getProductId());
 				ApiResponse<List<DrawResult>> response = ResponseUtils.success(200, null, result);
 				return ResponseEntity.ok(response);
 			}else{
-				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
-				return ResponseEntity.ok(response);
+				if(!drawResultService.checkPrize(userId)){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+					return ResponseEntity.ok(response);
+				}else if(!drawResultService.checkStatus(gachaDrawDto.getProductId())){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "大賞已完售，不可再次抽獎", null);
+					return ResponseEntity.ok(response);
+				}
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "抽獎失敗", null);
 			return ResponseEntity.ok(response);
 		}
-	}
+        return null;
+    }
 
 	@GetMapping("/status/{productId}")
 	@Operation(summary = "檢視抽況", description = "根据产品ID获取所有奖项状态")
@@ -97,19 +110,26 @@ public class DrawController {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		try {
-			if(drawResultService.checkPrize(userId)){
+			if(drawResultService.checkPrize(userId) && drawResultService.checkStatus(drawDto.getProductId())){
 			List<DrawResult> drawResult = drawResultService.handleDraw2(userId, drawDto.getProductId(), drawDto.getPrizeNumbers() , drawDto.getExchangeType());
 			ApiResponse<List<DrawResult>> response = ResponseUtils.success(200, null, drawResult);
 			return ResponseEntity.ok(response);
 			}else{
-				ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
-				return ResponseEntity.ok(response);
+				if(!drawResultService.checkPrize(userId)){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+					return ResponseEntity.ok(response);
+				}else if(!drawResultService.checkStatus(drawDto.getProductId())){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "大賞已完售，不可再次抽獎", null);
+					return ResponseEntity.ok(response);
+				}
+
 			}
 		} catch (Exception e) {
 			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, e.getMessage(), null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
-	}
+        return null;
+    }
 
 	@PostMapping("/random/{productId}")
 	@Operation(summary = "紅利抽獎(隨機制)", description = "为特定产品和用户执行随机抽奖")
@@ -118,18 +138,25 @@ public class DrawController {
 		var userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		try {
-			if(drawResultService.checkPrize(userId)){
+			if(drawResultService.checkPrize(userId) && drawResultService.checkStatus(productId)){
 			DrawResult drawResult = drawResultService.handleDrawRandom(userId, productId);
 			ApiResponse<DrawResult> response = ResponseUtils.success(200, null, drawResult);
 			return ResponseEntity.ok(response);
 		}else{
-			ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
-			return ResponseEntity.ok(response);
+				if(!drawResultService.checkPrize(userId)){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "賞品盒數量大於150個，請先整理賞品盒", null);
+					return ResponseEntity.ok(response);
+				}else if(!drawResultService.checkStatus(productId)){
+					ApiResponse<List<DrawResult>> response = ResponseUtils.failure(400, "大賞已完售，不可再次抽獎", null);
+					return ResponseEntity.ok(response);
+				}
+
 		}
 		} catch (Exception e) {
 			ApiResponse<DrawResult> response = ResponseUtils.failure(400, "抽奖失败", null);
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
-	}
+        return null;
+    }
 
 }

@@ -3,6 +3,7 @@ package com.one.frontend.service;
 import com.one.frontend.dto.OrderDetailDto;
 import com.one.frontend.eenum.OrderStatus;
 import com.one.frontend.eenum.PrizeCategory;
+import com.one.frontend.eenum.ProductStatus;
 import com.one.frontend.eenum.ProductType;
 import com.one.frontend.model.*;
 import com.one.frontend.repository.*;
@@ -81,6 +82,13 @@ public class DrawResultService {
 		List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
 		int totalQuantity = prizeCartItemList.size();
 		return totalQuantity < 150;
+	}
+
+	public Boolean checkStatus(Long productId){
+		ProductRes productById = productRepository.getProductById(productId);
+		ProductStatus status = productById.getStatus();
+        return !ProductStatus.NOT_AVAILABLE_YET.equals(status);
+
 	}
 
 	// 抽奖操作，处理锁机制和保护期
