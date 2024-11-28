@@ -98,30 +98,38 @@ public class DrawResultService {
 			try {
 				LocalDateTime now = LocalDateTime.now(); // 当前时间
 				DrawProtection protection = productDrawProtectionMap.get(productId); // 获取该产品的保护信息
-				long protectionTime = getDrawProtectionTime(prizeNumbers.size()); // 根据抽奖次数计算保护时间
+				long protectionTime = 600L; // 默认保护时间为 600 秒
 
-				// 如果有保护信息，计算是否在保护期内
 				if (protection != null) {
 					long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, now).getSeconds();
-					System.out.println("Protection time: " + protectionTime + " seconds");
-					System.out.println("Seconds since last draw: " + secondsSinceLastDraw + " seconds");
+					long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
 
-					// 如果在保护期内，且不是同一个用户，则抛出异常
-					if (secondsSinceLastDraw < protectionTime && !Objects.equals(userId, protection.userId)) {
-						throw new Exception("抽獎保護期內，其他用戶不能抽獎。剩餘時間：" + (protectionTime - secondsSinceLastDraw) + "秒");
+					// 如果在保护期内
+					if (remainingProtectionTime > 0) {
+						System.out.println("Remaining protection time: " + remainingProtectionTime + " seconds");
+
+						// 如果是其他用户，抛出异常并显示剩余时间
+						if (!Objects.equals(userId, protection.userId)) {
+							long minutes = remainingProtectionTime / 60;
+							long seconds = remainingProtectionTime % 60;
+							throw new Exception("抽獎保護期內，其他用戶不能抽獎。剩餘時間：" + minutes + "分" + seconds + "秒");
+						}
+
+
+						// 如果是同一用户，延长保护时间
+						protectionTime = remainingProtectionTime + 30L; // 增加 30 秒
 					}
 				}
 
-				// 更新抽奖保护信息，设置新的保护时间
+				// 更新或设置新的保护信息
+				LocalDateTime newProtectionEndTime = now.plusSeconds(protectionTime);
 				productDrawProtectionMap.put(productId, new DrawProtection(now, userId));
 				System.out.println("Updated DrawProtection for productId: " + productId + ", userId: " + userId);
 
-				// 返回保护期的结束时间
-				LocalDateTime endTimes = now.plusSeconds(protectionTime);
-				return endTimes;
+				return newProtectionEndTime; // 返回保护期结束时间
 			} catch (Exception e) {
 				e.printStackTrace();
-				throw new Exception("抽獎發生錯誤: " + e.getMessage());
+				throw new Exception(e.getMessage());
 			} finally {
 				lock.unlock(); // 释放锁
 			}
@@ -129,6 +137,7 @@ public class DrawResultService {
 			throw new Exception("目前有其他用戶正在抽獎，請稍後。");
 		}
 	}
+
 
 
 
@@ -201,6 +210,9 @@ public class DrawResultService {
 
 	public List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
 		try {
+
+			LocalDateTime localDateTime = handleDrawForLock(userId, productId, prizeNumbers);
+
 			// 验证用户
 			Long prizeCartId = prizeCartRepository.getCartIdByUserId(userId);
 			if (prizeCartId == null) {
@@ -220,9 +232,19 @@ public class DrawResultService {
 
 			// 获取选中的奖品编号
 			List<PrizeNumber> selectedPrizeNumbers = prizeNumberMapper.getPrizeNumbersByProductIdAndNumbers(productId, prizeNumbers);
+
+// 如果奖品数量不匹配，抛出异常
 			if (selectedPrizeNumbers.size() != prizeNumbers.size()) {
 				throw new Exception("部分指定的獎品編號不存在或重複");
 			}
+
+// 检查是否有奖品已被抽走
+			for (PrizeNumber prizeNumber : selectedPrizeNumbers) {
+				if (prizeNumber.getIsDrawn()) {
+					throw new Exception("獎品編號 " + prizeNumber.getNumber() + " 已被抽走");
+				}
+			}
+
 
 			// 验证并扣除用户余额
 			BigDecimal totalAmount = calculateTotalAmount(product, prizeNumbers.size(), payMethod);

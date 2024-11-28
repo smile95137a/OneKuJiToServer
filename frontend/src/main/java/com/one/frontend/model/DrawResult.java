@@ -97,4 +97,6 @@ public class DrawResult{
 
     @Column(name = "pay_type")
     private String payType;
+
+    private LocalDateTime endTimes;
 }
