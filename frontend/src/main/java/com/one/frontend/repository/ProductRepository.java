@@ -82,7 +82,7 @@ public interface ProductRepository {
             "       p.stock_quantity AS detailQuantity " +
             "FROM product p " +
             "WHERE product_type = #{type} " +
-            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
             "         p.product_id DESC")
     List<ProductRes> getProductByType(String type);
 
@@ -102,7 +102,7 @@ public interface ProductRepository {
             "FROM product p " +
             "LEFT JOIN product_summary ps ON p.product_id = ps.product_id " +
             "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
-            "ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
             "         p.product_id DESC")
     List<ProductRes> getAll();
 

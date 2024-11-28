@@ -25,7 +25,7 @@ public interface ProductRepository {
     Product selectProductById(Long id);
 
     @Select("SELECT * FROM product " +
-            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 0 ELSE 1 END, " +
+            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
             "         product_id DESC")
     List<Product> selectAllProducts();
 
