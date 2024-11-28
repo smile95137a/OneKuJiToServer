@@ -2,11 +2,16 @@ package com.one.frontend.config.security.oauth2;
 
 import com.one.frontend.config.security.CustomUserDetails;
 import com.one.frontend.config.security.SecurityUtils;
+import com.one.frontend.model.Cart;
+import com.one.frontend.model.PrizeCart;
 import com.one.frontend.model.User;
+import com.one.frontend.repository.CartRepository;
+import com.one.frontend.repository.PrizeCartRepository;
 import com.one.frontend.repository.UserRepository;
 import com.one.frontend.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,7 +32,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 	private final UserRepository userRepository;
+	@Autowired
+	private PrizeCartRepository prizeCartRepository;
 
+	@Autowired
+	private CartRepository cartRepository;
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) {
 		log.info("CustomOAuth2UserService loadUser");
@@ -81,6 +90,22 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		userEntity.setStatus("ACTIVE");
 		userEntity.setUserUid(UUID.randomUUID().toString());
 		userRepository.createUser(userEntity);
+		// 4. 创建用户相关资源：购物车和奖品购物车
+		User userCart = userRepository.getUserByUserName(userEntity.getUsername());
+		Cart cart = new Cart();
+		cart.setUserId(userCart.getId());
+		cart.setUserUid(userCart.getUserUid());
+		cart.setCreatedAt(LocalDateTime.now());
+		cart.setUpdatedAt(LocalDateTime.now());
+		cartRepository.addCart(cart);
+
+		PrizeCart prizeCart = new PrizeCart();
+		prizeCart.setUserId(userCart.getId());
+		prizeCart.setUserUid(userCart.getUserUid());
+		prizeCart.setCreatedAt(LocalDateTime.now());
+		prizeCart.setUpdatedAt(LocalDateTime.now());
+		prizeCartRepository.addPrizeCart(prizeCart);
+
 		userEntity = userRepository.getUserByEmail(customAbstractOAuth2UserInfo.getEmail()).get();
 		return userEntity;
 	}
