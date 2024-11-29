@@ -8,6 +8,7 @@ import com.one.frontend.model.User;
 import com.one.frontend.repository.CartRepository;
 import com.one.frontend.repository.PrizeCartRepository;
 import com.one.frontend.repository.UserRepository;
+import com.one.frontend.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +78,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		String clientRegistrationId = oAuth2UserRequest.getClientRegistration().getRegistrationId();
 		OAuth2Provider provider = OAuth2Provider.fromString(clientRegistrationId);
 		User userEntity = new User();
-		userEntity.setUsername(customAbstractOAuth2UserInfo.getEmail());
+		userEntity.setUsername(RandomUtils.genRandom(32));
 		userEntity.setNickname(customAbstractOAuth2UserInfo.getName());
 		userEntity.setEmail(customAbstractOAuth2UserInfo.getEmail());
 		userEntity.setProvider(provider.name());

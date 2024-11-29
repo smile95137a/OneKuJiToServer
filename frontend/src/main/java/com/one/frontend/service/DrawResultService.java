@@ -280,7 +280,7 @@ public class DrawResultService {
 			UserRes userById = userRepository.getUserById(userId);
 
 			if(total >= 100){
-				mailService.sendPrizeMail(userById.getUsername());
+				mailService.sendPrizeMail(userById.getEmail());
 			}
 
 			return drawResults;

@@ -264,7 +264,7 @@ return null;
             BigDecimal amount = new BigDecimal(amountInCents);
             UserRes user = userRepository.getUserById(userId);
             paymentRequest.setBuyerName(user.getNickname());
-            paymentRequest.setBuyerMail(user.getUsername());
+            paymentRequest.setBuyerMail(user.getEmail());
             paymentRequest.setBuyerTelm(user.getPhoneNumber());
             response = this.webATM2(paymentRequest);
             userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , response.getOrderId());
@@ -396,7 +396,7 @@ return null;
 
         //訂單成立開立發票並且傳送至email
         ReceiptReq invoiceRequest = new ReceiptReq();
-        invoiceRequest.setEmail(userById.getUsername());
+        invoiceRequest.setEmail(userById.getEmail());
         invoiceRequest.setTotalFee(String.valueOf(amount));
         List<ReceiptReq.Item> items = new ArrayList<>();
         ReceiptReq.Item item = new ReceiptReq.Item();
@@ -523,7 +523,7 @@ return null;
         }
 
 // 设置电子邮件
-        invoiceRequest.setEmail(userById.getUsername());
+        invoiceRequest.setEmail(userById.getEmail());
 
 // 设置发票状态和捐赠信息
         if (order.getState() != null) {
@@ -669,7 +669,7 @@ return null;
             //訂單成立開立發票並且傳送至email
             UserRes userById2 = userRepository.getUserById(userTransaction.getUserId());
             ReceiptReq invoiceRequest = new ReceiptReq();
-            invoiceRequest.setEmail(userById2.getUsername());
+            invoiceRequest.setEmail(userById2.getEmail());
             invoiceRequest.setTotalFee(String.valueOf(amount));
             List<ReceiptReq.Item> items = new ArrayList<>();
             ReceiptReq.Item item = new ReceiptReq.Item();

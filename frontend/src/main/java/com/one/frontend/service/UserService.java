@@ -66,7 +66,7 @@ public class UserService {
 					.username(userDto.getUsername())
 					.password(encryptedPassword)
 					.nickname(userDto.getNickname())
-					.email(userDto.getEmail())
+					.email(userDto.getUsername())
 					.phoneNumber(userDto.getPhoneNumber())
 					.city(userDto.getCity())
 					.area(userDto.getArea())
@@ -174,6 +174,6 @@ public class UserService {
 		String verificationUrls = verificationUrl + token;
 
 		// 3. 发送邮件
-		mailService.sendVerificationMail(user.getUsername(), verificationUrls);
+		mailService.sendVerificationMail(user.getEmail(), verificationUrls);
 	}
 }
