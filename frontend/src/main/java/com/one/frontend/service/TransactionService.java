@@ -20,14 +20,17 @@ public class TransactionService {
 
     public List<UserTransaction> getTransactions(Long userId, Date startDate, Date endDate) {
         List<UserTransaction> transactions;
-        // 將 Date 轉換為 LocalDateTime
-        LocalDateTime startLocalDateTime = convertToLocalDateTimeAtStartOfDay(startDate);
-        LocalDateTime endLocalDateTime = convertToLocalDateTimeAtEndOfDay(endDate);
 
-        if (startDate != null && endDate != null) {
-            transactions = transactionRepository.findTransactionsByUserIdAndDateRange(userId, startLocalDateTime, endLocalDateTime);
-        } else {
+        // 如果 startDate 和 endDate 都是 null 或空，獲取全部資料
+        if (startDate == null || endDate == null) {
             transactions = transactionRepository.findAllTransactionsByUserId(userId);
+        } else {
+            // 將 Date 轉換為 LocalDateTime，並設置為起始和結束時間
+            LocalDateTime startLocalDateTime = convertToLocalDateTimeAtStartOfDay(startDate);
+            LocalDateTime endLocalDateTime = convertToLocalDateTimeAtEndOfDay(endDate);
+
+            // 根據時間範圍查詢
+            transactions = transactionRepository.findTransactionsByUserIdAndDateRange(userId, startLocalDateTime, endLocalDateTime);
         }
 
         // 不需要再将中文设置回枚举
@@ -39,6 +42,7 @@ public class TransactionService {
 
         return transactions;
     }
+
     private static LocalDateTime convertToLocalDateTimeAtStartOfDay(Date date) {
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         return localDate.atStartOfDay();  // 設置為該天的 00:00:00
