@@ -17,6 +17,7 @@ import java.io.OutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @RestController
@@ -36,20 +37,14 @@ public class ReportController {
 
         try {
             LocalDateTime start;
-            LocalDateTime end = LocalDateTime.now(); // 默认结束时间为当前时间
+            LocalDateTime end;
 
             // 如果提供了日期参数，尝试解析；否则按 groupType 推算
             if (startDate != null && !startDate.isEmpty()) {
-                // 判断日期格式
-                if (startDate.contains("T")) {
-                    // 如果日期包含时间部分，直接解析为 LocalDateTime
-                    start = LocalDateTime.parse(startDate);
-                } else {
-                    // 如果只有日期部分，补充时间为 00:00:00
-                    start = LocalDate.parse(startDate).atStartOfDay();
-                }
+                start = LocalDate.parse(startDate).atStartOfDay(); // 当天 00:00:00
             } else {
-                // 如果前端未传，根据 groupType 推算
+                // 根据 groupType 推算
+                end = LocalDateTime.now();
                 switch (groupType.toLowerCase()) {
                     case "day":
                         start = end.toLocalDate().atStartOfDay(); // 设置为今天零点
@@ -68,14 +63,8 @@ public class ReportController {
                 }
             }
 
-            // 如果未传 endDate，默认为当前时间
             if (endDate != null && !endDate.isEmpty()) {
-                // 判断日期格式
-                if (endDate.contains("T")) {
-                    end = LocalDateTime.parse(endDate);
-                } else {
-                    end = LocalDate.parse(endDate).atStartOfDay();
-                }
+                end = LocalDate.parse(endDate).atTime(LocalTime.MAX); // 当天 23:59:59
             } else {
                 end = LocalDateTime.now();
             }
@@ -88,8 +77,8 @@ public class ReportController {
             for (Map<String, Object> dataRow : reportData) {
                 Map<String, Object> translatedRow = new HashMap<>();
                 for (Map.Entry<String, Object> entry : dataRow.entrySet()) {
-                    String translatedField = FieldTranslator.translate(entry.getKey()); // 轉換字段名稱
-                    translatedRow.put(translatedField, entry.getValue()); // 將轉換後的字段名稱與對應的值放入新結果
+                    String translatedField = FieldTranslator.translate(entry.getKey()); // 转换字段名称
+                    translatedRow.put(translatedField, entry.getValue()); // 将转换后的字段名称与对应的值放入新结果
                 }
                 translatedData.add(translatedRow);
             }
@@ -112,45 +101,28 @@ public class ReportController {
 
         try {
             LocalDateTime start;
-            LocalDateTime end = LocalDateTime.now(); // 默认结束时间为当前时间
+            LocalDateTime end;
 
-            // 如果提供了日期参数，尝试解析；否则按 groupType 推算
+            // 设置开始时间
             if (startDate != null && !startDate.isEmpty()) {
                 if (startDate.contains("T")) {
-                    // 如果日期包含时间部分，直接解析为 LocalDateTime
-                    start = LocalDateTime.parse(startDate);
+                    start = LocalDateTime.parse(startDate).with(LocalTime.MIN); // 设置为当天00:00:00
                 } else {
-                    // 如果只有日期部分，补充时间为 00:00:00
-                    start = LocalDate.parse(startDate).atStartOfDay();
+                    start = LocalDate.parse(startDate).atStartOfDay(); // 设置为当天00:00:00
                 }
             } else {
-                // 如果前端未传，根据 groupType 推算
-                switch (groupType.toLowerCase()) {
-                    case "day":
-                        start = end.toLocalDate().atStartOfDay(); // 设置为今天零点
-                        break;
-                    case "week":
-                        start = end.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(); // 当周的周一零点
-                        break;
-                    case "month":
-                        start = end.withDayOfMonth(1).toLocalDate().atStartOfDay(); // 当月的第一天零点
-                        break;
-                    case "year":
-                        start = end.withDayOfYear(1).toLocalDate().atStartOfDay(); // 当年的第一天零点
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Invalid groupType: " + groupType);
-                }
+                start = determineStartDateByGroupType(groupType); // 根据 groupType 推算
             }
 
+            // 设置结束时间
             if (endDate != null && !endDate.isEmpty()) {
                 if (endDate.contains("T")) {
-                    end = LocalDateTime.parse(endDate);
+                    end = LocalDateTime.parse(endDate).with(LocalTime.MAX); // 设置为当天23:59:59
                 } else {
-                    end = LocalDate.parse(endDate).atStartOfDay();
+                    end = LocalDate.parse(endDate).atTime(LocalTime.MAX); // 设置为当天23:59:59
                 }
             } else {
-                end = LocalDateTime.now();
+                end = LocalDateTime.now().with(LocalTime.MAX); // 默认结束时间为当前时间的23:59:59
             }
 
             // 获取报表数据
@@ -173,10 +145,9 @@ public class ReportController {
                     String fieldName = fieldOrder.get(i);
                     String translatedField = FieldTranslator.translate(fieldName); // 转换字段名称
                     header.createCell(i).setCellValue(translatedField);
-                    System.out.println("Header field: " + translatedField);  // 调试打印
                 }
 
-// 填充数据行
+                // 填充数据行
                 int rowIndex = 1;
                 for (Map<String, Object> row : reportData) {
                     Row dataRow = sheet.createRow(rowIndex++);
@@ -184,7 +155,6 @@ public class ReportController {
                         String fieldName = fieldOrder.get(i);
                         Object value = row.getOrDefault(fieldName, "");
                         dataRow.createCell(i).setCellValue(value.toString());
-                        System.out.println("Data for field " + fieldName + ": " + value);  // 调试打印
                     }
                 }
 
@@ -195,6 +165,23 @@ public class ReportController {
             // 处理异常
             System.err.println("Error occurred while exporting report: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 根据 groupType 推算起始时间
+    private LocalDateTime determineStartDateByGroupType(String groupType) {
+        LocalDateTime now = LocalDateTime.now();
+        switch (groupType.toLowerCase()) {
+            case "day":
+                return now.toLocalDate().atStartOfDay();
+            case "week":
+                return now.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+            case "month":
+                return now.withDayOfMonth(1).toLocalDate().atStartOfDay();
+            case "year":
+                return now.withDayOfYear(1).toLocalDate().atStartOfDay();
+            default:
+                throw new IllegalArgumentException("Invalid groupType: " + groupType);
         }
     }
 
