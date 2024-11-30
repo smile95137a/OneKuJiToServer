@@ -29,17 +29,17 @@ public class ReportService {
             case "TOTAL_CONSUMPTION":
                 return storeConsumptionRepository.getTotalConsumptionByTimeGroup(startDate, endDate, groupType);
             case "TOTAL_DEPOSIT":
-                return storeConsumptionRepository.getTotalDepositByTimeGroup(groupType);
+                return storeConsumptionRepository.getTotalDepositByTimeGroup(groupType, startDate, endDate);
             case "USER_UPDATE_LOG":
-                return storeConsumptionRepository.getUserUpdateLogSummary(groupType);
+                return storeConsumptionRepository.getUserUpdateLogSummary(groupType, startDate, endDate);
             case "DAILY_SIGN_IN":
-                return storeConsumptionRepository.getDailySignInSummary(groupType);
+                return storeConsumptionRepository.getDailySignInSummary(groupType, startDate, endDate);
             case "SLIVER_COIN_RECYCLE":
-                return storeConsumptionRepository.getTotalSliverCoinByRecycleTime(groupType);
+                return storeConsumptionRepository.getTotalSliverCoinByRecycleTime(groupType, startDate, endDate);
             case "PRIZE_RECYCLE_REPORT":
-                return storeConsumptionRepository.getPrizeRecycleReport(groupType);
+                return storeConsumptionRepository.getPrizeRecycleReport(groupType, startDate, endDate);
             case "DRAW_RESULT_SUMMARY":
-                return storeConsumptionRepository.getDrawResultSummary(groupType);
+                return storeConsumptionRepository.getDrawResultSummary(groupType, startDate, endDate);
             default:
                 throw new IllegalArgumentException("Invalid report type: " + reportType);
         }

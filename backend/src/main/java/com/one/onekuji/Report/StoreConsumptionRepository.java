@@ -108,6 +108,8 @@ public interface StoreConsumptionRepository {
             "FROM user_transaction ut " +
             "LEFT JOIN `user` u ON ut.user_id = u.id " +
             "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "  AND ut.status != 'NO_PAY' " +
+            "  AND ut.created_at BETWEEN #{startDate} AND #{endDate} " +
             "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
             "SELECT 'week' AS group_type, " +
@@ -118,6 +120,8 @@ public interface StoreConsumptionRepository {
             "FROM user_transaction ut " +
             "LEFT JOIN `user` u ON ut.user_id = u.id " +
             "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "  AND ut.status != 'NO_PAY' " +
+            "  AND ut.created_at BETWEEN #{startDate} AND #{endDate} " +
             "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
             "SELECT 'month' AS group_type, " +
@@ -128,6 +132,8 @@ public interface StoreConsumptionRepository {
             "FROM user_transaction ut " +
             "LEFT JOIN `user` u ON ut.user_id = u.id " +
             "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "  AND ut.status != 'NO_PAY' " +
+            "  AND ut.created_at BETWEEN #{startDate} AND #{endDate} " +
             "GROUP BY time_group, u.nickname, u.phone_number " +
             "UNION ALL " +
             "SELECT 'year' AS group_type, " +
@@ -138,10 +144,16 @@ public interface StoreConsumptionRepository {
             "FROM user_transaction ut " +
             "LEFT JOIN `user` u ON ut.user_id = u.id " +
             "WHERE ut.transaction_type = 'DEPOSIT' " +
+            "  AND ut.status != 'NO_PAY' " +
+            "  AND ut.created_at BETWEEN #{startDate} AND #{endDate} " +
             "GROUP BY time_group, u.nickname, u.phone_number " +
             "ORDER BY group_type, time_group DESC " +
             "</script>")
-    List<Map<String, Object>> getTotalDepositByTimeGroup(@Param("groupType") String groupType);
+    List<Map<String, Object>> getTotalDepositByTimeGroup(
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 
     @Select({
@@ -158,6 +170,7 @@ public interface StoreConsumptionRepository {
             "    SUM(u.sliver_coin_delta) AS total_sliver_coin,",
             "    SUM(u.bonus_delta) AS total_bonus",
             "FROM user_update_log u",
+            "WHERE u.created_at BETWEEN #{startDate} AND #{endDate}",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
             "       GROUP BY time_group",
@@ -169,8 +182,11 @@ public interface StoreConsumptionRepository {
             "</script>"
     })
     List<Map<String, Object>> getUserUpdateLogSummary(
-            @Param("groupType") String groupType
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
     );
+
 
 
     @Select({
@@ -184,8 +200,9 @@ public interface StoreConsumptionRepository {
             "        WHEN #{groupType} = 'all' THEN DATE(d.sign_in_date)",
             "        ELSE DATE(d.sign_in_date)",
             "    END AS time_group,",
-            "    SUM(d.reward_points) AS total_sliver_coin " +
+            "    SUM(d.reward_points) AS total_sliver_coin",
             "FROM onekuji.daily_sign_in_records d",
+            "WHERE d.sign_in_date BETWEEN #{startDate} AND #{endDate}",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
             "       GROUP BY time_group",
@@ -197,8 +214,11 @@ public interface StoreConsumptionRepository {
             "</script>"
     })
     List<Map<String, Object>> getDailySignInSummary(
-            @Param("groupType") String groupType
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
@@ -216,6 +236,7 @@ public interface StoreConsumptionRepository {
             "    END AS time_group,",
             "    SUM(pl.sliver_coin) AS total_sliver_coin",
             "FROM prize_recycle_log pl",
+            "WHERE pl.recycle_time BETWEEN #{startDate} AND #{endDate}",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
             "       GROUP BY time_group",
@@ -228,8 +249,11 @@ public interface StoreConsumptionRepository {
             "</script>"
     })
     List<Map<String, Object>> getTotalSliverCoinByRecycleTime(
-            @Param("groupType") String groupType
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
     );
+
 
     @Select({
             "<script>",
@@ -251,20 +275,25 @@ public interface StoreConsumptionRepository {
             "LEFT JOIN product_detail pd ON pl.product_detail_id = pd.product_detail_id",
             "LEFT JOIN product p ON pd.product_id = p.product_id",
             "WHERE IFNULL(pd.product_name, '') != ''",
+            "<if test='startDate != null and endDate != null'>",
+            "    AND pl.recycle_time BETWEEN #{startDate} AND #{endDate}",
+            "</if>",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
-            "       -- 如果是 'all' 类型，按日期和商品分组",
             "       GROUP BY time_group, pd.product_name, pd.image_urls, pd.grade, pl.sliver_coin",
             "   </when>",
             "   <otherwise>",
-            "       -- 对于其他分组类型，按时间和商品分组",
             "       GROUP BY time_group, pd.product_name, pd.image_urls, pd.grade, pl.sliver_coin",
             "   </otherwise>",
             "</choose>",
             "ORDER BY time_group DESC",
             "</script>"
-            })
-    List<Map<String, Object>> getPrizeRecycleReport(@Param("groupType") String groupType);
+    })
+    List<Map<String, Object>> getPrizeRecycleReport(
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 
 
@@ -297,6 +326,9 @@ public interface StoreConsumptionRepository {
             "LEFT JOIN product p ON dr.product_id = p.product_id",
             "LEFT JOIN `user` u ON dr.user_id = u.id",
             "WHERE dr.pay_type IS NOT NULL",
+            "<if test='startDate != null and endDate != null'>",
+            "    AND dr.create_date BETWEEN #{startDate} AND #{endDate}",
+            "</if>",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
             "       GROUP BY time_group, p.product_name, pd.product_name, pd.image_urls, u.nickname, dr.amount, dr.pay_type",
@@ -309,8 +341,11 @@ public interface StoreConsumptionRepository {
             "</script>"
     })
     List<Map<String, Object>> getDrawResultSummary(
-            @Param("groupType") String groupType
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
