@@ -648,7 +648,7 @@ public class DrawResultService {
 						int newQuantity = detail.getQuantity() - 1;
 						if(newQuantity == 0){
 							if("true".equals(detail.getIsPrize())){
-								productDetailRepository.updateIsPrize();
+								productDetailRepository.updateIsPrize(detail.getProductDetailId());
 							}
 						}
 						if (newQuantity >= 0) {
