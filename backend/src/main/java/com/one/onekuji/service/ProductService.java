@@ -111,6 +111,11 @@ public class ProductService {
 
 
     private ProductRes convertEntityToRes(Product product) {
+        List<ProductDetail> productDetailByProductId = productDetailRepository.getProductDetailByProductId(Long.valueOf(product.getProductId()));
+        int totalQuantity = productDetailByProductId.stream()
+                .mapToInt(ProductDetail::getQuantity)
+                .sum();
+        product.setStockQuantity(totalQuantity);
         return new ProductRes(
                 product.getProductId(),
                 product.getProductName(),

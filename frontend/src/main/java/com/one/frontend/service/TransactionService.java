@@ -5,6 +5,10 @@ import com.one.frontend.repository.UserTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -16,9 +20,12 @@ public class TransactionService {
 
     public List<UserTransaction> getTransactions(Long userId, Date startDate, Date endDate) {
         List<UserTransaction> transactions;
+        // 將 Date 轉換為 LocalDateTime
+        LocalDateTime startLocalDateTime = convertToLocalDateTimeAtStartOfDay(startDate);
+        LocalDateTime endLocalDateTime = convertToLocalDateTimeAtEndOfDay(endDate);
 
         if (startDate != null && endDate != null) {
-            transactions = transactionRepository.findTransactionsByUserIdAndDateRange(userId, startDate, endDate);
+            transactions = transactionRepository.findTransactionsByUserIdAndDateRange(userId, startLocalDateTime, endLocalDateTime);
         } else {
             transactions = transactionRepository.findAllTransactionsByUserId(userId);
         }
@@ -32,5 +39,14 @@ public class TransactionService {
 
         return transactions;
     }
+    private static LocalDateTime convertToLocalDateTimeAtStartOfDay(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return localDate.atStartOfDay();  // 設置為該天的 00:00:00
+    }
 
+    // 將 Date 轉換為 LocalDateTime 並設置為該天的 23:59:59
+    private static LocalDateTime convertToLocalDateTimeAtEndOfDay(Date date) {
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        return localDate.atTime(LocalTime.MAX);  // 設置為該天的 23:59:59
+    }
 }

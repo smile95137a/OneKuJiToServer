@@ -154,7 +154,7 @@ public class DrawResultService {
 			return handleDraw2(userId , productId , prizeNumbers , "1");
 	}
 
-	public DrawResponse getAllPrizes(Long productId, Long userId) {
+	public DrawResponse getAllPrizes(Long productId) {
 		// 1. 获取产品详细信息
 		List<ProductDetail> productDetails = productDetailRepository.getAllProductDetailsByProductId(productId);
 		List<PrizeNumber> allPrizeNumbers = new ArrayList<>();

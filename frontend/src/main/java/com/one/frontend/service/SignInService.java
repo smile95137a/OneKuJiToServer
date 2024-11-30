@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -31,8 +33,8 @@ public class SignInService {
 
     public SignInRes spinWheel(Long userId) throws Exception {
         // 获取当月的开始和结束日期
-        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
+        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();  // 2024-11-01 00:00:00
+        LocalDateTime endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).atTime(LocalTime.MAX);  // 2024-11-30 23:59:59.999999999
 
         // 查询用户当月的储值总金额
         BigDecimal totalDepositAmount = userTransactionRepository.getTotalAmountForUserAndMonth(

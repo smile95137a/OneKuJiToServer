@@ -24,6 +24,8 @@ import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -299,9 +301,8 @@ return null;
      */
     public Award getTotalConsumeAmountForCurrentMonth(Long userId) {
         // 計算本月的起始與結束日期
-        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
-        LocalDate endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth());
-
+        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();  // 2024-11-01 00:00:00
+        LocalDateTime endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).atTime(LocalTime.MAX);  // 2024-11-30 23:59:59.999999999
         // 獲取該用戶當月的消費總金額
         BigDecimal deposit = userTransactionRepository.getTotalAmountForUserAndMonth(userId, "CONSUME", startOfMonth, endOfMonth);
 

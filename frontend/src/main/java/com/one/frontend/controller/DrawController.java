@@ -93,9 +93,7 @@ public class DrawController {
 	@GetMapping("/status/{productId}")
 	@Operation(summary = "檢視抽況", description = "根据产品ID获取所有奖项状态")
 	public ResponseEntity<ApiResponse<DrawResponse>> getDrawStatus(@PathVariable Long productId) {
-		var userDetails = SecurityUtils.getCurrentUserPrinciple();
-		var userId = userDetails.getId();
-		DrawResponse prizes = drawResultService.getAllPrizes(productId , userId);
+		DrawResponse prizes = drawResultService.getAllPrizes(productId);
 		if (prizes == null) {
 			ApiResponse<DrawResponse> response = ResponseUtils.failure(404, "沒有此ID", null);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

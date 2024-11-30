@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -26,8 +27,8 @@ public interface UserRewardRepository {
             "AND threshold_amount = #{thresholdAmount}")
     boolean hasReceivedRewardForThreshold(
             @Param("userId") Long userId,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
             @Param("thresholdAmount") BigDecimal thresholdAmount
     );
 

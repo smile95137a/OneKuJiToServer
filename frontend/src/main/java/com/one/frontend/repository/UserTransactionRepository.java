@@ -5,8 +5,7 @@ import com.one.frontend.model.UserTransaction;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -34,15 +33,15 @@ public interface UserTransactionRepository {
             "AND transaction_date BETWEEN #{startDate} AND #{endDate}")
     BigDecimal getTotalAmountForUserAndMonth(@Param("userId") Long userId,
                                              @Param("transactionType") String transactionType,
-                                             @Param("startDate") LocalDate startDate,
-                                             @Param("endDate") LocalDate endDate);
+                                             @Param("startDate") LocalDateTime startDate,
+                                             @Param("endDate") LocalDateTime endDate);
 
     @Select("SELECT * FROM user_transaction WHERE user_id = #{userId} " +
             "AND transaction_date BETWEEN #{startDate} AND #{endDate} order by transaction_date desc")
     List<UserTransaction> findTransactionsByUserIdAndDateRange(
             @Param("userId") Long userId,
-            @Param("startDate") Date startDate,
-            @Param("endDate") Date endDate);
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate);
 
     @Select("SELECT * FROM user_transaction WHERE user_id = #{userId} order by transaction_date desc")
     List<UserTransaction> findAllTransactionsByUserId(@Param("userId") Long userId);
