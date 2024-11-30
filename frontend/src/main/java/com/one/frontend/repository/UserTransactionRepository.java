@@ -13,18 +13,19 @@ public interface UserTransactionRepository {
 
     // 插入新的交易记录
     @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at) " +
-            "VALUES (#{userId}, #{transactionType}, #{amount}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)")
+            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate})")
     void insertTransaction(@Param("userId") Long userId,
                            @Param("transactionType") String transactionType,
-                           @Param("amount") BigDecimal amount);
-
+                           @Param("amount") BigDecimal amount,
+                           @Param("localDate") LocalDateTime localDate);
 
     @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , order_number , status) " +
-            "VALUES (#{userId}, #{transactionType}, #{amount}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP , #{orderNumber} , 'NO_PAY')")
+            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{orderNumber} , 'NO_PAY')")
     void insertTransaction2(@Param("userId") Long userId,
                            @Param("transactionType") String transactionType,
                            @Param("amount") BigDecimal amount,
-                           @Param("orderNumber") String orderNumber);
+                           @Param("orderNumber") String orderNumber,
+                            @Param("localDate") LocalDateTime localDate);
 
 
     // 获取某个用户在指定时间段内的交易金额（消费或储值）

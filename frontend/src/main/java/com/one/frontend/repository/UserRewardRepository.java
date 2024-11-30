@@ -54,7 +54,7 @@ public interface UserRewardRepository {
 
     // 更新用户奖励
     @Update("UPDATE user_reward SET reward_amount = #{rewardAmount}, reward_date = #{rewardDate}, " +
-            "created_at = CURRENT_TIMESTAMP WHERE id = #{id}")
+            "created_at = #{createdAt} WHERE id = #{id}")
     void update(UserReward userReward);
 
     // 删除用户奖励

@@ -269,7 +269,8 @@ return null;
             paymentRequest.setBuyerMail(user.getEmail());
             paymentRequest.setBuyerTelm(user.getPhoneNumber());
             response = this.webATM2(paymentRequest);
-            userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , response.getOrderId());
+            LocalDateTime localDateTime = LocalDateTime.now();
+            userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , response.getOrderId() , localDateTime);
         }
 
 
@@ -416,7 +417,8 @@ return null;
     public String recordDeposit3(Long userId, BigDecimal amount) throws MessagingException {
         String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
         int amountInCents = amount.intValue(); // 转为整数分
-        userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount, orderNumber);
+        LocalDateTime localDateTime = LocalDateTime.now();
+        userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount, orderNumber , localDateTime);
         return orderNumber;
     }
 
