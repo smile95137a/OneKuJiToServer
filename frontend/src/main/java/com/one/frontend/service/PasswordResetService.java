@@ -44,7 +44,7 @@ public class PasswordResetService {
 
   passwordResetTokenRepository.save(prt);
   var link = String.format("%s/restPwd/%s", frontendDomain, token);
-  mailService.sendPassWordMail(user.getEmail(), link);
+  mailService.sendPassWordMail(user.getUsername(), link);
  }
 
  @Transactional
@@ -90,7 +90,7 @@ public class PasswordResetService {
    var userId = prtEntity.getUserId();
    var userEntity = userRepository.getUserBId(userId);
    var pwd = passwordEncoder.encode(password);
-
+   userEntity.setId(userId);
    userEntity.setPassword(pwd);
    userEntity.setUpdatedAt(now);
    userRepository.resetUser(userEntity);

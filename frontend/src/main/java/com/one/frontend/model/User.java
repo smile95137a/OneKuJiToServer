@@ -79,7 +79,7 @@ public class User{
     private LocalDateTime createdAt;
 
     @Schema(description = "用戶最後更新時間", example = "2024-08-22T15:30:00")
-    @Column(name = "updatedAt")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @Schema(description = "用戶角色識別碼", example = "1")

@@ -41,9 +41,7 @@ public interface UserRepository {
 	@Delete("DELETE FROM user WHERE id = #{userId}")
 	void deleteUser(@Param("userId") Long userId);
 
-	@Select("SELECT username, password , role_id FROM user WHERE username = #{username}")
-	@Results({ @Result(property = "username", column = "username"), @Result(property = "password", column = "password"),
-			@Result(property = "roles", column = "id", many = @Many(select = "selectRolesByUserId")) })
+	@Select("SELECT id,username, password , role_id FROM user WHERE username = #{username}")
 	Optional<User> findByUsername(@Param("username") String username);
 
 	@Select("SELECT r.* FROM roles r " + "JOIN users_roles ur ON r.id = ur.role_id " + "WHERE ur.user_id = #{userId}")
@@ -102,7 +100,6 @@ public interface UserRepository {
 	@Update("update `user` set balance = balance + #{balance} where id = #{userId}")
 	void updateBalance(@Param("userId") Long userId, @Param("balance") int balance);
 
-	@Insert("INSERT INTO `user` (password , update_at) "
-			+ "VALUES (#{password} , #{updatedAt})")
-	void resetUser(User user);
+	@Update("update `user` set password = #{user.password} , updated_at = #{user.updatedAt} where id = #{user.id}")
+	void resetUser(@Param("user") User user);
 }
