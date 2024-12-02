@@ -274,7 +274,7 @@ public class OrderService {
 
 	private void recordConsume(Long userId, BigDecimal amount) {
 		LocalDateTime localDateTime = LocalDateTime.now();
-		userTransactionRepository.insertTransaction(userId, "CONSUME", amount , localDateTime);
+		userTransactionRepository.insertTransaction(userId, "CONSUME", amount , localDateTime , "1");
 	}
 
 	@Transactional(rollbackFor = Exception.class)

@@ -251,7 +251,8 @@ public class DrawResultService {
 			deductUserBalance(userId, totalAmount, product.getPrizeCategory(), payMethod);
 
 			// **记录消费** (在扣除用户余额后)
-			recordConsume(userId, totalAmount);
+
+			recordConsume(userId, totalAmount , payMethod);
 
 			// 为每个选择的编号随机抽奖（按概率）
 			List<PrizeNumber> drawnPrizeNumbers = drawPrizesForNumbersWithStock(selectedPrizeNumbers, productDetails , productId);
@@ -289,9 +290,9 @@ public class DrawResultService {
 		}
 	}
 
-	private void recordConsume(Long userId, BigDecimal amount) {
+	private void recordConsume(Long userId, BigDecimal amount , String payMethod) {
 		LocalDateTime localDateTime = LocalDateTime.now();
-		userTransactionRepository.insertTransaction(userId, "CONSUME", amount , localDateTime);
+		userTransactionRepository.insertTransaction(userId, "CONSUME", amount , localDateTime , payMethod);
 	}
 
 

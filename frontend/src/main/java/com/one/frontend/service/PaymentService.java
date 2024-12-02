@@ -304,6 +304,9 @@ return null;
         // 計算本月的起始與結束日期
         LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();  // 2024-11-01 00:00:00
         LocalDateTime endOfMonth = LocalDate.now().withDayOfMonth(LocalDate.now().lengthOfMonth()).atTime(LocalTime.MAX);  // 2024-11-30 23:59:59.999999999
+
+        System.out.println(startOfMonth);
+        System.out.println(endOfMonth);
         // 獲取該用戶當月的消費總金額
         BigDecimal deposit = userTransactionRepository.getTotalAmountForUserAndMonth(userId, "CONSUME", startOfMonth, endOfMonth);
 

@@ -12,12 +12,13 @@ import java.util.List;
 public interface UserTransactionRepository {
 
     // 插入新的交易记录
-    @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at) " +
-            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate})")
+    @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , pay_method) " +
+            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{payMethod})")
     void insertTransaction(@Param("userId") Long userId,
                            @Param("transactionType") String transactionType,
                            @Param("amount") BigDecimal amount,
-                           @Param("localDate") LocalDateTime localDate);
+                           @Param("localDate") LocalDateTime localDate,
+    @Param("payMethod") String payMethod);
 
     @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , order_number , status) " +
             "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{orderNumber} , 'NO_PAY')")
@@ -31,7 +32,7 @@ public interface UserTransactionRepository {
     // 获取某个用户在指定时间段内的交易金额（消费或储值）
     @Select("SELECT COALESCE(SUM(amount), 0) FROM user_transaction " +
             "WHERE user_id = #{userId} AND transaction_type = #{transactionType} " +
-            "AND transaction_date BETWEEN #{startDate} AND #{endDate}")
+            "AND transaction_date BETWEEN #{startDate} AND #{endDate} and pay_method = '1'")
     BigDecimal getTotalAmountForUserAndMonth(@Param("userId") Long userId,
                                              @Param("transactionType") String transactionType,
                                              @Param("startDate") LocalDateTime startDate,

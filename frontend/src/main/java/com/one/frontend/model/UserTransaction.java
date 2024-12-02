@@ -47,6 +47,8 @@ public class UserTransaction {
     private String orderNumber;
     @Column(name = "status")
     private String status;
+    @Column(name = "pay_method")
+    private String payMethod;
 
     // 在保存实体时自动生成创建和更新时间
     @PrePersist
