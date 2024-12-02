@@ -81,4 +81,24 @@ public class MailService {
             e.printStackTrace(); // 处理邮件发送异常
         }
     }
+
+    public void sendPassWordMail(String to, String verificationUrl) {
+        // 创建 MIME 邮件
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+
+        try {
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("忘記密碼連結");
+            // 将邮件内容设置为 HTML 格式
+            String htmlContent = "<p>請點擊網址重設密碼:</p>" +
+                    "<a href=\"" + verificationUrl + "\">" + verificationUrl + "</a>";
+            helper.setText(htmlContent, true); // 第二个参数设为 true 表示内容为 HTML
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            e.printStackTrace(); // 处理邮件发送异常
+        }
+    }
 }
