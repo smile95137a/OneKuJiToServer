@@ -72,6 +72,9 @@ public class ProductDetailService {
             // 6. 计算尺寸，并将结果存入 detailReq
             detailReq.setSize(detailReq.getSize());
 
+            if(!detailReq.getIsPrize().equals("true")){
+                detailReq.setIsPrize(String.valueOf(false));
+            }
             // 7. 插入产品细节，不排除 "LAST" 等级
             productDetailMapper.insert(detailReq);
             Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
