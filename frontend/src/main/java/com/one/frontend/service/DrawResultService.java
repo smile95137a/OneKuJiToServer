@@ -271,9 +271,9 @@ public class DrawResultService {
 			if (spDrawResult != null) {
 				drawResults.add(spDrawResult);
 			}
-
-			// 计算并更新用户红利
-			updateUserBonus(userId, totalAmount, prizeNumbers.size(), payMethod);
+			if("1".equals(payMethod) || "2".equals(payMethod) ){
+				updateUserBonus(userId, totalAmount, prizeNumbers.size(), payMethod);
+			}
 
 			Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
 			List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
@@ -532,7 +532,7 @@ public class DrawResultService {
 			bonusPercentage = new BigDecimal("0.10");
 		} else if (count >= 5) {
 			bonusPercentage = new BigDecimal("0.04");
-		} else if (count > 3) {
+		} else if (count >= 3) {
 			bonusPercentage = new BigDecimal("0.02");
 		} else {
 			bonusPercentage = BigDecimal.ZERO;
