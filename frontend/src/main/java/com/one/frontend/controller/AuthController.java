@@ -10,7 +10,6 @@ import com.one.frontend.service.AuthService;
 import com.one.frontend.util.ResponseUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,22 +56,22 @@ public class AuthController {
         } catch (AllException.InvalidCredentialsException e) {
             // 返回999错误码，表示账号密码错误
             ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(999, "帳號密碼錯誤", null);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.ok(response);
 
         } catch (AllException.UnverifiedUserException e) {
             // 返回998错误码，表示用户没有验证
             ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(998, "用戶沒有認證，請到信箱認證", null);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            return ResponseEntity.ok(response);
 
         } catch (AllException.BlacklistedUserException e) {
             // 返回997错误码，表示用户是黑名单
             ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(997, "黑名單用戶，無法登入", null);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             // 处理其他异常，返回500
             ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(500, "服務氣出錯", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 

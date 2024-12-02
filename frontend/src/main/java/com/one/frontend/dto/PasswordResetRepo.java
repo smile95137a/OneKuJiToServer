@@ -1,4 +1,4 @@
-package com.one.frontend.repository;
+package com.one.frontend.dto;
 
 import com.one.frontend.model.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface PasswordResetRepo extends JpaRepository<PasswordResetToken, Integer> {
 	Optional<PasswordResetToken> findByToken(String token);
 
-	List<PasswordResetToken> findBSyUserIdOrderByCreateTimeDesc(Long userId);
+	List<PasswordResetToken> findByUserIdOrderByCreateTimeDesc(Long userId);
 }

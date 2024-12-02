@@ -8,7 +8,6 @@ import com.one.frontend.response.UserRes;
 import com.one.frontend.service.UserService;
 import com.one.frontend.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -86,4 +85,23 @@ public class UserController {
 		}
 	}
 
+
+	@PutMapping("/resetPwd")
+	public ResponseEntity<?> resetPwd(@RequestBody UserReq req) {
+		CustomUserDetails userDetails = SecurityUtils.getCurrentUserPrinciple();
+		if (userDetails == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		var user = userService.getUserById(userDetails.getId());
+		if (user == null) {
+			return ResponseEntity.ok(ResponseUtils.failure(999, "找不到使用者", user));
+		}
+		var userId = user.getId();
+		try {
+			var res = userService.updateUser(req, userId);
+			return ResponseEntity.ok(ResponseUtils.success(200, "更新成功", res));
+		} catch (Exception e) {
+			return ResponseEntity.ok(ResponseUtils.failure(999, "更新失敗", false));
+		}
+	}
 }

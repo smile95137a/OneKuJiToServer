@@ -101,4 +101,8 @@ public interface UserRepository {
 	void updateUserRoleId(User user);
 	@Update("update `user` set balance = balance + #{balance} where id = #{userId}")
 	void updateBalance(@Param("userId") Long userId, @Param("balance") int balance);
+
+	@Insert("INSERT INTO `user` (password , update_at) "
+			+ "VALUES (#{password} , #{updatedAt})")
+	void resetUser(User user);
 }

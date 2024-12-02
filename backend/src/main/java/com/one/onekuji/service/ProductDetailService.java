@@ -149,7 +149,9 @@ public class ProductDetailService {
         // 计算尺寸
 
         productDetailReq.setSize(productDetailReq.getSize());
-
+        if(productDetailReq.getIsPrize() == null){
+            productDetailReq.setIsPrize(String.valueOf(false));
+        }
         // 更新商品细节
         productDetailMapper.update(productDetailReq);
 
