@@ -32,6 +32,8 @@ public class FieldTranslator {
         fieldMapping.put("total_bonus" , "紅利總額");
         fieldMapping.put("phone_number" , "電話號碼");
         fieldMapping.put("amount_with_type" , "金幣與幣種");
+        fieldMapping.put("user_email" , "信箱帳號");
+        fieldMapping.put("user_nickname" , "暱稱");
     }
 
     public static String translate(String fieldName) {
