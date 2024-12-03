@@ -33,7 +33,7 @@ public class ReportController {
             @RequestParam("reportType") String reportType,
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam("groupType") String groupType) {
+            @RequestParam("groupType") String groupType) { // 默认分页参数
 
         try {
             LocalDateTime start;
@@ -69,7 +69,7 @@ public class ReportController {
                 end = LocalDateTime.now();
             }
 
-            // 调用服务层，处理时间范围
+            // 调用服务层，处理时间范围，传递分页参数
             List<Map<String, Object>> reportData = reportService.getReportData(reportType, start, end, groupType);
 
             // 使用 FieldTranslator 将字段名转换为繁体中文
@@ -90,6 +90,7 @@ public class ReportController {
             return ResponseEntity.badRequest().body(Collections.emptyList());
         }
     }
+
 
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public void exportReport(

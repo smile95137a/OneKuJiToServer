@@ -25,7 +25,7 @@ public class ReportService {
     public List<Map<String, Object>> getReportData(String reportType, LocalDateTime startDate, LocalDateTime endDate, String groupType) {
         switch (reportType) {
             case "DRAW_AMOUNT":
-                return storeConsumptionRepository.getDrawAmountsByTimeRange(startDate, endDate);
+                return storeConsumptionRepository.getDrawAmountsByGroupType(groupType,startDate, endDate);
             case "TOTAL_CONSUMPTION":
                 return storeConsumptionRepository.getTotalConsumptionByTimeGroup(startDate, endDate, groupType);
             case "TOTAL_DEPOSIT":
