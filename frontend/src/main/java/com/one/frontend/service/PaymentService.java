@@ -264,12 +264,9 @@ return null;
             String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
             String amountInCents = paymentRequest.getAmount();
             BigDecimal amount = new BigDecimal(amountInCents);
-            UserRes user = userRepository.getUserById(userId);
-            paymentRequest.setBuyerName(user.getNickname());
-            paymentRequest.setBuyerMail(user.getEmail());
-            paymentRequest.setBuyerTelm(user.getPhoneNumber());
             LocalDateTime localDateTime = LocalDateTime.now();
             userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , orderNumber , localDateTime);
+            response.setOrderNo(orderNumber);
         }
 
 
