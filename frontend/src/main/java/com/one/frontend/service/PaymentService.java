@@ -473,47 +473,51 @@ return null;
         Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(order.getUserId());
         List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId1);
 
+        if("1".equals(order.getPaymentMethod())){
+            if("1".equals(order.getType())){
+                // 獲取所有購物車項的ID並移除
+                List<Long> cartItemIds = cartItemList.stream()
+                        .filter(cartItem -> orderDetailsByOrderId.stream()
+                                .anyMatch(orderDetail -> orderDetail.getStoreProduct().getStoreProductId().equals(cartItem.getStoreProductId())))
+                        .map(CartItem::getCartItemId)
+                        .collect(Collectors.toList());
+                if(!cartItemIds.isEmpty()){
+                    cartItemList.forEach(cartItem -> {
+                        // 查詢目前的商品數據
+                        StoreProduct storeProduct = storeProductRepository.findById(cartItem.getStoreProductId());
 
-        if("1".equals(order.getType())){
-            // 獲取所有購物車項的ID並移除
-            List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
-            if(!cartItemIds.isEmpty()){
-                cartItemList.forEach(cartItem -> {
-                    // 查詢目前的商品數據
-                    StoreProduct storeProduct = storeProductRepository.findById(cartItem.getStoreProductId());
+                        // 更新庫存和已售數量
+                        int newStockQuantity = storeProduct.getStockQuantity() - cartItem.getQuantity();
+                        int newSoldQuantity = (storeProduct.getSoldQuantity() == null ? 0 : storeProduct.getSoldQuantity()) + cartItem.getQuantity();
 
-                    // 更新庫存和已售數量
-                    int newStockQuantity = storeProduct.getStockQuantity() - cartItem.getQuantity();
-                    int newSoldQuantity = (storeProduct.getSoldQuantity() == null ? 0 : storeProduct.getSoldQuantity()) + cartItem.getQuantity();
+                        // 判斷是否需要更新為 SOLD_OUT 狀態
+                        String newStatus = (newStockQuantity <= 0) ? "SOLD_OUT" : storeProduct.getStatus();
 
-                    // 判斷是否需要更新為 SOLD_OUT 狀態
-                    String newStatus = (newStockQuantity <= 0) ? "SOLD_OUT" : storeProduct.getStatus();
-
-                    // 更新商品信息
-                    storeProductRepository.updateStoreProduct(
-                            storeProduct.getStoreProductId(),
-                            Math.max(newStockQuantity, 0), // 確保庫存不為負
-                            newSoldQuantity,
-                            newStatus
-                    );
-                });
-                // 移除購物車項
-                cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
-            }
+                        // 更新商品信息
+                        storeProductRepository.updateStoreProduct(
+                                storeProduct.getStoreProductId(),
+                                Math.max(newStockQuantity, 0), // 確保庫存不為負
+                                newSoldQuantity,
+                                newStatus
+                        );
+                    });
+                    // 移除購物車項
+                    cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+                }
 
 
 
-        }else if("2".equals(order.getType())){
+            }else if("2".equals(order.getType())){
 // 獲取所有購物車項的ID並移除
-            List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
-            if(!cartItemIds.isEmpty()){
-                prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+                List<Long> cartItemIds = prizeCartItemList.stream()
+                        .filter(prizeCartItem -> orderDetailsByOrderId.stream()
+                                .anyMatch(orderDetail -> orderDetail.getProductDetailRes().getProductDetailId().equals(prizeCartItem.getProductDetailId())))
+                        .map(PrizeCartItem::getPrizeCartItemId)
+                        .collect(Collectors.toList());   if(!cartItemIds.isEmpty()){
+                    prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+                }
             }
         }
-
-
-
-
         // 生成发票请求对象
         ReceiptReq invoiceRequest = new ReceiptReq();
 
