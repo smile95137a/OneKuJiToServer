@@ -517,13 +517,6 @@ return null;
         // 生成发票请求对象
         ReceiptReq invoiceRequest = new ReceiptReq();
 
-// 设置订单号，如果有车辆信息，则使用车辆作为订单号，否则使用订单ID
-        if (order.getVehicle() != null) {
-            invoiceRequest.setOrderCode(order.getVehicle());
-        } else {
-            invoiceRequest.setOrderCode(null);  // 使用订单ID作为备用
-        }
-
 // 设置电子邮件
         invoiceRequest.setEmail(userById.getEmail());
 
