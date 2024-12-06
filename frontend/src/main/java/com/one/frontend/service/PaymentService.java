@@ -259,7 +259,7 @@ return null;
     }
 
     public PaymentResponse topOp(PaymentRequest paymentRequest, String payMethod , Long userId) throws Exception {
-        PaymentResponse response = null;
+        PaymentResponse response = new PaymentResponse();
         if("2".equals(payMethod)){
             String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
             String amountInCents = paymentRequest.getAmount();

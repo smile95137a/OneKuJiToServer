@@ -146,7 +146,7 @@ public class PaymentController {
         try{
             if("2".equals(paymentRequest.getPaymentMethod()) && Integer.parseInt(paymentRequest.getAmount()) < 20000){
                 PaymentResponse response = paymentService.topOp(paymentRequest , paymentRequest.getPaymentMethod() , userId);
-                ApiResponse<Object> response1 = ResponseUtils.success(200, response.getRetMsg(), response);
+                ApiResponse<Object> response1 = ResponseUtils.success(200, null, response);
                 return ResponseEntity.ok(response1);
             }else if("1".equals(paymentRequest.getPaymentMethod())){
                 int amount = Integer.parseInt(paymentRequest.getAmount());
