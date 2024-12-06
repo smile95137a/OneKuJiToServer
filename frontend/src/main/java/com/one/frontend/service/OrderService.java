@@ -172,7 +172,7 @@ public class OrderService {
 			paymentResponse.setResult("1");
 			String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 			paymentResponse.setOrderId(orderNumber);
-			paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+			paymentResponse.setEPayAccount(String.valueOf(totalAmount));
 		}else if("2".equals(payCartRes.getPaymentMethod())){
 			PaymentRequest paymentRequest = new PaymentRequest();
 			BigDecimal totalAmount2 = new BigDecimal(String.valueOf(totalAmount)); // 假设你的 totalAmount 是 BigDecimal
@@ -182,6 +182,9 @@ public class OrderService {
 			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
 			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
 			paymentRequest.setBuyerMemo("再來一抽備註");
+			String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+			paymentResponse.setOrderId(orderNumber);
+			paymentResponse.setEPayAccount(String.valueOf(totalAmount));
 		}
 
 		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
@@ -283,11 +286,10 @@ public class OrderService {
 
 		//取得用戶資訊
 		UserRes userRes = userRepository.getUserById(userId);
-
+		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 		PaymentResponse paymentResponse = new PaymentResponse();
 		if("1".equals(payCartRes.getPaymentMethod())){
 			paymentResponse.setResult("1");
-			String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 			paymentResponse.setOrderId(orderNumber);
 			paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 		}else if("2".equals(payCartRes.getPaymentMethod())){
@@ -299,8 +301,11 @@ public class OrderService {
 			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
 			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
 			paymentRequest.setBuyerMemo("再來一抽備註");
+			paymentResponse.setResult("1");
+			paymentResponse.setOrderId(orderNumber);
+			paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 		}
-		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+
 
 		//paymentResponse result = 1 等於成功
 			// 創建訂單實體，這裡包含了支付和運輸方式、收貨人、賬單信息等字段
