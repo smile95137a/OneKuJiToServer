@@ -259,7 +259,7 @@ public class OrderService {
 					cartItemList.stream().map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId , finalPaymentResponse.getEPayAccount())) // 映射購物車項目為訂單詳情
 							.forEach(orderDetail -> orderDetailRepository.saveOrderDetail(orderDetail)); // 保存訂單詳情
 
-					List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+					List<Long> cartItemIds = cartItemList.stream().filter(CartItem::getIsSelected).map(CartItem::getCartItemId).collect(Collectors.toList());
 
 					// 移除購物車項
 					cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
@@ -423,7 +423,7 @@ public class OrderService {
 				}
 
 				// 獲取所有購物車項的ID並移除
-				List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+				List<Long> cartItemIds = prizeCartItemList.stream().filter(PrizeCartItem::getIsSelected).map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
 
 				// 移除購物車項
 				prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
