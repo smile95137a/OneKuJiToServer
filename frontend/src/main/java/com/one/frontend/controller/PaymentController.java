@@ -73,7 +73,7 @@ public class PaymentController {
         System.out.println("e_PayInfo: " + e_PayInfo);
         System.out.println("str_check: " + str_check);
         try {
-            if("已付款".equals(ret_msg)){
+            if("1".equals(result)){
                 paymentService.transferOrderFromTemp(e_orderno);
             } else {
                 paymentService.rePrizeCart(e_orderno);
