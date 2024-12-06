@@ -476,10 +476,7 @@ return null;
 
         if("1".equals(order.getType())){
             // 獲取所有購物車項的ID並移除
-            List<Long> cartItemIds = cartItemList.stream()
-                    .filter(CartItem::getIsSelected) // 筛选 is_selected 为 true 的项
-                    .map(CartItem::getCartItemId) // 提取 cartItemId
-                    .collect(Collectors.toList());
+            List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
             if(!cartItemIds.isEmpty()){
                 cartItemList.forEach(cartItem -> {
                     // 查詢目前的商品數據
@@ -508,10 +505,7 @@ return null;
 
         }else if("2".equals(order.getType())){
 // 獲取所有購物車項的ID並移除
-            List<Long> cartItemIds = prizeCartItemList.stream()
-                    .filter(PrizeCartItem::getIsSelected) // 筛选 is_selected 为 true 的项
-                    .map(PrizeCartItem::getPrizeCartItemId) // 提取 prizeCartItemId
-                    .collect(Collectors.toList());
+            List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
             if(!cartItemIds.isEmpty()){
                 prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
             }
