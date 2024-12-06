@@ -182,15 +182,13 @@ public class OrderService {
 			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
 			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
 			paymentRequest.setBuyerMemo("再來一抽備註");
-			paymentResponse = paymentService.webATM(paymentRequest);
 		}
 
-
+		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 		//paymentResponse result = 1 等於成功
-		if("1".equals(paymentResponse.getResult())){
 
 				// 創建訂單實體，這裡包含了支付和運輸方式、收貨人、賬單信息等字段
-				Order orderEntity = Order.builder().userId(userId).orderNumber(paymentResponse.getOrderId()).totalAmount(totalAmount) // 總金額 =
+				Order orderEntity = Order.builder().userId(userId).orderNumber(orderNumber).totalAmount(totalAmount) // 總金額 =
 						// 商品價格
 						// + 運費
 						.paymentMethod(payCartRes.getPaymentMethod()) // 從 PayCartRes 獲取支付方式
@@ -240,7 +238,7 @@ public class OrderService {
 					orderRepository.insertOrder(orderEntity);
 
 					// 根據訂單號查詢訂單ID
-					Long orderId = orderRepository.getOrderIdByOrderNumber(paymentResponse.getOrderId());
+					Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
 					// 轉換購物車項目到訂單詳情並保存
 					cartItemList.stream().map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId , finalPaymentResponse.getEPayAccount())) // 映射購物車項目為訂單詳情
 							.forEach(orderDetail -> orderDetailRepository.saveOrderDetail(orderDetail)); // 保存訂單詳情
@@ -251,7 +249,7 @@ public class OrderService {
 					orderRepository.insertOrder(orderEntity);
 
 					// 根據訂單號查詢訂單ID
-					Long orderId = orderRepository.getOrderIdByOrderNumber(paymentResponse.getOrderId());
+					Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
 
 					// 轉換購物車項目到訂單詳情並保存
 
@@ -266,10 +264,8 @@ public class OrderService {
 				}
 
 				this.recordConsume(userId , totalAmount);
-		}else{
-			throw new Exception("資料有錯" + paymentResponse.getRetMsg());
-		}
-		return new OrderPayRes(paymentResponse.getOrderId() , "1" ,  paymentResponse); // 返回訂單號
+
+		return new OrderPayRes(orderNumber , "1" ,  paymentResponse); // 返回訂單號
 	}
 
 	private void recordConsume(Long userId, BigDecimal amount) {
@@ -303,14 +299,12 @@ public class OrderService {
 			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
 			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
 			paymentRequest.setBuyerMemo("再來一抽備註");
-			paymentResponse = paymentService.webATM(paymentRequest);
 		}
-
+		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 
 		//paymentResponse result = 1 等於成功
-		if("1".equals(paymentResponse.getResult())){
 			// 創建訂單實體，這裡包含了支付和運輸方式、收貨人、賬單信息等字段
-			Order orderEntity = Order.builder().userId(userId).orderNumber(paymentResponse.getOrderId()).totalAmount(shippingCost) // 總金額 =
+			Order orderEntity = Order.builder().userId(userId).orderNumber(orderNumber).totalAmount(shippingCost) // 總金額 =
 					// 商品價格
 					// + 運費
 					.paymentMethod(payCartRes.getPaymentMethod()) // 從 PayCartRes 獲取支付方式
@@ -359,7 +353,7 @@ public class OrderService {
 				orderRepository.insertOrder(orderEntity);
 
 				// 根據訂單號查詢訂單ID
-				Long orderId = orderRepository.getOrderIdByOrderNumber(paymentResponse.getOrderId());
+				Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
 
 				// 根據訂單號查詢訂單ID
 
@@ -409,7 +403,7 @@ public class OrderService {
 				orderRepository.insertOrder(orderEntity);
 
 				// 根據訂單號查詢訂單ID
-				Long orderId = orderRepository.getOrderIdByOrderNumber(paymentResponse.getOrderId());
+				Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
 
 				// 根據訂單號查詢訂單ID
 				List<OrderDetail> orderDetails = prizeCartItemList.stream()
@@ -431,10 +425,7 @@ public class OrderService {
 
 			}
 			this.recordConsume(userId , shippingCost);
-		}else{
-			throw new Exception("資料有錯" + paymentResponse.getRetMsg());
-		}
-		return new OrderPayRes(paymentResponse.getOrderId() , "2" , paymentResponse); // 返回訂單號
+		return new OrderPayRes(orderNumber , "2" , paymentResponse); // 返回訂單號
 	}
 
 	private Order createOrderEntity(PayCartRes payCartRes, Long userId, String orderNumber, BigDecimal shippingCost) {
