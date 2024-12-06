@@ -268,9 +268,8 @@ return null;
             paymentRequest.setBuyerName(user.getNickname());
             paymentRequest.setBuyerMail(user.getEmail());
             paymentRequest.setBuyerTelm(user.getPhoneNumber());
-            response = this.webATM2(paymentRequest);
             LocalDateTime localDateTime = LocalDateTime.now();
-            userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , response.getOrderId() , localDateTime);
+            userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , orderNumber , localDateTime);
         }
 
 

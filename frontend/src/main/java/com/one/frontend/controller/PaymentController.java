@@ -74,7 +74,7 @@ public class PaymentController {
         System.out.println("str_check: " + str_check);
         try {
             if("已付款".equals(ret_msg)){
-                paymentService.transferOrderFromTemp(OrderID);
+                paymentService.transferOrderFromTemp(e_orderno);
             } else {
                 paymentService.rePrizeCart(OrderID);
             }
@@ -128,7 +128,7 @@ public class PaymentController {
         System.out.println("str_check: " + str_check);
         if("1".equals(result)){
             // 记录储值交易
-            PaymentResponse byId = paymentResponseMapper.findById(OrderID);
+            PaymentResponse byId = paymentResponseMapper.findById(e_orderno);
             paymentService.recordDeposit(byId.getUserId(), new BigDecimal(PayAmount) , OrderID);
             ApiResponse<Void> response1 = ResponseUtils.success(200, "成功", null);
 
