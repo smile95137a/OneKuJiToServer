@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -476,45 +477,98 @@ return null;
         if("1".equals(order.getPaymentMethod())){
             if("1".equals(order.getType())){
                 // 獲取所有購物車項的ID並移除
-                List<Long> cartItemIds = cartItemList.stream()
-                        .filter(cartItem -> orderDetailsByOrderId.stream()
-                                .anyMatch(orderDetail -> orderDetail.getStoreProduct().getStoreProductId().equals(cartItem.getStoreProductId())))
-                        .map(CartItem::getCartItemId)
-                        .collect(Collectors.toList());
-                if(!cartItemIds.isEmpty()){
-                    cartItemList.forEach(cartItem -> {
-                        // 查詢目前的商品數據
+                // 按 product_detail_id 分组
+                Map<Long, List<CartItem>> groupedCartItems = cartItemList.stream()
+                        .collect(Collectors.groupingBy(CartItem::getStoreProductId));
+
+// 遍历订单详情，按匹配的数量删除购物车项
+                List<Long> cartItemIdsToRemove = new ArrayList<>();
+                orderDetailsByOrderId.forEach(orderDetail -> {
+                    Long storeProductId = orderDetail.getStoreProduct().getStoreProductId();
+
+                    // 获取对应的购物车项
+                    List<CartItem> matchingCartItems = groupedCartItems.get(storeProductId);
+
+                    if (matchingCartItems != null && !matchingCartItems.isEmpty()) {
+                        // 根据订单详情的商品数量取出匹配的购物车项
+                        int remainingQuantity = orderDetail.getQuantity(); // 假设 OrderDetail 中有 quantity 字段
+                        for (CartItem cartItem : matchingCartItems) {
+                            if (remainingQuantity <= 0) break; // 如果数量已满足，退出循环
+
+                            cartItemIdsToRemove.add(cartItem.getCartItemId());
+                            remainingQuantity -= cartItem.getQuantity();
+                        }
+
+                        // 更新分组后的列表，移除已匹配的购物车项
+                        groupedCartItems.put(storeProductId, matchingCartItems.stream()
+                                .filter(cartItem -> !cartItemIdsToRemove.contains(cartItem.getCartItemId()))
+                                .collect(Collectors.toList()));
+                    }
+                });
+
+// 更新库存和移除购物车项
+                cartItemIdsToRemove.forEach(cartItemId -> {
+                    CartItem cartItem = cartItemList.stream()
+                            .filter(item -> item.getCartItemId().equals(cartItemId))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (cartItem != null) {
                         StoreProduct storeProduct = storeProductRepository.findById(cartItem.getStoreProductId());
 
-                        // 更新庫存和已售數量
+                        // 更新库存和已售数量
                         int newStockQuantity = storeProduct.getStockQuantity() - cartItem.getQuantity();
                         int newSoldQuantity = (storeProduct.getSoldQuantity() == null ? 0 : storeProduct.getSoldQuantity()) + cartItem.getQuantity();
-
-                        // 判斷是否需要更新為 SOLD_OUT 狀態
                         String newStatus = (newStockQuantity <= 0) ? "SOLD_OUT" : storeProduct.getStatus();
 
-                        // 更新商品信息
                         storeProductRepository.updateStoreProduct(
                                 storeProduct.getStoreProductId(),
-                                Math.max(newStockQuantity, 0), // 確保庫存不為負
+                                Math.max(newStockQuantity, 0),
                                 newSoldQuantity,
                                 newStatus
                         );
-                    });
-                    // 移除購物車項
-                    cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+                    }
+                });
+
+// 移除购物车项
+                if (!cartItemIdsToRemove.isEmpty()) {
+                    cartItemService.removeCartItems(cartItemIdsToRemove, cartItemList.get(0).getCartId());
                 }
 
 
-
             }else if("2".equals(order.getType())){
-// 獲取所有購物車項的ID並移除
-                List<Long> cartItemIds = prizeCartItemList.stream()
-                        .filter(prizeCartItem -> orderDetailsByOrderId.stream()
-                                .anyMatch(orderDetail -> orderDetail.getProductDetailRes().getProductDetailId().equals(prizeCartItem.getProductDetailId())))
-                        .map(PrizeCartItem::getPrizeCartItemId)
-                        .collect(Collectors.toList());   if(!cartItemIds.isEmpty()){
-                    prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+// 按 product_detail_id 分组
+                Map<Long, List<PrizeCartItem>> groupedPrizeCartItems = prizeCartItemList.stream()
+                        .collect(Collectors.groupingBy(PrizeCartItem::getProductDetailId));
+
+// 遍历订单详情，按匹配的数量删除购物车项
+                List<Long> cartItemIdsToRemove = new ArrayList<>();
+                orderDetailsByOrderId.forEach(orderDetail -> {
+                    Long productDetailId = orderDetail.getProductDetailRes().getProductDetailId();
+
+                    // 获取对应的购物车项
+                    List<PrizeCartItem> matchingPrizeCartItems = groupedPrizeCartItems.get(productDetailId);
+
+                    if (matchingPrizeCartItems != null && !matchingPrizeCartItems.isEmpty()) {
+                        // 根据订单详情的商品数量取出匹配的购物车项
+                        int remainingQuantity = orderDetail.getQuantity(); // 假设 OrderDetail 中有 quantity 字段
+                        for (PrizeCartItem prizeCartItem : matchingPrizeCartItems) {
+                            if (remainingQuantity <= 0) break; // 如果数量已满足，退出循环
+
+                            cartItemIdsToRemove.add(prizeCartItem.getPrizeCartItemId());
+                            remainingQuantity -= prizeCartItem.getQuantity();
+                        }
+
+                        // 更新分组后的列表，移除已匹配的购物车项
+                        groupedPrizeCartItems.put(productDetailId, matchingPrizeCartItems.stream()
+                                .filter(prizeCartItem -> !cartItemIdsToRemove.contains(prizeCartItem.getPrizeCartItemId()))
+                                .collect(Collectors.toList()));
+                    }
+                });
+
+// 移除购物车项
+                if (!cartItemIdsToRemove.isEmpty()) {
+                    prizeCartItemService.removeCartItems(cartItemIdsToRemove, prizeCartItemList.get(0).getCartId());
                 }
             }
         }
