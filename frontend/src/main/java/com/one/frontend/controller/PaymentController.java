@@ -87,9 +87,14 @@ public class PaymentController {
     @PostMapping("/creditMP")
     public ResponseEntity<ApiResponse<?>> creditpaymentCallback(@RequestBody CreditDto creditDto) {
         try {
-            String s = paymentService.transferOrderFromTemp(creditDto.getOrderNumber());
-            ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
-            return ResponseEntity.ok(sc);
+            if(paymentService.checkStatus(creditDto.getOrderNumber())){
+                String s = paymentService.transferOrderFromTemp(creditDto.getOrderNumber());
+                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
+                return ResponseEntity.ok(sc);
+            }else{
+                ApiResponse<Object> sc = ResponseUtils.failure(999, "此訂單已繳費，請確認訂單狀態是否改為準備發貨", null);
+                return ResponseEntity.ok(sc);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);

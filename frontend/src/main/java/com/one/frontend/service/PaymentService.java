@@ -463,6 +463,11 @@ return null;
     @Autowired
     private StoreProductRepository storeProductRepository;
 
+    public Boolean checkStatus(String orderId){
+        OrderRes order = orderMapper.findOrderByOrderNumber(orderId);
+        return "NO_PAY".equals(order.getResultStatus());
+    }
+
     @Transactional
     public String transferOrderFromTemp(String orderId) throws MessagingException {
         OrderRes order = orderMapper.findOrderByOrderNumber(orderId);
