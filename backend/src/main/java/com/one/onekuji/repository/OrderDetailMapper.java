@@ -56,7 +56,8 @@ public interface OrderDetailMapper {
             @Result(property = "productDetailRes.productDetailId", column = "product_detail_id"),
             @Result(property = "productDetailRes.productName", column = "productName"),
             @Result(property = "productDetailRes.imageUrls", column = "imageUrls"),
-            @Result(property = "productDetailRes.grade" , column = "grade")
+            @Result(property = "productDetailRes.grade" , column = "grade"),
+            @Result(property = "productDetailRes.pName" , column = "pName")
     })
     List<OrderDetailRes> findOrderDetailsByOrderId(Long orderId);
 }
