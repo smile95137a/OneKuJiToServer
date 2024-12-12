@@ -1,15 +1,18 @@
 package com.one.frontend.config.security.oauth2;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
@@ -22,10 +25,12 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 			AuthenticationException exception) throws IOException, ServletException {
 		exception.printStackTrace();
 
-		String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-				.queryParam("errorMsg", String.format("oauth登錄失敗，原因: %s", exception.getMessage())).build()
+		String errorMessage = URLEncoder.encode(String.format("oauth登錄失敗，原因: %s", exception.getMessage()),
+				StandardCharsets.UTF_8.toString());
+		String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl).queryParam("errorMsg", errorMessage).build()
 				.toUriString();
-        response.sendRedirect(targetUrl);
+
+		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
 	}
 }
