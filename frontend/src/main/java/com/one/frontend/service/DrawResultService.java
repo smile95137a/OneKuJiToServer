@@ -87,7 +87,7 @@ public class DrawResultService {
 	public Boolean checkStatus(Long productId){
 		ProductRes productById = productRepository.getProductById(productId);
 		ProductStatus status = productById.getStatus();
-        return !ProductStatus.NOT_AVAILABLE_YET.equals(status);
+        return ProductStatus.AVAILABLE.equals(status);
 
 	}
 

@@ -42,8 +42,8 @@ public class ProductDetailController {
             @Parameter(description = "獎品的 ID", example = "1") @PathVariable Long productId) {
         List<ProductDetailRes> products = productDetailService.getProductDetailByProductId(productId);
         if (products == null || products.isEmpty()) {
-            ApiResponse<List<ProductDetailRes>> response = ResponseUtils.failure(404, null, null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            ApiResponse<List<ProductDetailRes>> response = ResponseUtils.failure(999, "此商品已下架或全售完，無法查看此商品", null);
+            return ResponseEntity.ok(response);
         }
 
         ApiResponse<List<ProductDetailRes>> response = ResponseUtils.success(200, null, products);
