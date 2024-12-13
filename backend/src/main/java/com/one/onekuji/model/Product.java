@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.eenum.PrizeCategory;
 import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.eenum.ProductType;
@@ -9,7 +10,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -52,18 +52,18 @@ public class Product{
     @Schema(description = "稀有度", example = "Rare")
     @Column(name = "rarity", length = 50)
     private String rarity;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建日期", example = "2024-08-22T15:30:00")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Schema(description = "開始日期", example = "2024-08-01")
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private LocalDateTime startDate;
 
     @Schema(description = "結束日期", example = "2024-08-31")
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private LocalDateTime endDate;
 
     @Schema(description = "創建用戶", example = "1")
     @Column(name = "created_user")
@@ -72,7 +72,7 @@ public class Product{
     @Schema(description = "更新用戶", example = "2")
     @Column(name = "update_user")
     private Integer updateUser;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新日期", example = "2024-08-22T15:30:00")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

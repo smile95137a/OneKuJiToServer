@@ -1,8 +1,10 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -27,7 +29,7 @@ public class OrderLog{
     @Schema(description = "新狀態", example = "SHIPPED")
     @Column(name = "new_status", length = 50)
     private String newStatus;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "狀態變更時間", example = "2024-08-22T16:00:00")
     @Column(name = "change_time")
     private LocalDateTime changeTime;

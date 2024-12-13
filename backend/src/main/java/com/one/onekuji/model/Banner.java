@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.eenum.BannerStatus;
 import com.one.onekuji.eenum.ProductType;
 import com.one.onekuji.util.StringListConverter;
@@ -39,10 +40,10 @@ public class Banner {
     @Column(name = "status", nullable = false)
     private BannerStatus status;
 
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

@@ -1,8 +1,10 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -44,15 +46,15 @@ public class PaymentOverview {
     @Schema(description = "總支出紅利", example = "150.00")
     @Column(name = "total_spent_bonus")
     private BigDecimal totalSpentBonus;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "最後交易日期", example = "2024-08-22T15:30:00")
     @Column(name = "last_transaction_date")
     private LocalDateTime lastTransactionDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建日期", example = "2024-08-22T15:30:00")
     @Column(name = "create_date")
     private LocalDateTime createDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新日期", example = "2024-08-22T15:30:00")
     @Column(name = "update_date")
     private LocalDateTime updateDate;

@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.eenum.NewsStatus;
 import com.one.onekuji.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -45,10 +46,10 @@ public class News {
     @Enumerated(EnumType.STRING) // 将枚举映射为其名称，例如存储 'AVAILABLE'
     @Column(name = "status", nullable = false)
     private NewsStatus status;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Column(name = "created_date") // 创建时间，不能为空
     private LocalDateTime createdDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Column(name = "updated_date") // 最后更新时间，可为空
     private LocalDateTime updatedDate;
 

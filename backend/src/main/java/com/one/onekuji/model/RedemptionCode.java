@@ -1,11 +1,12 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,9 +23,9 @@ public class RedemptionCode {
 
     @Column(name = "is_redeemed", nullable = false)
     private Boolean isRedeemed;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Column(name = "redeemed_at")
-    private Date redeemedAt;
+    private LocalDateTime redeemedAt;
 
     @Column(name = "user_id")
     private Long userId;

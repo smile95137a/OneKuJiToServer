@@ -1,5 +1,6 @@
 package com.one.onekuji.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,8 +21,11 @@ public class OrderRes {
 	private boolean isFreeShipping;
 	private Integer bonusPointsEarned;
 	private Integer bonusPointsUsed;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
 	private LocalDateTime createdAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
 	private LocalDateTime updatedAt;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
 	private LocalDateTime paidAt;
 	private String resultStatus;
 	private String paymentMethod;

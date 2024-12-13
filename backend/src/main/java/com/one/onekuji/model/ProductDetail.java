@@ -1,9 +1,11 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,11 +67,11 @@ public class ProductDetail{
     @Schema(description = "銀幣價格", example = "100.00")
     @Column(name = "sliver_price")
     private BigDecimal sliverPrice;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建日期", example = "2024-08-22T15:30:00")
     @Column(name = "create_date")
     private LocalDateTime createDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新日期", example = "2024-08-22T15:30:00")
     @Column(name = "update_date")
     private LocalDateTime updateDate;

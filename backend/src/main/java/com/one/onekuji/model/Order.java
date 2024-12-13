@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.eenum.OrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -51,15 +52,15 @@ public class Order {
     @Schema(description = "使用的獎勳點數", example = "5")
     @Column(name = "bonus_points_used")
     private Integer bonusPointsUsed; // 使用的积分，用户下单时使用的积分
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建日期", example = "2024-08-22T15:30:00")
     @Column(name = "created_at")
     private LocalDateTime createdAt; // 创建日期，订单创建的时间
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新日期", example = "2024-08-22T15:30:00")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt; // 更新日期，订单最后一次更新的时间
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "支付日期", example = "2024-08-22T16:00:00")
     @Column(name = "paid_at")
     private LocalDateTime paidAt; // 支付日期，订单支付的时间

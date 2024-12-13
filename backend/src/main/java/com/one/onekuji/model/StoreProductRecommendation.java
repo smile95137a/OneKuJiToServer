@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -21,11 +22,11 @@ public class StoreProductRecommendation {
     @Schema(description = "推薦名稱", example = "你可能會喜歡")
     @Column(name = "recommendation_name", length = 100)
     private String recommendationName;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建時間", example = "2024-08-22T15:30:00")
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新時間", example = "2024-08-22T15:30:00")
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;

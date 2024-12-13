@@ -1,5 +1,6 @@
 package com.one.onekuji.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +24,9 @@ public class ShippingMethodRes {
     private BigDecimal minSize;
 
     private BigDecimal maxSize;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     private LocalDateTime createDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     private LocalDateTime updateDate;
 
 }

@@ -1,8 +1,10 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -23,11 +25,11 @@ public class UserPasswordResetLog{
     @Schema(description = "重置令牌", example = "token123456")
     @Column(name = "reset_token", length = 255)
     private String resetToken;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "重置時間", example = "2024-08-22T15:30:00")
     @Column(name = "reset_time")
     private LocalDateTime resetTime;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "令牌過期時間", example = "2024-08-23T15:30:00")
     @Column(name = "token_expiry")
     private LocalDateTime tokenExpiry;

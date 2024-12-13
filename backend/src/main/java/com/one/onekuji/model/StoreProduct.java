@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -53,11 +54,11 @@ public class StoreProduct {
     @Schema(description = "狀態", example = "ACTIVE")
     @Column(name = "status", length = 50)
     private String status;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建時間", example = "2024-08-22T15:30:00")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新時間", example = "2024-08-22T15:30:00")
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
