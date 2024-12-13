@@ -1,6 +1,8 @@
 package com.one.frontend.config.security.oauth2;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
@@ -23,8 +25,9 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 			AuthenticationException exception) throws IOException, ServletException {
 		exception.printStackTrace();
 
-		String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl)
-				.queryParam("errorMsg", String.format("oauth登錄失敗，原因: %s", exception.getMessage())).build()
+		String errorMessage = URLEncoder.encode(String.format("oauth登錄失敗，原因: %s", exception.getMessage()),
+				StandardCharsets.UTF_8.toString());
+		String targetUrl = UriComponentsBuilder.fromUriString(redirectUrl).queryParam("errorMsg", errorMessage).build()
 				.toUriString();
 		getRedirectStrategy().sendRedirect(request, response, targetUrl);
 
