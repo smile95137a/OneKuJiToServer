@@ -12,7 +12,6 @@ import com.one.onekuji.util.ImageUtil;
 import com.one.onekuji.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +39,7 @@ public class ProductDetailController {
 //            }
             if (productDetailResList == null || productDetailResList.isEmpty()) {
                 ApiResponse<List<DetailRes>> response = ResponseUtils.failure(404, "無商品", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
             }
 
             ApiResponse<List<DetailRes>> response = ResponseUtils.success(200, null, productDetailResList);
@@ -96,7 +95,7 @@ public class ProductDetailController {
 
         List<DetailRes> detailResList = productDetailService.addProductDetails(detailReqs);
         ApiResponse<List<DetailRes>> response = ResponseUtils.success(201, null, detailResList);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
 
@@ -113,7 +112,7 @@ public class ProductDetailController {
 
             if (productDetailReq == null) {
                 ApiResponse<DetailRes> response = ResponseUtils.failure(404, "未找到該商品", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
             }
 
             // 如果有传递图片，清空现有的 imageUrls 列表
@@ -153,7 +152,7 @@ public class ProductDetailController {
         boolean isDeleted = productDetailService.deleteProductDetail(id);
         if (!isDeleted) {
             ApiResponse<Void> response = ResponseUtils.failure(404, "未找到該商品", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<Void> response = ResponseUtils.success(200, "商品已成功刪除", null);
         return ResponseEntity.ok(response);
@@ -165,7 +164,7 @@ public class ProductDetailController {
         ProductDetailRes productRes = productDetailService.getProductById(productId);
         if (productRes == null) {
             ApiResponse<ProductDetailRes> response = ResponseUtils.failure(404, "產品不存在", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
 
         ApiResponse<ProductDetailRes> response = ResponseUtils.success(200, null, productRes);

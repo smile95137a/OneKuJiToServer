@@ -1,5 +1,6 @@
 package com.one.frontend.service;
 
+import com.one.frontend.eenum.ProductStatus;
 import com.one.frontend.eenum.ProductType;
 import com.one.frontend.repository.ProductRepository;
 import com.one.frontend.repository.UserRepository;
@@ -38,7 +39,11 @@ public class ProductService {
     }
 
     public ProductRes getProductById(Long productId) {
-        return productRepository.getProductById(productId);
+        ProductRes productById = productRepository.getProductById(productId);
+        if(productById.getStatus() == ProductStatus.UNAVAILABLE || productById.getStatus() == ProductStatus.NOT_AVAILABLE_YET){
+            return null;
+        }
+        return productById;
     }
 
 

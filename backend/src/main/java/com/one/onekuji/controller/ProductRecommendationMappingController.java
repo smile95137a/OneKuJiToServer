@@ -5,7 +5,6 @@ import com.one.onekuji.model.ProductRecommendationMapping;
 import com.one.onekuji.service.ProductRecommendationMappingService;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +22,7 @@ public class ProductRecommendationMappingController {
     public ResponseEntity<ApiResponse<List<ProductRecommendationMapping>>> getAllMappings() {
         List<ProductRecommendationMapping> mappings = service.getAllMappings();
         if (mappings.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "無商品推薦關聯", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "無商品推薦關聯", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, null, mappings));
     }
@@ -34,8 +32,7 @@ public class ProductRecommendationMappingController {
     public ResponseEntity<ApiResponse<ProductRecommendationMapping>> getMappingById(@PathVariable Long id) {
         ProductRecommendationMapping mapping = service.getMappingById(id);
         if (mapping == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "商品推薦關聯未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "商品推薦關聯未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, null, mapping));
     }
@@ -45,11 +42,9 @@ public class ProductRecommendationMappingController {
     public ResponseEntity<ApiResponse<ProductRecommendationMapping>> createMapping(@RequestBody ProductRecommendationMapping mapping) {
         int result = service.createMapping(mapping);
         if (result > 0) {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ResponseUtils.success(201, "創建成功", mapping));
+            return ResponseEntity.ok(ResponseUtils.success(201, "創建成功", mapping));
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ResponseUtils.failure(500, "創建失敗", null));
+        return ResponseEntity.ok(ResponseUtils.failure(500, "創建失敗", null));
     }
 
     // 更新商品推薦關聯
@@ -59,8 +54,7 @@ public class ProductRecommendationMappingController {
         if (result > 0) {
             return ResponseEntity.ok(ResponseUtils.success(200, "更新成功", mapping));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtils.failure(404, "更新失敗，商品推薦關聯未找到", null));
+        return ResponseEntity.ok(ResponseUtils.failure(404, "更新失敗，商品推薦關聯未找到", null));
     }
 
     // 刪除商品推薦關聯
@@ -70,7 +64,6 @@ public class ProductRecommendationMappingController {
         if (result > 0) {
             return ResponseEntity.ok(ResponseUtils.success(200, "刪除成功", null));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtils.failure(404, "刪除失敗，商品推薦關聯未找到", null));
+        return ResponseEntity.ok(ResponseUtils.failure(404, "刪除失敗，商品推薦關聯未找到", null));
     }
 }

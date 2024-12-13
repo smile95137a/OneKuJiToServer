@@ -30,7 +30,7 @@ public class SignInController {
         SignIn signIn = signInService.getSignInById(id);
         if (signIn == null) {
             ApiResponse<SignIn> response = ResponseUtils.failure(404, "SignIn not found", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<SignIn> response = ResponseUtils.success(200, null, signIn);
         return ResponseEntity.ok(response);
@@ -41,10 +41,10 @@ public class SignInController {
         try {
             signInService.createSignIn(signIn);
             ApiResponse<SignIn> response = ResponseUtils.success(201, "SignIn created successfully", signIn);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<SignIn> response = ResponseUtils.failure(400, e.getMessage(), null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 

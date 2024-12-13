@@ -6,7 +6,6 @@ import com.one.onekuji.model.ProductCategory;
 import com.one.onekuji.service.ProductCategoryService;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +21,7 @@ public class ProductCategoryController {
     public ResponseEntity<ApiResponse<ProductCategoryResponse>> getAllCategories() {
         ProductCategoryResponse categories = productCategoryService.getAllCategories();
         if (categories == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "無類別", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "無類別", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, null, categories));
     }
@@ -33,8 +31,7 @@ public class ProductCategoryController {
     public ResponseEntity<ApiResponse<ProductCategory>> getCategoryById(@PathVariable("id") Long id) {
         ProductCategory category = productCategoryService.getCategoryById(id);
         if (category == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "類別未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "類別未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, null, category));
     }
@@ -44,8 +41,7 @@ public class ProductCategoryController {
     public ResponseEntity<ApiResponse<ProductCategory>> createCategory(@RequestBody ProductCategory category) {
         try{
             ProductCategory createdCategory = productCategoryService.createCategory(category);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ResponseUtils.success(201, "創建成功", createdCategory));
+            return ResponseEntity.ok(ResponseUtils.success(201, "創建成功", createdCategory));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -59,8 +55,7 @@ public class ProductCategoryController {
             @RequestBody ProductCategory category) {
         ProductCategory updatedCategory = productCategoryService.updateCategory(id, category);
         if (updatedCategory == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "類別未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "類別未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, "更新成功", updatedCategory));
     }
@@ -70,8 +65,7 @@ public class ProductCategoryController {
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable("id") Long id) {
         boolean deleted = productCategoryService.deleteCategory(id);
         if (!deleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ResponseUtils.failure(404, "類別未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "類別未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, "刪除成功", null));
     }

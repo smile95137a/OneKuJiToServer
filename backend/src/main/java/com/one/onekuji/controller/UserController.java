@@ -8,7 +8,6 @@ import com.one.onekuji.response.UserRes;
 import com.one.onekuji.service.UserService;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,7 @@ public class UserController {
         List<UserRes> userList = userService.getAllUsers();
         if (userList == null || userList.isEmpty()) {
             ApiResponse<List<UserRes>> response = ResponseUtils.failure(404, "無用戶", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<List<UserRes>> response = ResponseUtils.success(200, null, userList);
         return ResponseEntity.ok(response);
@@ -39,7 +38,7 @@ public class UserController {
         UserRes user = userService.getUserById(userId);
         if (user == null) {
             ApiResponse<UserRes> response = ResponseUtils.failure(404, "用戶未找到", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<UserRes> response = ResponseUtils.success(200, null, user);
         return ResponseEntity.ok(response);
@@ -50,7 +49,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<User>> createUser(@RequestBody UserReq userReq) {
         User res = userService.createUser(userReq);
         ApiResponse<User> response = ResponseUtils.success(201, "用戶創建成功", res);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 更新用戶

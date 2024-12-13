@@ -6,7 +6,6 @@ import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.model.Banner;
 import com.one.onekuji.service.BannerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +27,7 @@ public class BannerController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<Banner> response = new ApiResponse<>(400, "Banner not found", false, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -40,7 +39,7 @@ public class BannerController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<List<Banner>> response = new ApiResponse<>(400, "No banners found", false, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -57,7 +56,7 @@ public class BannerController {
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Banner> response = new ApiResponse<>(400, "Banner creation failed", false, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -74,7 +73,7 @@ public class BannerController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<Banner> response = new ApiResponse<>(400, "Banner update failed", false, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -86,7 +85,7 @@ public class BannerController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<Void> response = new ApiResponse<>(400, "Banner deletion failed", false, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 }

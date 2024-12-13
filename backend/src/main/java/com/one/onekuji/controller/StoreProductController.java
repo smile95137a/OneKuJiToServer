@@ -62,7 +62,7 @@ public class StoreProductController {
         StoreProductRes storeProductRes = storeProductService.addStoreProduct(storeProductReq);
 
         ApiResponse<StoreProductRes> response = ResponseUtils.success(201, null, storeProductRes);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
 
@@ -76,7 +76,7 @@ public class StoreProductController {
         StoreProductReq storeProductReq = objectMapper.readValue(storeProductReqJson, StoreProductReq.class);
         if (storeProductReq == null) {
             ApiResponse<StoreProductRes> response = ResponseUtils.failure(404, "未找到該商品", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
 
 
@@ -106,7 +106,7 @@ public class StoreProductController {
         boolean isDeleted = storeProductService.deleteStoreProduct(id);
         if (!isDeleted) {
             ApiResponse<Void> response = ResponseUtils.failure(404, "未找到該商品", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<Void> response = ResponseUtils.success(200, "商品已成功刪除", null);
         return ResponseEntity.ok(response);

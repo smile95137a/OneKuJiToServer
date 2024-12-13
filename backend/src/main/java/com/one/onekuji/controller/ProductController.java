@@ -39,7 +39,7 @@ public class ProductController {
         List<ProductRes> products = productService.getAllProduct();
         if (products == null || products.isEmpty()) {
             ApiResponse<List<ProductRes>> response = ResponseUtils.failure(404, "無類別", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
 
         ApiResponse<List<ProductRes>> response = ResponseUtils.success(200, null, products);
@@ -52,7 +52,7 @@ public class ProductController {
         ProductRes productRes = productService.getProductById(id);
         if (productRes == null) {
             ApiResponse<ProductRes> response = ResponseUtils.failure(404, "產品不存在", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
 
         ApiResponse<ProductRes> response = ResponseUtils.success(200, null, productRes);
@@ -70,7 +70,7 @@ public class ProductController {
 
             if (products == null || products.isEmpty()) {
                 ApiResponse<List<ProductRes>> response = ResponseUtils.failure(404, "無類別", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
             }
 
             ApiResponse<List<ProductRes>> response = ResponseUtils.success(200, null, products);
@@ -86,7 +86,7 @@ public class ProductController {
             List<ProductRes> products = productService.getOneKuJiType(prizeCategory);
             if (products == null || products.isEmpty()) {
                 ApiResponse<List<ProductRes>> response = ResponseUtils.failure(404, "無類別", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
             }
 
             ApiResponse<List<ProductRes>> response = ResponseUtils.success(200, null, products);
@@ -140,7 +140,7 @@ public class ProductController {
         // 调用 service 创建产品
         ProductRes productRes = productService.createProduct(storeProductReq);
         ApiResponse<ProductRes> response = ResponseUtils.success(201, "產品創建成功", productRes);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
 

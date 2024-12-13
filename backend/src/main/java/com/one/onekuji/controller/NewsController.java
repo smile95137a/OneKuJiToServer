@@ -9,7 +9,6 @@ import com.one.onekuji.util.ImageUtil;
 import com.one.onekuji.util.ResponseUtils;
 import com.one.onekuji.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +33,7 @@ public class NewsController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ApiResponse<List<News>> response = ResponseUtils.failure(500, "获取新闻列表失败", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -48,12 +47,12 @@ public class NewsController {
                 return ResponseEntity.ok(response);
             } else {
                 ApiResponse<News> response = ResponseUtils.failure(404, "新闻不存在", null);
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<News> response = ResponseUtils.failure(500, "获取新闻失败", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -89,15 +88,15 @@ public class NewsController {
             int result = newsService.insertNews(newsReq);
             if (result > 0) {
                 ApiResponse<Void> response = ResponseUtils.success(201, "新闻创建成功", null);
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                return ResponseEntity.ok(response);
             } else {
                 ApiResponse<Void> response = ResponseUtils.failure(400, "新闻创建失败", null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Void> response = ResponseUtils.failure(500, "创建新闻时发生错误", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -159,12 +158,12 @@ public class NewsController {
                 return ResponseEntity.ok(response);
             } else {
                 ApiResponse<Void> response = ResponseUtils.failure(400, "新闻更新失败", null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Void> response = ResponseUtils.failure(500, "更新新闻时发生错误", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -206,11 +205,11 @@ public class NewsController {
                 return ResponseEntity.ok(response);
             } else {
                 ApiResponse<Void> response = ResponseUtils.failure(400, "新闻删除失败", null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                return ResponseEntity.ok(response);
             }
         } catch (Exception e) {
             ApiResponse<Void> response = ResponseUtils.failure(500, "删除新闻时发生错误", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            return ResponseEntity.ok(response);
         }
     }
 }

@@ -15,21 +15,22 @@ public class RedemptionCodeController {
 
     // 生成新的兌換碼
     @PostMapping("/generate/{productId}")
-    public String generateRedemptionCode(@PathVariable Long productId , @RequestParam Long count) {
-        return redemptionCodeService.generateRedemptionCode(productId , count);
+    public ResponseEntity<ApiResponse<?>> generateRedemptionCode(@PathVariable Long productId , @RequestParam Long count) {
+        ApiResponse<?> response = new ApiResponse<>(200, null, true, redemptionCodeService.generateRedemptionCode(productId , count));
+        return ResponseEntity.ok(response);
     }
 
     // 兌換兌換碼
     @PostMapping("/redeem")
     public ResponseEntity<ApiResponse<?>> redeemCode() {
-        ApiResponse<?> response = new ApiResponse<>(200, "找不到banner", true, redemptionCodeService.redeemCode());
+        ApiResponse<?> response = new ApiResponse<>(200, null, true, redemptionCodeService.redeemCode());
         return ResponseEntity.ok(response);
     }
 
 
     @PostMapping("/redeem/{productId}")
     public ResponseEntity<ApiResponse<?>> redeemCode(@PathVariable Long productId) {
-        ApiResponse<?> response = new ApiResponse<>(200, "找不到banner", true, redemptionCodeService.redeemCodeByProductId(productId));
+        ApiResponse<?> response = new ApiResponse<>(200, null, true, redemptionCodeService.redeemCodeByProductId(productId));
         return ResponseEntity.ok(response);
     }
 }

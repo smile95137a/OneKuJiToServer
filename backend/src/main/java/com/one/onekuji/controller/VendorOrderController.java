@@ -8,7 +8,6 @@ import com.one.onekuji.repository.OrderRepository;
 import com.one.onekuji.repository.VendorOrderRepository;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +24,7 @@ public class VendorOrderController {
         List<VendorOrderEntity> categories = vendorOrderRepository.findAll();
         if (categories == null || categories.isEmpty()) {
             ApiResponse<List<VendorOrderEntity>> response = ResponseUtils.failure(404, "無類別", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
 
         ApiResponse<List<VendorOrderEntity>> response = ResponseUtils.success(200, null, categories);
@@ -48,17 +47,17 @@ public class VendorOrderController {
 
 
     @PutMapping("/{id}")
-    public ApiResponse<VendorOrderEntity> updateOrder(@PathVariable String id, @RequestBody VendorOrderEntity vendorOrder) {
+    public ResponseEntity<ApiResponse<?>> updateOrder(@PathVariable String id, @RequestBody VendorOrderEntity vendorOrder) {
         // 在此处可以添加一些验证逻辑，比如检查 ID 和订单是否匹配
         vendorOrder.setVendorOrder(id); // 确保将 ID 设置到 vendorOrder 实体中
         vendorOrderRepository.update(vendorOrder);
-
-        return ResponseUtils.success(200, "訂單更新成功", vendorOrder);
+        ApiResponse<VendorOrderEntity> response = ResponseUtils.success(200, null, null );
+        return ResponseEntity.ok(response);
     }
     @Autowired
     private OrderRepository orderRepository;
     @PostMapping("/updateTrackingNumber")
-    public ApiResponse<VendorOrderEntity> updateTrackingNumber(@RequestBody TrackingNumberRequest request) {
+    public ResponseEntity<ApiResponse<?>> updateTrackingNumber(@RequestBody TrackingNumberRequest request) {
         Order orderById = orderRepository.getOrderById(Long.valueOf(request.getOrderId()));
         // 查找訂單對應的 VendorOrderEntity
         VendorOrderEntity existingVendorOrder = vendorOrderRepository.findByVendorOrder(orderById.getOrderNumber());
@@ -74,7 +73,8 @@ public class VendorOrderController {
             // 更新資料庫
             vendorOrderRepository.update2(existingVendorOrder);
 
-            return ResponseUtils.success(200, "訂單更新成功", existingVendorOrder);
+            ApiResponse<VendorOrderEntity> response = ResponseUtils.success(200, null,  existingVendorOrder);
+            return ResponseEntity.ok(response);
         } else {
             // 如果不存在則插入新訂單
             VendorOrderEntity vendorOrderEntity = new VendorOrderEntity();
@@ -89,7 +89,7 @@ public class VendorOrderController {
                 vendorOrderRepository.insert2(vendorOrderEntity);
 
 
-            return ResponseUtils.success(200, "訂單插入成功", vendorOrderEntity);
+            return ResponseEntity.ok(ResponseUtils.success(200, "訂單插入成功", vendorOrderEntity));
         }
     }
 

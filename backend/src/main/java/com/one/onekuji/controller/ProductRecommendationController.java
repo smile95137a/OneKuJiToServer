@@ -23,8 +23,7 @@ public class ProductRecommendationController {
     public ResponseEntity<ApiResponse<List<StoreProductRecommendation>>> getAllRecommendations() {
         List<StoreProductRecommendation> recommendations = recommendationService.getAllRecommendations();
         if (recommendations == null || recommendations.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtils.failure(404, "無推薦類別", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "無推薦類別", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, null, recommendations));
     }
@@ -44,8 +43,7 @@ public class ProductRecommendationController {
     @PostMapping
     public ResponseEntity<ApiResponse<StoreProductRecommendation>> createRecommendation(@RequestBody StoreProductRecommendation recommendation) {
         StoreProductRecommendation createdRecommendation = recommendationService.createRecommendation(recommendation);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResponseUtils.success(201, "創建成功", createdRecommendation));
+        return ResponseEntity.ok(ResponseUtils.success(201, "創建成功", createdRecommendation));
     }
 
     // 更新推薦類別
@@ -54,8 +52,7 @@ public class ProductRecommendationController {
             @PathVariable("id") Long id, @RequestBody StoreProductRecommendation recommendation) {
         StoreProductRecommendation updatedRecommendation = recommendationService.updateRecommendation(id, recommendation);
         if (updatedRecommendation == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtils.failure(404, "推薦類別未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "推薦類別未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, "更新成功", updatedRecommendation));
     }
@@ -65,8 +62,7 @@ public class ProductRecommendationController {
     public ResponseEntity<ApiResponse<Void>> deleteRecommendation(@PathVariable("id") Long id) {
         boolean deleted = recommendationService.deleteRecommendation(id);
         if (!deleted) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ResponseUtils.failure(404, "推薦類別未找到", null));
+            return ResponseEntity.ok(ResponseUtils.failure(404, "推薦類別未找到", null));
         }
         return ResponseEntity.ok(ResponseUtils.success(200, "刪除成功", null));
     }

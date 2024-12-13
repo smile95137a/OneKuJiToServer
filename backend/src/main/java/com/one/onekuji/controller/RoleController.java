@@ -5,7 +5,6 @@ import com.one.onekuji.model.Role;
 import com.one.onekuji.service.RoleService;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +23,7 @@ public class RoleController {
         List<Role> roleList = roleService.getAllRole();
         if (roleList == null || roleList.isEmpty()) {
             ApiResponse<List<Role>> response = ResponseUtils.failure(404, "無角色", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<List<Role>> response = ResponseUtils.success(200, null, roleList);
         return ResponseEntity.ok(response);
@@ -36,7 +35,7 @@ public class RoleController {
         Role role = roleService.getRoleById(roleId);
         if (role == null) {
             ApiResponse<Role> response = ResponseUtils.failure(404, "角色未找到", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<Role> response = ResponseUtils.success(200, null, role);
         return ResponseEntity.ok(response);
@@ -47,7 +46,7 @@ public class RoleController {
     public ResponseEntity<ApiResponse<Void>> createRole(@RequestBody Role role) {
         roleService.createRole(role);
         ApiResponse<Void> response = ResponseUtils.success(201, "角色創建成功", null);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 更新角色

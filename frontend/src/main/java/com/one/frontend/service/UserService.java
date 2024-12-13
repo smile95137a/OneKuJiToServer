@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -51,8 +52,8 @@ public class UserService {
 	public UserRes registerUser(UserReq userDto) throws Exception {
 		try {
 			// 1. 检查用户是否存在
-			User check = userRepository.getUserByUserName(userDto.getUsername());
-			if (check != null) {
+			Optional<User> check = userRepository.getUserByEmail(userDto.getUsername());
+			if (check.isPresent()) {
 				throw new Exception("帳號已存在");
 			}
 

@@ -6,7 +6,6 @@ import com.one.onekuji.response.ShippingMethodRes;
 import com.one.onekuji.service.ShippingMethodService;
 import com.one.onekuji.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +30,7 @@ public class ShippingMethodController {
         ShippingMethodRes shippingMethod = shippingMethodService.getShippingMethodById(id);
         if (shippingMethod == null) {
             ApiResponse<ShippingMethodRes> response = ResponseUtils.failure(404, "找不到配送方式", null);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.ok(response);
         }
         ApiResponse<ShippingMethodRes> response = ResponseUtils.success(200, null, shippingMethod);
         return ResponseEntity.ok(response);
@@ -41,7 +40,7 @@ public class ShippingMethodController {
     public ResponseEntity<ApiResponse<ShippingMethodRes>> createShippingMethod(@RequestBody ShippingMethodReq shippingMethodReq) {
         shippingMethodService.createShippingMethod(shippingMethodReq);
         ApiResponse<ShippingMethodRes> response = ResponseUtils.success(201, "創建成功", null);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/method/{id}")
