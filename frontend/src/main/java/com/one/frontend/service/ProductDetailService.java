@@ -29,7 +29,7 @@ public class ProductDetailService {
 
     public List<ProductDetailRes> getProductDetailByProductId(Long productId) {
         ProductRes productById = productRepository.getProductById(productId);
-        if(productById.getStatus() == ProductStatus.UNAVAILABLE || productById.getStatus() == ProductStatus.NOT_AVAILABLE_YET){
+        if(productById.getStatus() == ProductStatus.UNAVAILABLE){
             return null;
         }
         return productDetailRepository.getProductDetailByProductId(productId);
