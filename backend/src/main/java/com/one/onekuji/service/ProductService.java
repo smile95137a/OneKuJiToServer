@@ -75,6 +75,26 @@ public class ProductService {
         }
         return null;
     }
+    
+    public ProductRes uploadProductImg(Long id, List<String> paths) {
+        Product product = productRepository.selectProductById(id);
+        if (product != null) {
+            product.setImageUrls(paths);
+            productRepository.updateProduct(product);
+            return convertEntityToRes(product);
+        }
+        return null;
+    }
+    
+    public ProductRes uploadProductBannerImg(Long id, List<String> paths) {
+        Product product = productRepository.selectProductById(id);
+        if (product != null) {
+            product.setBannerImageUrl(paths);
+            productRepository.updateProduct(product);
+            return convertEntityToRes(product);
+        }
+        return null;
+    }
 
     public boolean deleteProduct(Long id) {
         Product product = productRepository.getProductById(id);
