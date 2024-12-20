@@ -1,6 +1,5 @@
 package com.one.onekuji.Report;
 
-import com.one.onekuji.config.security.CustomUserDetails;
 import com.one.onekuji.response.UserRes;
 import com.one.onekuji.service.UserService;
 import com.one.onekuji.util.SecurityUtils;
@@ -10,10 +9,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,19 +32,20 @@ public class ReportController {
 
     @Autowired
     private UserService userService;
+
     // 通用的報表查詢接口
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> getReport(
             @RequestParam("reportType") String reportType,
             @RequestParam(value = "startDate", required = false) String startDate,
             @RequestParam(value = "endDate", required = false) String endDate,
-            @RequestParam("groupType") String groupType) {
+            @RequestParam("groupType") String groupType) { // 默认分页参数
 
         try {
             // 獲取當前用戶信息
-            CustomUserDetails currentUserPrinciple = SecurityUtils.getCurrentUserPrinciple();
-            assert currentUserPrinciple != null;
-            Long id = currentUserPrinciple.getId();
+            var userDetails = SecurityUtils.getCurrentUserPrinciple();
+            assert userDetails != null;
+            Long id = userDetails.getId();
             UserRes userById = userService.getUserById(id);
 
             // 獲取用戶角色 ID
@@ -69,24 +67,24 @@ public class ReportController {
             LocalDateTime start;
             LocalDateTime end;
 
-            // 如果提供了日期參數，嘗試解析；否則按 groupType 推算
+            // 如果提供了日期参数，尝试解析；否则按 groupType 推算
             if (startDate != null && !startDate.isEmpty()) {
-                start = LocalDate.parse(startDate).atStartOfDay(); // 當天 00:00:00
+                start = LocalDate.parse(startDate).atStartOfDay(); // 当天 00:00:00
             } else {
-                // 根據 groupType 推算
+                // 根据 groupType 推算
                 end = LocalDateTime.now();
                 switch (groupType.toLowerCase()) {
                     case "day":
-                        start = end.toLocalDate().atStartOfDay(); // 設置為今天零點
+                        start = end.toLocalDate().atStartOfDay(); // 设置为今天零点
                         break;
                     case "week":
-                        start = end.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(); // 當周的周一零點
+                        start = end.with(DayOfWeek.MONDAY).toLocalDate().atStartOfDay(); // 当周的周一零点
                         break;
                     case "month":
-                        start = end.withDayOfMonth(1).toLocalDate().atStartOfDay(); // 當月的第一天零點
+                        start = end.withDayOfMonth(1).toLocalDate().atStartOfDay(); // 当月的第一天零点
                         break;
                     case "year":
-                        start = end.withDayOfYear(1).toLocalDate().atStartOfDay(); // 當年的第一天零點
+                        start = end.withDayOfYear(1).toLocalDate().atStartOfDay(); // 当年的第一天零点
                         break;
                     default:
                         throw new IllegalArgumentException("Invalid groupType: " + groupType);
@@ -94,37 +92,35 @@ public class ReportController {
             }
 
             if (endDate != null && !endDate.isEmpty()) {
-                end = LocalDate.parse(endDate).atTime(LocalTime.MAX); // 當天 23:59:59
+                end = LocalDate.parse(endDate).atTime(LocalTime.MAX); // 当天 23:59:59
             } else {
                 end = LocalDateTime.now();
             }
 
-            // 調用服務層，處理時間範圍，傳遞分頁參數
+            // 调用服务层，处理时间范围，传递分页参数
             List<Map<String, Object>> reportData = reportService.getReportData(reportType, start, end, groupType);
 
-            // 使用 FieldTranslator 將字段名轉換為繁體中文
+            // 使用 FieldTranslator 将字段名转换为繁体中文
             List<Map<String, Object>> translatedData = new ArrayList<>();
             for (Map<String, Object> dataRow : reportData) {
                 Map<String, Object> translatedRow = new HashMap<>();
                 for (Map.Entry<String, Object> entry : dataRow.entrySet()) {
-                    String translatedField = FieldTranslator.translate(entry.getKey()); // 轉換字段名稱
-                    translatedRow.put(translatedField, entry.getValue()); // 將轉換後的字段名稱與對應的值放入新結果
+                    String translatedField = FieldTranslator.translate(entry.getKey()); // 转换字段名称
+                    translatedRow.put(translatedField, entry.getValue()); // 将转换后的字段名称与对应的值放入新结果
                 }
                 translatedData.add(translatedRow);
             }
 
             return ResponseEntity.ok(translatedData);
         } catch (Exception e) {
-            // 權限錯誤
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Collections.singletonList(Map.of("error", e.getMessage())));
+            // 记录错误日志
+            System.err.println("Error occurred while fetching report: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Collections.emptyList());
         }
     }
 
 
-
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN')")
     public void exportReport(
             @RequestParam("reportType") String reportType,
             @RequestParam(value = "startDate", required = false) String startDate,

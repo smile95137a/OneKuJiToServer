@@ -13,7 +13,7 @@ public interface UserRepository {
     @Select("SELECT * FROM user")
     List<UserRes> findAll();
 
-    @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin,, updated_at, draw_count FROM user WHERE id = #{userId}")
+    @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin, updated_at, draw_count FROM user WHERE id = #{userId}")
     UserRes findById(Long userId);
 
     // 插入新用戶
