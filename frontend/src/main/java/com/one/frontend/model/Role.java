@@ -18,4 +18,7 @@ public class Role {
     @Schema(description = "角色名稱", example = "ADMIN")
     @Column(nullable = false, length = 255)
     private String name;
+
+    @Column
+    private String roleName;
 }
