@@ -129,6 +129,30 @@ public class ReportController {
             HttpServletResponse response) {
 
         try {
+
+
+            var userDetails = SecurityUtils.getCurrentUserPrinciple();
+            assert userDetails != null;
+            Long id = userDetails.getId();
+            UserRes userById = userService.getUserById(id);
+
+            // 獲取用戶角色 ID
+            Long userRoleId = userById.getRoleId(); // 假設每個用戶只有一個角色
+
+            // 根據 reportType 和角色進行權限校驗
+            if ("TOTAL_DEPOSIT".equalsIgnoreCase(reportType)) {
+                // TOTAL_DEPOSIT: 角色 1 和 2 都可查看
+                if (!userRoleId.equals(1L) && !userRoleId.equals(2L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            } else {
+                // 其他類型: 只有角色 1 可查看
+                if (!userRoleId.equals(1L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            }
+
+
             LocalDateTime start;
             LocalDateTime end;
 
