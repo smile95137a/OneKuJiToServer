@@ -42,7 +42,7 @@ public class SpringSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration configuration = new CorsConfiguration();
-                    configuration.setAllowedOrigins(Arrays.asList("https://onemorelottery.tw", "http://localhost:5173"));
+                    configuration.setAllowedOrigins(Arrays.asList("https://onemorelottery.tw" , "http://localhost:5173"));
                     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     configuration.setAllowedHeaders(Arrays.asList("*"));
                     configuration.setAllowCredentials(true);
@@ -52,19 +52,15 @@ public class SpringSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll() // 公共接口
-                        .requestMatchers("/img/**").permitAll() // 图片资源
-                        .requestMatchers("/api/reports").hasAnyRole("ADMIN", "MANAGER") // reports 允许 admin 和 manager 访问
-                        .requestMatchers("/api/**").hasRole("ADMIN") // 其他 API 仅 admin 可访问
-                        .requestMatchers("/**").permitAll() // 其他资源允许所有访问
-                        .anyRequest().authenticated()); // 默认需要认证
-
+                .authorizeHttpRequests(
+                        auth -> auth.requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+                                .requestMatchers("/img/**").permitAll()
+                                .requestMatchers("/**").permitAll()
+                                .anyRequest().authenticated());
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 
 
     @Bean
