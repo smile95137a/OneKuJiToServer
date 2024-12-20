@@ -22,7 +22,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		User user = userRepository.getUserByUserName(username);
 		List<SimpleGrantedAuthority> authorities = (user.getRoles() != null && !user.getRoles().isEmpty()) 
 			    ? user.getRoles().stream()
-			        .map(role -> new SimpleGrantedAuthority(role.getName()))
+			        .map(role -> new SimpleGrantedAuthority(role.getRoleName()))
 			        .collect(Collectors.toList())
 			    : List.of();
 
