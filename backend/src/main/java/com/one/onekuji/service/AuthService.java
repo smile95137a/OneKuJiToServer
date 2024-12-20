@@ -44,6 +44,6 @@ public class AuthService {
         if (!(user.getRoleId() == 1 || user.getRoleId() == 2)) {
             throw new Exception("不屬於管理者，無法登入");
         }
-        return new LoginResponse(token, user.getId(), user.getUsername());
+        return new LoginResponse(token, user.getId(), user.getUsername() , user.getRoleId().toString());
     }
 }
