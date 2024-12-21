@@ -19,13 +19,23 @@ public class CorsConfig implements WebMvcConfigurer {
 //        return source;
 //    }
 
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://chichi-player.s3-website.ap-northeast-3.amazonaws.com" , "http://localhost:5173") // 明確指定允許的源
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+//                .allowedHeaders("*")
+//                .allowCredentials(true)
+//                .maxAge(3600);
+//    }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://onemorelottery.tw" , "http://localhost:5173") // 明確指定允許的源
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowCredentials(true)
-                .maxAge(3600);
+                .maxAge(3600)
+                .allowedHeaders("*");
     }
 }
