@@ -1,5 +1,13 @@
 package com.one.onekuji.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.model.PrizeNumber;
 import com.one.onekuji.model.Product;
@@ -10,12 +18,6 @@ import com.one.onekuji.repository.ProductRepository;
 import com.one.onekuji.request.DetailReq;
 import com.one.onekuji.response.DetailRes;
 import com.one.onekuji.response.ProductDetailRes;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Service
 public class ProductDetailService {
@@ -72,9 +74,6 @@ public class ProductDetailService {
             // 6. 计算尺寸，并将结果存入 detailReq
             detailReq.setSize(detailReq.getSize());
 
-            if(detailReq.getIsPrize() == null){
-                detailReq.setIsPrize(String.valueOf(false));
-            }
             // 7. 插入产品细节，不排除 "LAST" 等级
             productDetailMapper.insert(detailReq);
             Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
@@ -149,9 +148,6 @@ public class ProductDetailService {
         // 计算尺寸
 
         productDetailReq.setSize(productDetailReq.getSize());
-        if(productDetailReq.getIsPrize() == null){
-            productDetailReq.setIsPrize(String.valueOf(false));
-        }
         // 更新商品细节
         productDetailMapper.update(productDetailReq);
 
@@ -227,28 +223,6 @@ public class ProductDetailService {
         return deleted > 0;
     }
 
-    private DetailRes convertToEntity(DetailReq detailReq) {
-        return new DetailRes(
-                detailReq.getProductDetailId(),
-                detailReq.getProductId(),
-                escapeTextForHtml(detailReq.getDescription()), // Escape HTML in description
-                detailReq.getNote(),
-                detailReq.getSize(),
-                detailReq.getQuantity(),
-                detailReq.getStockQuantity(),
-                detailReq.getProductName(),
-                detailReq.getGrade(),
-                detailReq.getPrice(),
-                detailReq.getSliverPrice(),
-                detailReq.getImageUrls(),
-                detailReq.getLength(),
-                detailReq.getWidth(),
-                detailReq.getHeight(),
-                escapeTextForHtml(detailReq.getSpecification()),
-                detailReq.getProbability(),
-                detailReq.getIsPrize()
-        );
-    }
 
     private String escapeTextForHtml(String text) {
         if (text == null) return "";
@@ -272,4 +246,14 @@ public class ProductDetailService {
     public ProductDetailRes getProductById(Long productId) {
         return productDetailMapper.getProductById(productId);
     }
+
+	public void uploadProductDetailImg(Long productDetailId, List<String> uploadedFilePaths) throws Exception {
+		var detail = productDetailMapper.findById(productDetailId);
+		DetailReq updatedDetail = new DetailReq();
+	    BeanUtils.copyProperties(detail, updatedDetail);
+	    
+	    updatedDetail.setImageUrls(uploadedFilePaths);
+	    this.updateProductDetail(productDetailId, updatedDetail);
+		
+	}
 }

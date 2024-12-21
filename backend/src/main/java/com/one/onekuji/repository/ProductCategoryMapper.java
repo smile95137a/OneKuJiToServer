@@ -1,9 +1,15 @@
 package com.one.onekuji.repository;
 
-import com.one.onekuji.model.ProductCategory;
-import org.apache.ibatis.annotations.*;
-
 import java.util.List;
+
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import com.one.onekuji.model.ProductCategory;
 
 @Mapper
 public interface ProductCategoryMapper {
@@ -11,9 +17,9 @@ public interface ProductCategoryMapper {
     // 查詢所有類別
     @Select("SELECT *,\n" +
             "       (SELECT MAX(product_sort) \n" +
-            "        FROM onekuji.product_category \n" +
+            "        FROM product_category \n" +
             "        WHERE category_id != 40) AS max_product_sort\n" +
-            "FROM onekuji.product_category \n" +
+            "FROM product_category \n" +
             "order by product_sort asc")
     List<ProductCategory> getAllCategories();
 

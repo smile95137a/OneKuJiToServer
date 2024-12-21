@@ -5,13 +5,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.request.DetailReq;
+import com.one.onekuji.request.ProductReq;
 import com.one.onekuji.response.DetailRes;
 import com.one.onekuji.response.ProductDetailRes;
+import com.one.onekuji.response.ProductRes;
 import com.one.onekuji.service.ProductDetailService;
 import com.one.onekuji.util.ImageUtil;
 import com.one.onekuji.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -170,5 +173,56 @@ public class ProductDetailController {
         ApiResponse<ProductDetailRes> response = ResponseUtils.success(200, null, productRes);
         return ResponseEntity.ok(response);
     }
+    
+
+
+    @PostMapping("/add2")
+    public ResponseEntity<?> addProductDetails2(@RequestBody DetailReq req) throws IOException {
+      
+        List<DetailRes> detailResList = productDetailService.addProductDetails(List.of(req));
+        ApiResponse<DetailRes> response = ResponseUtils.success(201, null, detailResList.get(0));
+        return ResponseEntity.ok(response);
+    }
+    
+	@PostMapping("/update2")
+	public ResponseEntity<?> updateProductDetails2(@RequestBody DetailReq req) throws Exception {
+		  DetailRes productDetailRes = productDetailService.updateProductDetail(Long.valueOf(req.getProductDetailId()), req);
+          ApiResponse<DetailRes> response = ResponseUtils.success(200, "商品已成功更新", productDetailRes);
+		return ResponseEntity.ok(response);
+	}
+
+    
+	@PostMapping("/uploadProductDetailImg")
+	public ResponseEntity<ApiResponse<List<String>>> uploadProductDetailImg(@RequestParam("productDetailId") Long productDetailId,
+			@RequestParam(value = "files", required = false) List<MultipartFile> files,
+			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
+		try {
+			List<String> uploadedFilePaths = new ArrayList<>();
+
+			// Handle new file uploads
+			if (files != null && !files.isEmpty()) {
+				for (MultipartFile file : files) {
+					if (!file.isEmpty()) {
+						String fileUrl = ImageUtil.upload(file);
+						uploadedFilePaths.add(fileUrl);
+					}
+				}
+			}
+
+			// Add existing URLs
+			if (existingUrls != null && !existingUrls.isEmpty()) {
+				uploadedFilePaths.addAll(existingUrls);
+			}
+
+			productDetailService.uploadProductDetailImg(productDetailId, uploadedFilePaths);
+
+			ApiResponse<List<String>> response = ResponseUtils.success(200, "Files uploaded successfully",
+					uploadedFilePaths);
+			return ResponseEntity.ok(response);
+		} catch (Exception e) {
+			ApiResponse<List<String>> response = ResponseUtils.failure(500, "Error uploading files", null);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+		}
+	}
 
 }
