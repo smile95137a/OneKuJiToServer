@@ -73,7 +73,7 @@ public class ProductService {
             List<ProductDetailRes> details = productDetailRepository.getProductDetailByProductId(Long.valueOf(product.getProductId()));
             product.setProductDetails(details);
         }
-        return all; // 修复：返回完整的结果列表
+        return all;
     }
 
 }
