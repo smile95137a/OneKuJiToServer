@@ -2,6 +2,7 @@ package com.one.frontend.service;
 
 import com.one.frontend.eenum.ProductStatus;
 import com.one.frontend.eenum.ProductType;
+import com.one.frontend.repository.ProductDetailRepository;
 import com.one.frontend.repository.ProductRepository;
 import com.one.frontend.repository.UserRepository;
 import com.one.frontend.response.ProductDetailRes;
@@ -17,6 +18,9 @@ public class ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductDetailRepository productDetailRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -64,6 +68,12 @@ public class ProductService {
     }
 
     public List<ProductRes> getAll() {
-        return productRepository.getAll();
+        List<ProductRes> all = productRepository.getAll();
+        for (ProductRes product : all) {
+            List<ProductDetailRes> details = productDetailRepository.getProductDetailByProductId(Long.valueOf(product.getProductId()));
+            product.setProductDetails(details);
+        }
+        return all; // 修复：返回完整的结果列表
     }
+
 }
