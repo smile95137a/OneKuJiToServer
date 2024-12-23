@@ -31,5 +31,7 @@ public class ProductDetailRes {
     private String prizeNumber;
     private String drawnNumbers;
     private Double probability;
-    private String isPrize;
+    private Boolean isPrize;
+    private Integer detailQuantityPerGrade;       // 對應 SQL 的 pd.quantity AS detailQuantityPerGrade
+    private Integer detailStockQuantityPerGrade;
 }

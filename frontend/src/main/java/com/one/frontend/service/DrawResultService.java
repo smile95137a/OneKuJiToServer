@@ -428,7 +428,7 @@ public class DrawResultService {
 
 		// 检查是否所有 isPrize 都为 false
 		boolean allPrizesFalse = remainingDetails.stream()
-				.noneMatch(detail -> "true".equalsIgnoreCase(detail.getIsPrize())); // 检查 isPrize 是否存在 "true"
+				.noneMatch(ProductDetailRes::getIsPrize); // 检查 isPrize 是否存在 "true"
 
 		if (allPrizesFalse) {
 			// 更新产品状态为 NOT_AVAILABLE_YET

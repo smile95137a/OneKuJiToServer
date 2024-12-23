@@ -41,8 +41,6 @@ public class ProductController {
 	@Autowired
 	private ProductService productService;
 
-	@Value("${file.upload-dir}")
-	private String uploadDir;
 
 	@Operation(summary = "獲取所有獎品", description = "檢索所有獎品的列表")
 	@GetMapping("/query")
