@@ -27,7 +27,7 @@ public class ImageUtil {
     private static String staticPicturePath;
     private static String staticPicturePathMapping;
     private static final int TARGET_SIZE = 400;
-    private static final int RECT_WIDTH = 600;
+    private static final int RECT_WIDTH = 440;
     private static final int RECT_HEIGHT = 300;
     private static final float OUTPUT_QUALITY = 0.85f;
 
@@ -143,7 +143,7 @@ public class ImageUtil {
         );
 
         Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
 
         try {
@@ -184,7 +184,7 @@ public class ImageUtil {
         );
 
         Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.WHITE);
+        g2d.setColor(Color.BLACK);
         g2d.fillRect(0, 0, RECT_WIDTH, RECT_HEIGHT);
 
         try {
