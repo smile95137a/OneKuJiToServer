@@ -1,6 +1,6 @@
 package com.one.config.security;
 
-import com.one.frontend.config.security.oauth2.OAuth2Provider;
+import com.one.config.security.oauth2.OAuth2Provider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -1,13 +1,13 @@
 package com.one.service;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.JwtTokenProvider;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.dto.LoginDto;
-import com.one.frontend.dto.LoginResponse;
-import com.one.frontend.exception.AllException;
-import com.one.frontend.model.User;
-import com.one.frontend.repository.UserRepository;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.JwtTokenProvider;
+import com.one.config.security.SecurityUtils;
+import com.one.dto.LoginDto;
+import com.one.dto.LoginResponse;
+import com.one.exception.AllException;
+import com.one.model.User;
+import com.one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

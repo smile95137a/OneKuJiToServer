@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.Banner;
+import com.one.model.Banner;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

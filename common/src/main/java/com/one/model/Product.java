@@ -1,10 +1,11 @@
 package com.one.model;
 
-import com.one.frontend.eenum.PrizeCategory;
-import com.one.frontend.eenum.ProductStatus;
-import com.one.frontend.eenum.ProductType;
-import com.one.frontend.util.StringListConverter;
+import com.one.eenum.PrizeCategory;
+import com.one.eenum.ProductStatus;
+import com.one.eenum.ProductType;
+import com.one.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;

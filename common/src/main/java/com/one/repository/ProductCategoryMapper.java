@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.ProductCategory;
+import com.one.model.ProductCategory;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

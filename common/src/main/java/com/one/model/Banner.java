@@ -1,9 +1,10 @@
 package com.one.model;
 
-import com.one.frontend.eenum.BannerStatus;
-import com.one.frontend.eenum.ProductType;
-import com.one.frontend.util.StringListConverter;
+import com.one.eenum.BannerStatus;
+import com.one.eenum.ProductType;
+import com.one.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

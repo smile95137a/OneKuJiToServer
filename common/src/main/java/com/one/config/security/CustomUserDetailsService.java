@@ -1,7 +1,7 @@
 package com.one.config.security;
 
-import com.one.frontend.model.User;
-import com.one.frontend.repository.UserRepository;
+import com.one.model.User;
+import com.one.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

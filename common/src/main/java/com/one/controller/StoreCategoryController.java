@@ -1,9 +1,9 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.StoreCategory;
-import com.one.frontend.service.StoreCategoryService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.model.StoreCategory;
+import com.one.service.StoreCategoryService;
+import com.one.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

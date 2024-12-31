@@ -1,6 +1,6 @@
 package com.one.dto;
 
-import com.one.frontend.eenum.OrderStatus;
+import com.one.eenum.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

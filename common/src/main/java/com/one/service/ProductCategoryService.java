@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.model.ProductCategory;
-import com.one.frontend.repository.ProductCategoryMapper;
+import com.one.model.ProductCategory;
+import com.one.repository.ProductCategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

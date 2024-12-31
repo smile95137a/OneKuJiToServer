@@ -1,6 +1,6 @@
 package com.one.util;
 
-import com.one.frontend.response.ProductDetailRes;
+import com.one.response.ProductDetailRes;
 
 import java.util.ArrayList;
 import java.util.List;

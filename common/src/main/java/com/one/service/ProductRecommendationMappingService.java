@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.repository.ProductRecommendationMappingMapper;
-import com.one.frontend.response.RecommendRes;
+import com.one.repository.ProductRecommendationMappingMapper;
+import com.one.response.RecommendRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

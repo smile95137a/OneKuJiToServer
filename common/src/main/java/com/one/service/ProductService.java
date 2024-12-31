@@ -1,11 +1,11 @@
 package com.one.service;
 
-import com.one.frontend.eenum.ProductStatus;
-import com.one.frontend.eenum.ProductType;
-import com.one.frontend.repository.ProductRepository;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.response.ProductDetailRes;
-import com.one.frontend.response.ProductRes;
+import com.one.eenum.ProductStatus;
+import com.one.eenum.ProductType;
+import com.one.repository.ProductRepository;
+import com.one.repository.UserRepository;
+import com.one.response.ProductDetailRes;
+import com.one.response.ProductRes;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

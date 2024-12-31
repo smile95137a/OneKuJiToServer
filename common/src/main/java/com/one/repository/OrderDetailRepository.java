@@ -1,9 +1,9 @@
 package com.one.repository;
 
-import com.one.frontend.dto.OrderDetailDto;
-import com.one.frontend.model.OrderDetail;
-import com.one.frontend.request.StoreOrderDetailReq;
-import com.one.frontend.response.OrderDetailRes;
+import com.one.dto.OrderDetailDto;
+import com.one.model.OrderDetail;
+import com.one.request.StoreOrderDetailReq;
+import com.one.response.OrderDetailRes;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

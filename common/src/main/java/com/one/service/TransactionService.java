@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.model.UserTransaction;
-import com.one.frontend.repository.UserTransactionRepository;
+import com.one.model.UserTransaction;
+import com.one.repository.UserTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,8 @@
 package com.one.repository;
 
-import com.one.frontend.model.Marquee;
-import com.one.frontend.model.MarqueeDetail;
-import com.one.frontend.response.MarqueeWithDetailsRes;
+import com.one.model.Marquee;
+import com.one.model.MarqueeDetail;
+import com.one.response.MarqueeWithDetailsRes;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;

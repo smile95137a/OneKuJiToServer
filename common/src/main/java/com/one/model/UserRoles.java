@@ -2,7 +2,7 @@ package com.one.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
+import jakarta.persistence.*;
 
 @Data
 @Schema(description = "用戶角色關聯模型")

@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.response.RecommendRes;
+import com.one.response.RecommendRes;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

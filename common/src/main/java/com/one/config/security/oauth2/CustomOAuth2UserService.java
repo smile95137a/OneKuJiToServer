@@ -1,14 +1,14 @@
 package com.one.config.security.oauth2;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.model.Cart;
-import com.one.frontend.model.PrizeCart;
-import com.one.frontend.model.User;
-import com.one.frontend.repository.CartRepository;
-import com.one.frontend.repository.PrizeCartRepository;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.util.RandomUtils;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.SecurityUtils;
+import com.one.model.Cart;
+import com.one.model.PrizeCart;
+import com.one.model.User;
+import com.one.repository.CartRepository;
+import com.one.repository.PrizeCartRepository;
+import com.one.repository.UserRepository;
+import com.one.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

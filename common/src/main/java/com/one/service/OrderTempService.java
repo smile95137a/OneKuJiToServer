@@ -1,8 +1,8 @@
 package com.one.service;
 
-import com.one.frontend.model.Order;
-import com.one.frontend.model.OrderTemp;
-import com.one.frontend.repository.OrderTempMapper;
+import com.one.model.Order;
+import com.one.model.OrderTemp;
+import com.one.repository.OrderTempMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

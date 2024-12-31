@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.News;
+import com.one.model.News;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

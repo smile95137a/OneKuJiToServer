@@ -1,8 +1,8 @@
 package com.one.repository;
 
-import com.one.frontend.model.Product;
-import com.one.frontend.response.ProductDetailRes;
-import com.one.frontend.response.ProductRes;
+import com.one.model.Product;
+import com.one.response.ProductDetailRes;
+import com.one.response.ProductRes;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

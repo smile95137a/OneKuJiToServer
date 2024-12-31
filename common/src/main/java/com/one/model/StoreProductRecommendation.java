@@ -1,10 +1,10 @@
 package com.one.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
 @Data
 @Schema(description = "推薦類別模型")
 @Table(name = "store_product_recommendation")

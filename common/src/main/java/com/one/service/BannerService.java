@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.model.Banner;
-import com.one.frontend.repository.BannerRepository;
+import com.one.model.Banner;
+import com.one.repository.BannerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

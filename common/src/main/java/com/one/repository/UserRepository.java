@@ -1,9 +1,9 @@
 package com.one.repository;
 
-import com.one.frontend.model.DrawResult;
-import com.one.frontend.model.Role;
-import com.one.frontend.model.User;
-import com.one.frontend.response.UserRes;
+import com.one.model.DrawResult;
+import com.one.model.Role;
+import com.one.model.User;
+import com.one.response.UserRes;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;

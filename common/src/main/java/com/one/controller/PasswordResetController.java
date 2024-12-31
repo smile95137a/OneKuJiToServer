@@ -1,10 +1,10 @@
 package com.one.controller;
 
-import com.one.frontend.exception.TokenVerificationException;
-import com.one.frontend.request.GenResetPwdReq;
-import com.one.frontend.request.ResetPwdReq;
-import com.one.frontend.service.PasswordResetService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.exception.TokenVerificationException;
+import com.one.request.GenResetPwdReq;
+import com.one.request.ResetPwdReq;
+import com.one.service.PasswordResetService;
+import com.one.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

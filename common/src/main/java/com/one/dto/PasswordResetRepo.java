@@ -1,6 +1,6 @@
 package com.one.dto;
 
-import com.one.frontend.model.PasswordResetToken;
+import com.one.model.PasswordResetToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

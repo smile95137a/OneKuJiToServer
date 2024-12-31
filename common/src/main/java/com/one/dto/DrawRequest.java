@@ -2,12 +2,12 @@ package com.one.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.one.frontend.eenum.PrizeCategory;
-import com.one.frontend.eenum.ProductType;
-import com.one.frontend.util.PrizeCategoryDeserializer;
-import com.one.frontend.util.PrizeCategorySerializer;
-import com.one.frontend.util.ProductTypeDeserializer;
-import com.one.frontend.util.ProductTypeSerializer;
+import com.one.eenum.PrizeCategory;
+import com.one.eenum.ProductType;
+import com.one.util.PrizeCategoryDeserializer;
+import com.one.util.PrizeCategorySerializer;
+import com.one.util.ProductTypeDeserializer;
+import com.one.util.ProductTypeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

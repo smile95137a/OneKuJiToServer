@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.RedemptionCode;
+import com.one.model.RedemptionCode;
 import org.apache.ibatis.annotations.*;
 
 import java.util.Optional;

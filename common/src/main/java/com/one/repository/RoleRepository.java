@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.Role;
+import com.one.model.Role;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

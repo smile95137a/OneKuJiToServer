@@ -1,11 +1,11 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.response.ProductDetailRes;
-import com.one.frontend.response.ProductRes;
-import com.one.frontend.service.ProductDetailService;
-import com.one.frontend.service.ProductService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.response.ProductDetailRes;
+import com.one.response.ProductRes;
+import com.one.service.ProductDetailService;
+import com.one.service.ProductService;
+import com.one.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

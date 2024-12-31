@@ -1,8 +1,8 @@
 package com.one.service;
 
 import com.google.gson.Gson;
-import com.one.frontend.dto.CreditDto;
-import com.one.frontend.request.ReceiptReq;
+import com.one.dto.CreditDto;
+import com.one.request.ReceiptReq;
 import com.one.model.*;
 import com.one.repository.*;
 import com.one.response.*;

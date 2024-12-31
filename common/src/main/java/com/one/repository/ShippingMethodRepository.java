@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.response.ShippingMethodRes;
+import com.one.response.ShippingMethodRes;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

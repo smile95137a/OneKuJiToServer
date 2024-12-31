@@ -1,8 +1,8 @@
 package com.one.repository;
 
-import com.one.frontend.dto.DrawResultDto;
-import com.one.frontend.model.Order;
-import com.one.frontend.response.OrderRes;
+import com.one.dto.DrawResultDto;
+import com.one.model.Order;
+import com.one.response.OrderRes;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.jdbc.SQL;
 

@@ -1,7 +1,7 @@
 package com.one.repository;
 
-import com.one.frontend.model.SignIn;
-import com.one.frontend.response.SignInRes;
+import com.one.model.SignIn;
+import com.one.response.SignInRes;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 

@@ -1,7 +1,7 @@
 package com.one.repository;
 
-import com.one.frontend.dto.CreditDto;
-import com.one.frontend.model.UserTransaction;
+import com.one.dto.CreditDto;
+import com.one.model.UserTransaction;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;

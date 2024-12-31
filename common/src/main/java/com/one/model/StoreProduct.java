@@ -1,6 +1,6 @@
 package com.one.model;
 
-import com.one.frontend.util.StringListConverter;
+import com.one.util.StringListConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

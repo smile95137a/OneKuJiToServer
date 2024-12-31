@@ -1,8 +1,8 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.request.CodeRequest;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.request.CodeRequest;
+import com.one.util.ResponseUtils;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

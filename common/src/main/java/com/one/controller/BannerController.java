@@ -1,8 +1,8 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.Banner;
-import com.one.frontend.service.BannerService;
+import com.one.model.ApiResponse;
+import com.one.model.Banner;
+import com.one.service.BannerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

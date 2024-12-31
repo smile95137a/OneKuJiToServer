@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.StoreKeyword;
+import com.one.model.StoreKeyword;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

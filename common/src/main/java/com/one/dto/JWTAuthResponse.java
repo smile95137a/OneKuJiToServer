@@ -1,6 +1,6 @@
 package com.one.dto;
 
-import com.one.frontend.model.User;
+import com.one.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

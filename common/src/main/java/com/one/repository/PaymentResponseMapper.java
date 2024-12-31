@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.response.PaymentResponse;
+import com.one.response.PaymentResponse;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

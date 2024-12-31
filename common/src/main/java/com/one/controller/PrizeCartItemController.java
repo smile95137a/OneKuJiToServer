@@ -1,11 +1,11 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.service.PrizeCartItemService;
-import com.one.frontend.service.PrizeCartService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.SecurityUtils;
+import com.one.model.ApiResponse;
+import com.one.service.PrizeCartItemService;
+import com.one.service.PrizeCartService;
+import com.one.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
-package com.one.service;//package com.one.frontend.service;
+package com.one.service;//package com.one.service;
 //
-//import com.one.frontend.model.User;
+//import com.one.model.User;
 //import org.springframework.security.core.GrantedAuthority;
 //import org.springframework.security.core.authority.SimpleGrantedAuthority;
 //import org.springframework.security.core.userdetails.UserDetails;

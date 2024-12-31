@@ -1,14 +1,14 @@
 package com.one.service;
 
-import com.one.frontend.dto.OrderDetailDto;
-import com.one.frontend.eenum.OrderStatus;
-import com.one.frontend.eenum.PrizeCategory;
-import com.one.frontend.eenum.ProductStatus;
-import com.one.frontend.eenum.ProductType;
-import com.one.frontend.response.DrawResponse;
-import com.one.frontend.response.ProductDetailRes;
-import com.one.frontend.response.ProductRes;
-import com.one.frontend.response.UserRes;
+import com.one.dto.OrderDetailDto;
+import com.one.eenum.OrderStatus;
+import com.one.eenum.PrizeCategory;
+import com.one.eenum.ProductStatus;
+import com.one.eenum.ProductType;
+import com.one.response.DrawResponse;
+import com.one.response.ProductDetailRes;
+import com.one.response.ProductRes;
+import com.one.response.UserRes;
 import com.one.model.*;
 import com.one.repository.*;
 import lombok.RequiredArgsConstructor;

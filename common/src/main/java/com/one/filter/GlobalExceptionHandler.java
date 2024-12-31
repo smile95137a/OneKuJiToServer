@@ -1,7 +1,7 @@
 package com.one.filter;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.util.ResponseUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;

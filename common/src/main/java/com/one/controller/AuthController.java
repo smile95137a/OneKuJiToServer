@@ -1,13 +1,13 @@
 package com.one.controller;
 
-import com.one.frontend.dto.JWTAuthResponse;
-import com.one.frontend.dto.LoginDto;
-import com.one.frontend.dto.LoginResponse;
-import com.one.frontend.exception.AllException;
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.User;
-import com.one.frontend.service.AuthService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.dto.JWTAuthResponse;
+import com.one.dto.LoginDto;
+import com.one.dto.LoginResponse;
+import com.one.exception.AllException;
+import com.one.model.ApiResponse;
+import com.one.model.User;
+import com.one.service.AuthService;
+import com.one.util.ResponseUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;

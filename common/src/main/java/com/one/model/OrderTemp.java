@@ -1,7 +1,8 @@
 package com.one.model;
 
-import com.one.frontend.eenum.OrderStatus;
+import com.one.eenum.OrderStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

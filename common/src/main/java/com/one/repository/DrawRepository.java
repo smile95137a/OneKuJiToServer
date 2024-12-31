@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.DrawResult;
+import com.one.model.DrawResult;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

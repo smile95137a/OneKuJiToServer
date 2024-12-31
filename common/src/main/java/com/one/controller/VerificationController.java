@@ -1,13 +1,13 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.Role;
-import com.one.frontend.model.User;
-import com.one.frontend.model.VerificationToken;
-import com.one.frontend.repository.RoleRepository;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.repository.VerificationTokenRepository;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.model.Role;
+import com.one.model.User;
+import com.one.model.VerificationToken;
+import com.one.repository.RoleRepository;
+import com.one.repository.UserRepository;
+import com.one.repository.VerificationTokenRepository;
+import com.one.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

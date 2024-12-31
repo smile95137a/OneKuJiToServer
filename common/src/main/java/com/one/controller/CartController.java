@@ -1,8 +1,8 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.service.CartService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.SecurityUtils;
+import com.one.service.CartService;
+import com.one.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

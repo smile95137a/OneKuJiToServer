@@ -1,14 +1,14 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.dto.DrawDto;
-import com.one.frontend.dto.GachaDrawDto;
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.DrawResult;
-import com.one.frontend.response.DrawResponse;
-import com.one.frontend.service.DrawResultService;
-import com.one.frontend.service.RedemptionCodeService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.SecurityUtils;
+import com.one.dto.DrawDto;
+import com.one.dto.GachaDrawDto;
+import com.one.model.ApiResponse;
+import com.one.model.DrawResult;
+import com.one.response.DrawResponse;
+import com.one.service.DrawResultService;
+import com.one.service.RedemptionCodeService;
+import com.one.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

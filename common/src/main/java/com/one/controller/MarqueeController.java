@@ -1,7 +1,7 @@
 package com.one.controller;
 
-import com.one.frontend.service.MarqueeService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.service.MarqueeService;
+import com.one.util.ResponseUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

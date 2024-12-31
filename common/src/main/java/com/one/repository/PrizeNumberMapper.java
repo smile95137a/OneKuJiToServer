@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.PrizeNumber;
+import com.one.model.PrizeNumber;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;

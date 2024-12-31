@@ -1,10 +1,10 @@
 package com.one.service;
 
-import com.one.frontend.dto.PasswordResetRepo;
-import com.one.frontend.exception.TokenVerificationException;
-import com.one.frontend.repository.PasswordResetTokenMapper;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.util.RandomUtils;
+import com.one.dto.PasswordResetRepo;
+import com.one.exception.TokenVerificationException;
+import com.one.repository.PasswordResetTokenMapper;
+import com.one.repository.UserRepository;
+import com.one.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +28,7 @@ public class PasswordResetService {
 
  private final MailService mailService;
 
- @Value("${frontend.domain}")
+ @Value("${domain}")
  private String frontendDomain;
 
  @Transactional

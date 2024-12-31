@@ -1,10 +1,10 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.request.ReceiptReq;
-import com.one.frontend.response.ReceiptRes;
-import com.one.frontend.service.InvoiceService;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.SecurityUtils;
+import com.one.request.ReceiptReq;
+import com.one.response.ReceiptRes;
+import com.one.service.InvoiceService;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

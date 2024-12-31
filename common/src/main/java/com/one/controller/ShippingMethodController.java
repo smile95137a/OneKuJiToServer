@@ -1,9 +1,9 @@
 package com.one.controller;
 
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.response.ShippingMethodRes;
-import com.one.frontend.service.ShippingMethodService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.model.ApiResponse;
+import com.one.response.ShippingMethodRes;
+import com.one.service.ShippingMethodService;
+import com.one.util.ResponseUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

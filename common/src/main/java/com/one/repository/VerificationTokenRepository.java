@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.VerificationToken;
+import com.one.model.VerificationToken;
 import org.apache.ibatis.annotations.*;
 
 @Mapper

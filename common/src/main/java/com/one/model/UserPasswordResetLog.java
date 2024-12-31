@@ -1,10 +1,10 @@
 package com.one.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-
 @Data
 @Schema(description = "用戶密碼重置日誌模型")
 @Table(name = "user_password_reset_log")

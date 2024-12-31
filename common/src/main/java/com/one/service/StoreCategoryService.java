@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.model.StoreCategory;
-import com.one.frontend.repository.StoreCategoryRepository;
+import com.one.model.StoreCategory;
+import com.one.repository.StoreCategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

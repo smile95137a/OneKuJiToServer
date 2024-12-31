@@ -1,7 +1,7 @@
 package com.one.config.security.oauth2;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.JwtTokenProvider;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

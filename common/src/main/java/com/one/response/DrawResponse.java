@@ -1,6 +1,6 @@
 package com.one.response;
 
-import com.one.frontend.model.PrizeNumber;
+import com.one.model.PrizeNumber;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

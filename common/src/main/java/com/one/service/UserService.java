@@ -1,12 +1,10 @@
 package com.one.service;
 
-import com.one.frontend.request.UserReq;
-import com.one.frontend.response.UserRes;
-import com.one.frontend.util.RandomUtils;
-import com.one.model.Cart;
-import com.one.model.PrizeCart;
-import com.one.model.VerificationToken;
+import com.one.model.*;
 import com.one.repository.*;
+import com.one.request.UserReq;
+import com.one.response.UserRes;
+import com.one.util.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;

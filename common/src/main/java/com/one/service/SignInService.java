@@ -1,12 +1,12 @@
 package com.one.service;
 
-import com.one.frontend.model.DailySignInRecord;
-import com.one.frontend.model.SignIn;
-import com.one.frontend.repository.DailySignInRepository;
-import com.one.frontend.repository.SignInMapper;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.repository.UserTransactionRepository;
-import com.one.frontend.response.SignInRes;
+import com.one.model.DailySignInRecord;
+import com.one.model.SignIn;
+import com.one.repository.DailySignInRepository;
+import com.one.repository.SignInMapper;
+import com.one.repository.UserRepository;
+import com.one.repository.UserTransactionRepository;
+import com.one.response.SignInRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

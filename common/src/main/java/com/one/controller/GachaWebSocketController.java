@@ -1,6 +1,6 @@
 package com.one.controller;
 
-import com.one.frontend.model.GachaMessage;
+import com.one.model.GachaMessage;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;

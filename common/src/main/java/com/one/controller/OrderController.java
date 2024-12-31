@@ -1,11 +1,11 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.request.OrderQueryReq;
-import com.one.frontend.request.PayCartRes;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.SecurityUtils;
+import com.one.repository.UserRepository;
+import com.one.request.OrderQueryReq;
+import com.one.request.PayCartRes;
+import com.one.util.ResponseUtils;
 import com.one.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -137,12 +137,6 @@ public class OrderController {
 		var userId = userDetails.getId();
 		var res = orderService.getPrizeOrderByOrderNumber(userId, orderNumber);
 		return ResponseEntity.ok(ResponseUtils.success(200, null, res));
-	}
-
-	@PostMapping("/ecpayCheckout")
-	public String ecpayCheckout(@RequestBody Integer userId) {
-
-		return orderService.ecpayCheckout(userId);
 	}
 
 	@PostMapping(value = "/returnUrl", consumes = "application/x-www-form-urlencoded")

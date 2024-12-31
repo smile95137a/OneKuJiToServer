@@ -1,7 +1,8 @@
 package com.one.model;
 
-import com.one.frontend.util.StringListConverter;
+import com.one.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

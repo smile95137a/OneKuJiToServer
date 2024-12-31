@@ -1,12 +1,12 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.CustomUserDetails;
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.request.UserReq;
-import com.one.frontend.response.UserRes;
-import com.one.frontend.service.UserService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.CustomUserDetails;
+import com.one.config.security.SecurityUtils;
+import com.one.model.ApiResponse;
+import com.one.request.UserReq;
+import com.one.response.UserRes;
+import com.one.service.UserService;
+import com.one.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;

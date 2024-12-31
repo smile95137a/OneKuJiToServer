@@ -1,9 +1,9 @@
 package com.one.config;
 
-import com.one.frontend.config.security.JwtAuthenticationFilter;
-import com.one.frontend.config.security.oauth2.CustomOAuth2UserService;
-import com.one.frontend.config.security.oauth2.OAuth2AuthenticationFailureHandler;
-import com.one.frontend.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.one.config.security.JwtAuthenticationFilter;
+import com.one.config.security.oauth2.CustomOAuth2UserService;
+import com.one.config.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.one.config.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

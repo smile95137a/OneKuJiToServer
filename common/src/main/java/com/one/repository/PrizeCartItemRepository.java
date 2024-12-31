@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.PrizeCartItem;
+import com.one.model.PrizeCartItem;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;

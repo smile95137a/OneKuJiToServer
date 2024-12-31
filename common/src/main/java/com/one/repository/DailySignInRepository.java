@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.DailySignInRecord;
+import com.one.model.DailySignInRecord;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDate;

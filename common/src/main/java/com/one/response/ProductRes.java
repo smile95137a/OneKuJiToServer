@@ -1,8 +1,8 @@
     package com.one.response;
 
-    import com.one.frontend.eenum.PrizeCategory;
-    import com.one.frontend.eenum.ProductStatus;
-    import com.one.frontend.eenum.ProductType;
+    import com.one.eenum.PrizeCategory;
+    import com.one.eenum.ProductStatus;
+    import com.one.eenum.ProductType;
     import lombok.AllArgsConstructor;
     import lombok.Data;
     import lombok.NoArgsConstructor;

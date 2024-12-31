@@ -1,7 +1,8 @@
 package com.one.model;
 
-import com.one.frontend.response.ProductDetailRes;
-import com.one.frontend.util.StringListConverter;
+import com.one.response.ProductDetailRes;
+import com.one.util.StringListConverter;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

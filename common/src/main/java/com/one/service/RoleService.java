@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.model.Role;
-import com.one.frontend.repository.RoleRepository;
+import com.one.model.Role;
+import com.one.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

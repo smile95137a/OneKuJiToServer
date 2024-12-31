@@ -1,11 +1,11 @@
 package com.one.service;
 
-import com.one.frontend.model.InvoicePictureRequest;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.request.ReceiptReq;
-import com.one.frontend.response.ReceiptRes;
-import com.one.frontend.response.UserRes;
-import com.one.frontend.util.Md5;
+import com.one.model.InvoicePictureRequest;
+import com.one.repository.UserRepository;
+import com.one.request.ReceiptReq;
+import com.one.response.ReceiptRes;
+import com.one.response.UserRes;
+import com.one.util.Md5;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;

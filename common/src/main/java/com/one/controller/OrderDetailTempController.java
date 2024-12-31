@@ -1,8 +1,8 @@
 package com.one.controller;
 
-import com.one.frontend.model.OrderDetail;
-import com.one.frontend.model.OrderDetailTemp;
-import com.one.frontend.service.OrderDetailTempService;
+import com.one.model.OrderDetail;
+import com.one.model.OrderDetailTemp;
+import com.one.service.OrderDetailTempService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

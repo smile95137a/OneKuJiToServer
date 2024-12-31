@@ -1,6 +1,6 @@
 package com.one.response;
 
-import com.one.frontend.model.StoreKeyword;
+import com.one.model.StoreKeyword;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

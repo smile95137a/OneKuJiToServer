@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.UserReward;
+import com.one.model.UserReward;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;

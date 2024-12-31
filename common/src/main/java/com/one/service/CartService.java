@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.repository.CartRepository;
-import com.one.frontend.response.CartItemRes;
+import com.one.repository.CartRepository;
+import com.one.response.CartItemRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

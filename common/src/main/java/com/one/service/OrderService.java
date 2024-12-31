@@ -1,16 +1,14 @@
 package com.one.service;
 
-import com.one.frontend.dto.DrawResultDto;
-import com.one.frontend.ecpay.payment.integration.AllInOne;
-import com.one.frontend.ecpay.payment.integration.domain.AioCheckOutALL;
-import com.one.frontend.eenum.OrderStatus;
-import com.one.frontend.request.OrderQueryReq;
-import com.one.frontend.request.PayCartRes;
-import com.one.frontend.util.Md5;
-import com.one.frontend.util.RandomUtils;
+import com.one.dto.DrawResultDto;
+import com.one.eenum.OrderStatus;
 import com.one.model.*;
 import com.one.repository.*;
+import com.one.request.OrderQueryReq;
+import com.one.request.PayCartRes;
 import com.one.response.*;
+import com.one.util.Md5;
+import com.one.util.RandomUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
@@ -54,26 +52,6 @@ public class OrderService {
 
 	@Autowired
 	private PrizeCartItemRepository prizeCartItemRepository;
-
-	public String ecpayCheckout(Integer userId) {
-
-		String uuId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 20);
-
-		AllInOne all = new AllInOne("");
-
-		AioCheckOutALL obj = new AioCheckOutALL();
-		obj.setMerchantTradeNo(uuId);
-		obj.setMerchantTradeDate("2017/01/01 08:05:23");
-		obj.setTotalAmount("50");
-		obj.setTradeDesc("test Description");
-		obj.setItemName("TestItem");
-		obj.setReturnURL("https://2217-111-248-73-184.ngrok-free.app/returnUrl");
-		obj.setNeedExtraPaidInfo("N");
-		obj.setCustomField1(String.valueOf(userId));
-		String form = all.aioCheckOut(obj, null);
-		System.out.println(form);
-		return form;
-	}
 
 	public List<OrderRes> queryOrders(Long userId, OrderQueryReq req) {
 		// 初始化查询参数

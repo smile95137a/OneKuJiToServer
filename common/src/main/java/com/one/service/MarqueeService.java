@@ -1,9 +1,9 @@
 package com.one.service;
 
-import com.one.frontend.model.Marquee;
-import com.one.frontend.model.MarqueeDetail;
-import com.one.frontend.repository.MarqueeMapper;
-import com.one.frontend.response.MarqueeWithDetailsRes;
+import com.one.model.Marquee;
+import com.one.model.MarqueeDetail;
+import com.one.repository.MarqueeMapper;
+import com.one.response.MarqueeWithDetailsRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

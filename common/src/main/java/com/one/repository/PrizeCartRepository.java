@@ -1,7 +1,7 @@
 package com.one.repository;
 
-import com.one.frontend.model.PrizeCart;
-import com.one.frontend.response.PrizeCartItemRes;
+import com.one.model.PrizeCart;
+import com.one.response.PrizeCartItemRes;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;

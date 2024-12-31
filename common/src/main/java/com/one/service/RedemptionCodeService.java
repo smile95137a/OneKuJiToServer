@@ -1,8 +1,8 @@
 package com.one.service;
 
-import com.one.frontend.dto.DrawDto;
-import com.one.frontend.model.RedemptionCode;
-import com.one.frontend.repository.RedemptionCodeMapper;
+import com.one.dto.DrawDto;
+import com.one.model.RedemptionCode;
+import com.one.repository.RedemptionCodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

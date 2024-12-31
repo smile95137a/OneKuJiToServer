@@ -1,7 +1,7 @@
 package com.one.repository;
 
-import com.one.frontend.model.OrderDetail;
-import com.one.frontend.model.OrderDetailTemp;
+import com.one.model.OrderDetail;
+import com.one.model.OrderDetailTemp;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;

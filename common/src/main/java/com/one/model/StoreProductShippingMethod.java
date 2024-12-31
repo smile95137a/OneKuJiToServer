@@ -3,7 +3,7 @@ package com.one.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-
+import jakarta.persistence.*;
 @Data
 @Schema(description = "商店產品運輸方式模型")
 @Table(name = "store_product_shipping_method")

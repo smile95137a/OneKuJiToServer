@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.repository.StoreProductRepository;
-import com.one.frontend.response.StoreProductRes;
+import com.one.repository.StoreProductRepository;
+import com.one.response.StoreProductRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

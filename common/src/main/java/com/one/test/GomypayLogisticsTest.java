@@ -1,6 +1,6 @@
 package com.one.test;
 
-import com.one.frontend.util.Md5;
+import com.one.util.Md5;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;

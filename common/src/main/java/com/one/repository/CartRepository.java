@@ -1,8 +1,8 @@
 package com.one.repository;
 
-import com.one.frontend.model.Cart;
-import com.one.frontend.model.CartItem;
-import com.one.frontend.response.CartItemRes;
+import com.one.model.Cart;
+import com.one.model.CartItem;
+import com.one.response.CartItemRes;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

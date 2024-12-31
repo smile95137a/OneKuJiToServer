@@ -1,6 +1,6 @@
 package com.one.util;
 
-import com.one.frontend.model.ApiResponse;
+import com.one.model.ApiResponse;
 
 public class ResponseUtils {
 

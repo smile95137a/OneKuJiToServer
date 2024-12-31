@@ -1,11 +1,11 @@
 package com.one.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.ibatis.mapping.FetchType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -107,7 +107,7 @@ public class User{
     private String provider;
 
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private Set<Role> roles;
 

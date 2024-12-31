@@ -1,7 +1,7 @@
 package com.one.service;
 
-import com.one.frontend.repository.ShippingMethodRepository;
-import com.one.frontend.response.ShippingMethodRes;
+import com.one.repository.ShippingMethodRepository;
+import com.one.response.ShippingMethodRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

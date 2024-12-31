@@ -1,16 +1,16 @@
 package com.one.controller;
 
-import com.one.frontend.config.security.SecurityUtils;
-import com.one.frontend.dto.CreditDto;
-import com.one.frontend.model.ApiResponse;
-import com.one.frontend.model.Award;
-import com.one.frontend.model.PaymentRequest;
-import com.one.frontend.repository.OrderRepository;
-import com.one.frontend.repository.PaymentResponseMapper;
-import com.one.frontend.repository.UserRepository;
-import com.one.frontend.response.PaymentResponse;
-import com.one.frontend.service.PaymentService;
-import com.one.frontend.util.ResponseUtils;
+import com.one.config.security.SecurityUtils;
+import com.one.dto.CreditDto;
+import com.one.model.ApiResponse;
+import com.one.model.Award;
+import com.one.model.PaymentRequest;
+import com.one.repository.OrderRepository;
+import com.one.repository.PaymentResponseMapper;
+import com.one.repository.UserRepository;
+import com.one.response.PaymentResponse;
+import com.one.service.PaymentService;
+import com.one.util.ResponseUtils;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

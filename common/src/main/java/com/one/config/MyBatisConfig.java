@@ -20,7 +20,7 @@ public class MyBatisConfig {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         SqlSessionFactoryBean sessionFactoryBean = new SqlSessionFactoryBean();
         sessionFactoryBean.setDataSource(dataSource);
-        sessionFactoryBean.setTypeHandlersPackage("com.one.frontend.handler");
+        sessionFactoryBean.setTypeHandlersPackage("com.one.handler");
 
         org.apache.ibatis.session.Configuration configuration = new org.apache.ibatis.session.Configuration();
         configuration.setMapUnderscoreToCamelCase(true);

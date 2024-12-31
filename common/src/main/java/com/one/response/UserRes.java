@@ -1,6 +1,6 @@
 package com.one.response;
 
-import com.one.frontend.model.Role;
+import com.one.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

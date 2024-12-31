@@ -1,8 +1,8 @@
 package com.one.service;
 
-import com.one.frontend.model.PrizeCartItem;
-import com.one.frontend.repository.PrizeCartItemRepository;
-import com.one.frontend.repository.UserRepository;
+import com.one.model.PrizeCartItem;
+import com.one.repository.PrizeCartItemRepository;
+import com.one.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

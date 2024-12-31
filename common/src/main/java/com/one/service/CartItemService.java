@@ -1,10 +1,10 @@
 package com.one.service;
 
-import com.one.frontend.model.CartItem;
-import com.one.frontend.repository.CartItemRepository;
-import com.one.frontend.request.CartItemReq;
-import com.one.frontend.response.CartItemRes;
-import com.one.frontend.response.StoreProductRes;
+import com.one.model.CartItem;
+import com.one.repository.CartItemRepository;
+import com.one.request.CartItemReq;
+import com.one.response.CartItemRes;
+import com.one.response.StoreProductRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

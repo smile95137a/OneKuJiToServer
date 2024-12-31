@@ -1,6 +1,6 @@
 package com.one.repository;
 
-import com.one.frontend.model.PasswordResetToken;
+import com.one.model.PasswordResetToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
