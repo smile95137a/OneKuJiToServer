@@ -103,7 +103,7 @@ public class PaymentController {
     }
 
     @PostMapping("/paymentCallbackMP")
-    public ResponseEntity<ApiResponse<?>> paymentCallbackMP( @RequestParam String Send_Type,
+    public void paymentCallbackMP( @RequestParam String Send_Type,
                                                              @RequestParam String result,
                                                              @RequestParam String ret_msg,
                                                              @RequestParam String OrderID,
@@ -115,20 +115,21 @@ public class PaymentController {
                                                              @RequestParam String e_payaccount,
                                                              @RequestParam String e_PayInfo,
                                                              @RequestParam String str_check) {
-        try {
-            if(paymentService.checkStatus(e_orderno)){
-                String s = paymentService.transferOrderFromTemp(e_orderno);
-                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
-                return ResponseEntity.ok(sc);
-            }else{
-                ApiResponse<Object> sc = ResponseUtils.failure(999, "此訂單已繳費，請確認訂單狀態是否改為準備發貨", null);
-                return ResponseEntity.ok(sc);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+//        try {
+//            if(paymentService.checkStatus(e_orderno)){
+//                String s = paymentService.transferOrderFromTemp(e_orderno);
+//                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
+//                return ResponseEntity.ok(sc);
+//            }else{
+//                ApiResponse<Object> sc = ResponseUtils.failure(999, "此訂單已繳費，請確認訂單狀態是否改為準備發貨", null);
+//                return ResponseEntity.ok(sc);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+//        }
+        System.out.println("hello world");
     }
 
 
