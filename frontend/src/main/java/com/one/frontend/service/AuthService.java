@@ -43,7 +43,7 @@ public class AuthService {
 				throw new AllException.BlacklistedUserException("黑名單用戶");
 			}
 
-			return new LoginResponse(token, user.getId(), user.getUsername(), user.getUserUid());
+			return new LoginResponse(token, user.getId(), user.getUsername(), user.getUserUid() , user.getNickname());
 
 		} catch (AuthenticationException e) {
 			throw new AllException.InvalidCredentialsException("帳號密碼錯誤");

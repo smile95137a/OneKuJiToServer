@@ -48,6 +48,7 @@ public class AuthController {
             User user = new User();
             user.setUsername(loginResponse.getUsername());
             user.setUserUid(loginResponse.getUserUid());
+            user.setNickname(loginResponse.getNickname());
             jwtAuthResponse.setUser(user);
 
             ApiResponse<JWTAuthResponse> response = ResponseUtils.success(200, "Login successful", jwtAuthResponse);
