@@ -366,6 +366,7 @@ public class DrawResultService {
 	private DrawResult createDrawResult(Long userId, Long productId, ProductDetailRes prizeDetail,
 										ProductRes product, String payMethod, String prizeNumber,
 										int totalDrawCount, int remainingDrawCount) {
+		ProductDetailRes productDetailById = productDetailRepository.getProductDetailById(prizeDetail.getProductDetailId().longValue());
 		DrawResult drawResult = new DrawResult();
 		drawResult.setUserId(userId);
 		drawResult.setProductId(productId);
@@ -381,6 +382,7 @@ public class DrawResultService {
 		drawResult.setUpdateDate(LocalDateTime.now());
 		drawResult.setImageUrls(prizeDetail.getImageUrls());
 		drawResult.setProductName(prizeDetail.getProductName());
+		drawResult.setLevel(productDetailById.getGrade());
 		if (product.getPrizeCategory() == PrizeCategory.BONUS) {
 			drawResult.setPayType("3");
 		} else if ("1".equals(payMethod)) {

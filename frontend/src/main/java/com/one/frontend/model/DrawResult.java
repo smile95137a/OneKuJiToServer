@@ -99,4 +99,6 @@ public class DrawResult{
     private String payType;
 
     private LocalDateTime endTimes;
+
+    private String level;
 }
