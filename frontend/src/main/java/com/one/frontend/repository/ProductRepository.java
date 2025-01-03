@@ -89,43 +89,40 @@ public interface ProductRepository {
 
     @Select("""
         WITH product_summary AS (
-            SELECT product_id,
-                   SUM(quantity) AS detailQuantity,
-                   SUM(stock_quantity) AS detailStockQuantity
-            FROM product_detail
-            WHERE grade <> 'LAST'
-            GROUP BY product_id
-        ),
-        first_detail AS (
-            SELECT pd.*
-            FROM (
-                SELECT product_id,
-                       quantity AS detailQuantityPerGrade,
-                       stock_quantity AS detailStockQuantityPerGrade,
-                       grade,
-                       product_name,
-                       ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY grade) AS rn
-                FROM product_detail
-            ) pd
-            WHERE pd.rn = 1
-        )
-        SELECT p.product_id AS productId,
-               pc.category_uuid AS categoryUuid,
-               COALESCE(ps.detailQuantity, 0) AS detailQuantity,
-               COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity,
-               fd.detailQuantityPerGrade,
-               fd.detailStockQuantityPerGrade,
-               fd.grade,
-               fd.product_name AS productName,
-               p.status,
-               p.create_date AS createDate,
-               p.update_date AS updateDate
-        FROM product p
-        LEFT JOIN product_summary ps ON p.product_id = ps.product_id
-        LEFT JOIN product_category pc ON p.category_id = pc.category_id
-        LEFT JOIN first_detail fd ON p.product_id = fd.product_id
-        ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END,
-                 p.product_id DESC
+                                      SELECT product_id,
+                                             SUM(quantity) AS detailQuantity,
+                                             SUM(stock_quantity) AS detailStockQuantity
+                                      FROM product_detail
+                                      WHERE grade <> 'LAST'
+                                      GROUP BY product_id
+                                  ),
+                                  first_detail AS (
+                                      SELECT pd.*
+                                      FROM (
+                                          SELECT product_id,
+                                                 quantity AS detailQuantityPerGrade,
+                                                 stock_quantity AS detailStockQuantityPerGrade,
+                                                 grade,
+                                                 product_name,
+                                                 ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY grade) AS rn
+                                          FROM product_detail
+                                      ) pd
+                                      WHERE pd.rn = 1
+                                  )
+                                  SELECT p.*,
+                                         pc.category_uuid,
+                                         COALESCE(ps.detailQuantity, 0) AS detailQuantity,
+                                         COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity,
+                                         fd.detailQuantityPerGrade,
+                                         fd.detailStockQuantityPerGrade,
+                                         fd.grade,
+                                         fd.product_name
+                                  FROM product p
+                                  LEFT JOIN product_summary ps ON p.product_id = ps.product_id
+                                  LEFT JOIN product_category pc ON p.category_id = pc.category_id
+                                  LEFT JOIN first_detail fd ON p.product_id = fd.product_id
+                                  ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END,
+                                           p.product_id DESC;
     """)
     List<ProductRes> getAll();
 

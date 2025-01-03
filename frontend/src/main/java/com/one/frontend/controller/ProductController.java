@@ -87,7 +87,7 @@ public class ProductController {
             return ResponseEntity.ok(ResponseUtils.success(200, null, products));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ResponseUtils.failure(500, "系統錯誤", null));
+                    .body(ResponseUtils.failure(500, e.getMessage(), null));
         }
     }
 
