@@ -143,7 +143,7 @@ public class ImageUtil {
         );
 
         Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.BLACK);
+        g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
 
         try {
