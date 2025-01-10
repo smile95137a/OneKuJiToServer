@@ -9,6 +9,7 @@ import com.one.onekuji.response.UserRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,7 +55,8 @@ public class UserService {
         user.setRoleId(userReq.getRoleId());
         user.setBalance(userReq.getBalance());
         user.setCreatedAt(LocalDateTime.now());
-
+        user.setBonus(BigDecimal.valueOf(0.0));
+        user.setSliverCoin(BigDecimal.valueOf(0.0));
         userRepository.insert(user);
 
         return user;
@@ -70,7 +72,6 @@ public class UserService {
             user.setPhoneNumber(userReq.getPhoneNumber());
             user.setAddress(userReq.getAddress());
             user.setRoleId(userReq.getRoleId());
-            user.setBalance(userReq.getBalance());
             user.setUpdatedAt(LocalDateTime.now());
 
             userRepository.update(user);

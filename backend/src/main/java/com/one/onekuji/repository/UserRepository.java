@@ -17,8 +17,8 @@ public interface UserRepository {
     UserRes findById(Long userId);
 
     // 插入新用戶
-    @Insert("INSERT INTO user (username, password, nickname, email, phone_number, address, role_id, balance, created_at) " +
-            "VALUES (#{username}, #{password}, #{nickname}, #{email}, #{phoneNumber}, #{address}, #{roleId}, #{balance}, #{createdAt})")
+    @Insert("INSERT INTO user (username, password, nickname, email, phone_number, address, role_id, balance, created_at , bonus , sliver_coin) " +
+            "VALUES (#{username}, #{password}, #{nickname}, #{email}, #{phoneNumber}, #{address}, #{roleId}, #{balance}, #{createdAt} , #{bonus} , #{sliverCoin})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(User user);
 
