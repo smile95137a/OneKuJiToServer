@@ -139,6 +139,9 @@ public class NewsController {
             }else{
                 News storeProductRes = newsService.getNewsById(newsReq.getNewsUid());
                 List<String> list = storeProductRes.getImageUrls();
+                if(list.isEmpty()){
+                    list = new ArrayList<>();
+                }
                 fileUrls.addAll(list);
             }
 
