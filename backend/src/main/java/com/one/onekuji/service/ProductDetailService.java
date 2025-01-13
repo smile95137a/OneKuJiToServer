@@ -1,13 +1,5 @@
 package com.one.onekuji.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.model.PrizeNumber;
 import com.one.onekuji.model.Product;
@@ -18,6 +10,13 @@ import com.one.onekuji.repository.ProductRepository;
 import com.one.onekuji.request.DetailReq;
 import com.one.onekuji.response.DetailRes;
 import com.one.onekuji.response.ProductDetailRes;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ProductDetailService {
@@ -67,8 +66,8 @@ public class ProductDetailService {
         int currentIndex = 0;
         for (DetailReq detailReq : detailReqs) {
             // 5. 转义 HTML 字符，确保安全
-            detailReq.setDescription(escapeTextForHtml(detailReq.getDescription()));
-            detailReq.setSpecification(escapeTextForHtml(detailReq.getSpecification()));
+            detailReq.setDescription((detailReq.getDescription()));
+            detailReq.setSpecification((detailReq.getSpecification()));
             detailReq.setStockQuantity(detailReq.getQuantity());
 
             // 6. 计算尺寸，并将结果存入 detailReq
@@ -142,8 +141,8 @@ public class ProductDetailService {
         }
 
         // 转义 HTML 字符
-        productDetailReq.setDescription(escapeTextForHtml(productDetailReq.getDescription()));
-        productDetailReq.setSpecification(escapeTextForHtml(productDetailReq.getSpecification()));
+        productDetailReq.setDescription((productDetailReq.getDescription()));
+        productDetailReq.setSpecification((productDetailReq.getSpecification()));
 
         // 计算尺寸
 
