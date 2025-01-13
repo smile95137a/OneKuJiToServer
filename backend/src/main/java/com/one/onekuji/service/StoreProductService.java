@@ -1,6 +1,5 @@
 package com.one.onekuji.service;
 
-import com.one.onekuji.model.Product;
 import com.one.onekuji.model.StoreCategory;
 import com.one.onekuji.model.StoreProduct;
 import com.one.onekuji.repository.ProductRecommendationMappingMapper;
@@ -58,8 +57,8 @@ public class StoreProductService {
 			throw new Exception("查無此類別，不能新增");
 		}
 
-		String description = formatTextToHtml(storeProductReq.getDescription());
-		String specification = formatTextToHtml(storeProductReq.getSpecification());
+		String description = storeProductReq.getDescription();
+		String specification = (storeProductReq.getSpecification());
 
 		BigDecimal height = storeProductReq.getHeight() != null ? storeProductReq.getHeight() : BigDecimal.ZERO;
 		BigDecimal width = storeProductReq.getWidth() != null ? storeProductReq.getWidth() : BigDecimal.ZERO;
@@ -100,7 +99,7 @@ public class StoreProductService {
 		storeProduct.setSize(calculatedSize);
 		storeProduct.setSpecification(specification);
 		storeProduct.setUpdatedAt(LocalDateTime.now());
-		storeProduct.setDetails(formatTextToHtml(storeProductReq.getDetails()));
+		storeProduct.setDetails((storeProductReq.getDetails()));
 
 		// Update the store product
 		storeProductMapper.update(storeProduct);
@@ -147,8 +146,8 @@ public class StoreProductService {
 			width = dimension.max(BigDecimal.ONE);
 			height = BigDecimal.valueOf(2); // 高度固定为2
 		}
-		String description = formatTextToHtml(storeProductReq.getDescription());
-		String specification = formatTextToHtml(storeProductReq.getSpecification());
+		String description = (storeProductReq.getDescription());
+		String specification = (storeProductReq.getSpecification());
 		BigDecimal calculatedSize = length.add(width).add(BigDecimal.TEN);
 		if (calculatedSize.compareTo(BigDecimal.valueOf(20)) < 0) {
 			calculatedSize = BigDecimal.valueOf(10);
@@ -170,7 +169,7 @@ public class StoreProductService {
 		storeProduct.setShippingMethod(storeProductReq.getShippingMethod());
 		storeProduct.setShippingPrice(storeProductReq.getShippingPrice());
 		storeProduct.setSpecification(specification);
-		storeProduct.setDetails(formatTextToHtml(storeProductReq.getDetails()));
+		storeProduct.setDetails((storeProductReq.getDetails()));
 		return storeProduct;
 	}
 
