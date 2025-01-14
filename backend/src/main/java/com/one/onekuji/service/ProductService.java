@@ -110,7 +110,7 @@ public class ProductService {
 
     private void convertReqToEntity(ProductReq req, Product product) {
         product.setProductName(req.getProductName());
-        product.setDescription(escapeTextForHtml(req.getDescription()));
+        product.setDescription((req.getDescription()));
         product.setPrice(BigDecimal.valueOf(req.getPrice()));
         product.setSliverPrice(req.getSliverPrice());
         product.setStockQuantity(req.getStockQuantity());
@@ -119,7 +119,7 @@ public class ProductService {
         product.setPrizeCategory(req.getPrizeCategory());
         product.setStatus(req.getStatus());
         product.setBonusPrice(req.getBonusPrice());
-        product.setSpecification(escapeTextForHtml(req.getSpecification()));
+        product.setSpecification((req.getSpecification()));
         product.setBannerImageUrl(req.getBannerImageUrl());
         if(req.getProductType().equals(ProductType.GACHA)){
             product.setCategoryId(0L);
