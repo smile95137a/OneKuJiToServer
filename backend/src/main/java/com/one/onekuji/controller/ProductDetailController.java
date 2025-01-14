@@ -3,6 +3,7 @@ package com.one.onekuji.controller;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.one.onekuji.dto.ProductDetailDTO;
 import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.request.DetailReq;
 import com.one.onekuji.response.DetailRes;
@@ -172,4 +173,18 @@ public class ProductDetailController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping(value = "/updateDetail/{id}")
+    public ResponseEntity<ApiResponse<DetailRes>> updateProductDetail(
+            @PathVariable Long id,
+            @RequestBody ProductDetailDTO productDetailDTO
+            ) throws IOException {
+        try {
+            DetailRes productDetailRes = productDetailService.updateProductDTO(id, productDetailDTO);
+            ApiResponse<DetailRes> response = ResponseUtils.success(200, "商品已成功更新", productDetailRes);
+            return ResponseEntity.ok(response);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

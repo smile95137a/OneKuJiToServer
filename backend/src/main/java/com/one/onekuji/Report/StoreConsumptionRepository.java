@@ -117,7 +117,8 @@ public interface StoreConsumptionRepository {
             "    </choose>,",
             "    SUM(ut.amount) AS total_amount,",
             "    u.nickname,",
-            "    u.phone_number",
+            "    u.phone_number ,",
+            "    u.address_name" ,
             "FROM user_transaction ut",
             "LEFT JOIN `user` u ON ut.user_id = u.id",
             "WHERE ut.transaction_type = 'DEPOSIT'",
@@ -146,19 +147,21 @@ public interface StoreConsumptionRepository {
             "        WHEN #{groupType} = 'all' THEN DATE(u.created_at)",
             "        ELSE DATE(u.created_at)",
             "    END AS time_group,",
-            "    SUM(u.sliver_coin_delta) AS total_sliver_coin,",
-            "    SUM(u.bonus_delta) AS total_bonus",
+            "    u.user_id,",
+            "    IFNULL(us.address_name, 'Anonymous') AS addressName,",
+            "    u.sliver_coin_delta AS sliver_coin_delta,",
+            "    u.bonus_delta AS bonus_delta",
             "FROM user_update_log u",
+            "LEFT JOIN `user` us ON u.user_id = us.id",
             "WHERE u.created_at BETWEEN #{startDate} AND #{endDate}",
             "<choose>",
             "   <when test='groupType == \"all\"'>",
-            "       GROUP BY time_group",
+            "       ORDER BY u.created_at DESC",
             "   </when>",
             "   <otherwise>",
-            "       GROUP BY time_group",
+            "       ORDER BY u.created_at DESC",
             "   </otherwise>",
             "</choose>",
-            "ORDER BY time_group DESC",  // 按 time_group 降序排列
             "</script>"
     })
     List<Map<String, Object>> getUserUpdateLogSummary(
@@ -166,6 +169,7 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
@@ -291,13 +295,9 @@ public interface StoreConsumptionRepository {
             "    IFNULL(pd.product_name, 'Unknown Product Detail') AS product_detail_name,",
             "    IFNULL(pd.image_urls, 'No Image') AS image_urls,",
             "    IFNULL(u.nickname, 'Anonymous') AS nickname,",
-            "    CONCAT(dr.amount, ' (',",
-            "        CASE",
-            "            WHEN dr.pay_type = 1 THEN '金幣'",
-            "            WHEN dr.pay_type = 2 THEN '銀幣'",
-            "            WHEN dr.pay_type = 3 THEN '紅利'",
-            "            ELSE '未知類型'",
-            "        END, ')') AS amount_with_type",
+            "    CASE WHEN dr.pay_type = 1 THEN dr.amount ELSE 0 END AS balance,",
+            "    CASE WHEN dr.pay_type = 2 THEN dr.amount ELSE 0 END AS silver_coin,",
+            "    CASE WHEN dr.pay_type = 3 THEN dr.amount ELSE 0 END AS bonus",
             "FROM draw_result dr",
             "LEFT JOIN product_detail pd ON dr.product_detail_id = pd.product_detail_id",
             "LEFT JOIN product p ON dr.product_id = p.product_id",
@@ -314,6 +314,7 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 

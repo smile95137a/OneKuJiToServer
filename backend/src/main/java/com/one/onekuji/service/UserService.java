@@ -89,12 +89,14 @@ public class UserService {
             // 1. 执行批量更新
             userRepository.updateSliverCoinBatch( sliverUpdate.getUserId(),
                     sliverUpdate.getSliverCoin(),
-                    sliverUpdate.getBonus());
+                    sliverUpdate.getBonus(),
+                    sliverUpdate.getBalance());
 
             // 2. 记录更新日志
             userRepository.logUpdate(sliverUpdate.getUserId(),
                     sliverUpdate.getSliverCoin(),
-                    sliverUpdate.getBonus());
+                    sliverUpdate.getBonus(),
+                    sliverUpdate.getBalance());
         } else {
             // 如果用户ID列表为空，抛出异常或处理其他逻辑
             throw new IllegalArgumentException("User ID list cannot be null or empty");
