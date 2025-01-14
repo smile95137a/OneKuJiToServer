@@ -1,5 +1,6 @@
 package com.one.onekuji.service;
 
+import com.one.onekuji.dto.ProductDetailDTO;
 import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.model.PrizeNumber;
 import com.one.onekuji.model.Product;
@@ -271,5 +272,14 @@ public class ProductDetailService {
 
     public ProductDetailRes getProductById(Long productId) {
         return productDetailMapper.getProductById(productId);
+    }
+
+
+    public DetailRes updateProductDTO(Long id , ProductDetailDTO productDetailDTO){
+        DetailRes byId = productDetailMapper.findById(id);
+        byId.setSliverPrice(productDetailDTO.getSliverPrice());
+        byId.setProbability(productDetailDTO.getProbability());
+        byId.setSize(productDetailDTO.getSize());
+        return productDetailMapper.updateProductDTO(byId);
     }
 }

@@ -70,4 +70,9 @@ public interface ProductDetailRepository {
     DetailRes getAllProductDetailsByProductId(Integer productId);
     @Select("select * from product_detail where product_id = #{productId}")
     ProductDetailRes getProductById(Long productId);
+
+    @Update("UPDATE product_detail SET " +
+            "probability = #{probability} , size = #{size} , sliver_price = #{sliverPrice}" +
+            "WHERE product_detail_id = #{productDetailId}")
+    DetailRes updateProductDTO(DetailRes byId);
 }

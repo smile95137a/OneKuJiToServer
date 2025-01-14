@@ -79,6 +79,8 @@ public interface ProductRepository {
             "VALUES (#{productName}, #{description}, #{price}, #{sliverPrice}, #{imageUrls}, #{createdAt}, #{productType}, #{prizeCategory}, #{status}, #{bonusPrice}, #{specification}, #{categoryId})")
     @Options(useGeneratedKeys = true, keyProperty = "productId", keyColumn = "product_id")
     int duplicateProduct(Product duplicatedProduct);
+    @Update("update `product` set price = #{price} , sliver_price = #{sliverPrice} , status = #{status} where product_id = #{id}")
+    void updateProductPrice(Product product);
 
     //ENUM('FIGURE', 'BONUS', 'C3')
 }

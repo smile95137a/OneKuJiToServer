@@ -1,5 +1,6 @@
 package com.one.onekuji.service;
 
+import com.one.onekuji.dto.ProductDTO;
 import com.one.onekuji.eenum.PrizeCategory;
 import com.one.onekuji.eenum.ProductStatus;
 import com.one.onekuji.eenum.ProductType;
@@ -218,4 +219,13 @@ public class ProductService {
         return detailReqs;
     }
 
+
+    public Product updateProduct(Long id, ProductDTO productDTO) {
+        Product product = productRepository.selectProductById(id);
+        product.setPrice(productDTO.getPrice());
+        product.setSliverPrice(productDTO.getSliverPrice());
+        product.setStatus(productDTO.getStatus());
+        productRepository.updateProductPrice(product);
+        return product;
+    }
 }
