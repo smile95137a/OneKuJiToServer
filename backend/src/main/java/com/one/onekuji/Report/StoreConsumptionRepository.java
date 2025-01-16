@@ -115,10 +115,10 @@ public interface StoreConsumptionRepository {
             "            YEAR(ut.created_at) AS time_group",
             "        </when>",
             "    </choose>,",
-            "    SUM(ut.amount) AS total_amount,",
-            "    u.nickname,",
-            "    u.phone_number ,",
-            "    u.address_name" ,
+            "    COALESCE(SUM(ut.amount), 0) AS total_amount,",
+            "    COALESCE(u.nickname, '') AS nickname,",
+            "    COALESCE(u.phone_number, '') AS phone_number,",
+            "    COALESCE(u.address_name, '') AS address_name",
             "FROM user_transaction ut",
             "LEFT JOIN `user` u ON ut.user_id = u.id",
             "WHERE ut.transaction_type = 'DEPOSIT'",
@@ -127,12 +127,13 @@ public interface StoreConsumptionRepository {
             "GROUP BY time_group, u.nickname, u.phone_number",
             "ORDER BY time_group DESC",
             "</script>"
-    })
+            })
     List<Map<String, Object>> getTotalDepositByTimeGroup(
             @Param("groupType") String groupType,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
@@ -292,6 +293,7 @@ public interface StoreConsumptionRepository {
             "    IFNULL(pd.product_name, 'Unknown Product Detail') AS product_detail_name,",
             "    IFNULL(pd.image_urls, 'No Image') AS image_urls,",
             "    IFNULL(u.nickname, 'Anonymous') AS nickname,",
+            "    IFNULL(pd.grade, 'Anonymous') AS grade,",
             "    CASE WHEN dr.pay_type = 1 THEN dr.amount ELSE 0 END AS gold_amount,",
             "    CASE WHEN dr.pay_type = 2 THEN dr.amount ELSE 0 END AS silver_amount,",
             "    CASE WHEN dr.pay_type = 3 THEN dr.amount ELSE 0 END AS bonus",

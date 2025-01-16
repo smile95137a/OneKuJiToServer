@@ -17,14 +17,14 @@ public interface NewsRepository {
     News getNewsById(String newsUid);
 
     // 新增新闻
-    @Insert("INSERT INTO news (news_uid , title, preview,content, created_date, image_urls, status,author ,updated_date) " +
-            "VALUES (#{newsUid} , #{title}, #{preview},#{content}, #{createdDate}, #{imageUrls}, #{status} , #{author} , #{updatedDate})")
+    @Insert("INSERT INTO news (news_uid , title, preview,content, created_date, image_urls, status,author ,updated_date , start_date , end_date , is_display_on_home) " +
+            "VALUES (#{newsUid} , #{title}, #{preview},#{content}, #{createdDate}, #{imageUrls}, #{status} , #{author} , #{updatedDate} , #{startDate} , #{endDate} , #{isDisplayOnHome})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
     int insertNews(News news);
 
     // 更新新闻
     @Update("UPDATE news SET title = #{title}, preview = #{preview}, created_date = #{createdDate}, " +
-            "image_urls = #{imageUrls},content = #{content}, status = #{status} , title = #{title} WHERE news_uid = #{newsUid}")
+            "image_urls = #{imageUrls},content = #{content}, status = #{status} , title = #{title} , start_date = #{startDate} , end_date = #{end_date} , is_display_on_home = #{#{isDisplayOnHome}} WHERE news_uid = #{newsUid}")
     int updateNews(News news);
 
     // 删除新闻

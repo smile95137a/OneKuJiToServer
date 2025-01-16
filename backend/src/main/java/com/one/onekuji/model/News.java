@@ -54,5 +54,11 @@ public class News {
 
     @Column(name = "author", length = 100) // 作者信息，最大长度 100
     private String author;
+    @Column(name = "start_date", length = 100)
+    private LocalDateTime startDate;
+    @Column(name = "end_date", length = 100)
+    private LocalDateTime endDate;
+    @Column(name = "is_display_on_home", length = 100)
+    private Boolean isDisplayOnHome;
 
 }
