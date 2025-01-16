@@ -146,22 +146,16 @@ public interface StoreConsumptionRepository {
             "        WHEN #{groupType} = 'year' THEN YEAR(u.created_at)",
             "        WHEN #{groupType} = 'all' THEN DATE(u.created_at)",
             "        ELSE DATE(u.created_at)",
-            "    END AS time_group,",
-            "    u.user_id,",
-            "    IFNULL(us.address_name, 'Anonymous') AS addressName,",
-            "    u.sliver_coin_delta AS sliver_coin_delta,",
-            "    u.bonus_delta AS bonus_delta",
+            "    END AS time_group,",  // 分组时间段
+            "    u.user_ids AS user_id,",  // 原始存储的 user_ids 列表
+            "    IFNULL(us.address_name, 'Anonymous') AS address_name,", // 用户地址
+            "    u.sliver_coin_delta AS silver_amount,",  // 每条记录的 sliver_coin_delta 原始值
+            "    u.bonus_delta AS bonus_amount",  // 每条记录的 bonus_delta 原始值
             "FROM user_update_log u",
-            "LEFT JOIN `user` us ON u.user_id = us.id",
+            "LEFT JOIN `user` us ON FIND_IN_SET(us.id, u.user_ids)",  // 使用 FIND_IN_SET 检查 user.id 是否在 user_ids 列表中
             "WHERE u.created_at BETWEEN #{startDate} AND #{endDate}",
-            "<choose>",
-            "   <when test='groupType == \"all\"'>",
-            "       ORDER BY u.created_at DESC",
-            "   </when>",
-            "   <otherwise>",
-            "       ORDER BY u.created_at DESC",
-            "   </otherwise>",
-            "</choose>",
+            "GROUP BY time_group, address_name, u.user_ids, u.sliver_coin_delta, u.bonus_delta",  // 按时间、地址和记录内容分组
+            "ORDER BY u.created_at DESC",  // 按创建时间降序排列
             "</script>"
     })
     List<Map<String, Object>> getUserUpdateLogSummary(
@@ -169,6 +163,9 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+
+
 
 
 
@@ -295,8 +292,8 @@ public interface StoreConsumptionRepository {
             "    IFNULL(pd.product_name, 'Unknown Product Detail') AS product_detail_name,",
             "    IFNULL(pd.image_urls, 'No Image') AS image_urls,",
             "    IFNULL(u.nickname, 'Anonymous') AS nickname,",
-            "    CASE WHEN dr.pay_type = 1 THEN dr.amount ELSE 0 END AS balance,",
-            "    CASE WHEN dr.pay_type = 2 THEN dr.amount ELSE 0 END AS silver_coin,",
+            "    CASE WHEN dr.pay_type = 1 THEN dr.amount ELSE 0 END AS gold_amount,",
+            "    CASE WHEN dr.pay_type = 2 THEN dr.amount ELSE 0 END AS silver_amount,",
             "    CASE WHEN dr.pay_type = 3 THEN dr.amount ELSE 0 END AS bonus",
             "FROM draw_result dr",
             "LEFT JOIN product_detail pd ON dr.product_detail_id = pd.product_detail_id",

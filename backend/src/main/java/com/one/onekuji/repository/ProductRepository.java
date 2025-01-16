@@ -25,9 +25,16 @@ public interface ProductRepository {
     Product selectProductById(Long id);
 
     @Select("SELECT * FROM product " +
-            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
+            "ORDER BY CASE " +
+            "           WHEN status = 'AVAILABLE' THEN 1 " +   // 上架的奖品排在最前面
+            "           WHEN status = 'NOT_AVAILABLE_YET' THEN 2 " + // 未上架的奖品
+            "           WHEN status = 'SOLD_OUT' THEN 3 " +    // 上架已售完
+            "           WHEN status = 'UNAVAILABLE' THEN 4 " + // 已下架的奖品排最后
+            "           ELSE 5 " +
+            "         END, " +
             "         product_id DESC")
     List<Product> selectAllProducts();
+
 
 
     @Select("SELECT * FROM product WHERE product_id = #{productId}")

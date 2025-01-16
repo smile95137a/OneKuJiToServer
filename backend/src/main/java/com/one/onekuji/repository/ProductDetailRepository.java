@@ -26,26 +26,31 @@ public interface ProductDetailRepository {
     int insert(DetailReq productDetailReq);
 
 
-    @Update("UPDATE product_detail SET " +
-            "product_id = #{productId}, " +
-            "description = #{description}, " +
-            "note = #{note}, " +
-            "size = #{size}, " +
-            "quantity = #{quantity}, " +
-            "stock_quantity = #{stockQuantity}, " +
-            "product_name = #{productName}, " +
-            "grade = #{grade}, " +
-            "price = #{price}, " +
-            "sliver_price = #{sliverPrice}, " +
-            "image_urls = #{imageUrls}, " +
-            "length = #{length}, " +
-            "width = #{width}, " +
-            "height = #{height}, " +
-            "is_prize = #{isPrize}, " +
-            "specification = #{specification}, " +  // 这里加上逗号
-            "probability = #{probability} " +
-            "WHERE product_detail_id = #{productDetailId}")
+    @Update("<script>" +
+            "UPDATE product_detail " +
+            "<set>" +
+            "<if test='productId != null'>product_id = #{productId},</if>" +
+            "<if test='description != null'>description = #{description},</if>" +
+            "<if test='note != null'>note = #{note},</if>" +
+            "<if test='size != null'>size = #{size},</if>" +
+            "<if test='quantity != null'>quantity = #{quantity},</if>" +
+            "<if test='stockQuantity != null'>stock_quantity = #{stockQuantity},</if>" +
+            "<if test='productName != null'>product_name = #{productName},</if>" +
+            "<if test='grade != null'>grade = #{grade},</if>" +
+            "<if test='price != null'>price = #{price},</if>" +
+            "<if test='sliverPrice != null'>sliver_price = #{sliverPrice},</if>" +
+            "<if test='imageUrls != null'>image_urls = #{imageUrls},</if>" +
+            "<if test='length != null'>length = #{length},</if>" +
+            "<if test='width != null'>width = #{width},</if>" +
+            "<if test='height != null'>height = #{height},</if>" +
+            "<if test='isPrize != null'>is_prize = #{isPrize},</if>" +
+            "<if test='specification != null'>specification = #{specification},</if>" +
+            "<if test='probability != null'>probability = #{probability}</if>" +
+            "</set>" +
+            "WHERE product_detail_id = #{productDetailId}" +
+            "</script>")
     int update(DetailReq productDetailReq);
+
 
 
     @Delete("DELETE FROM product_detail WHERE product_detail_id = #{id}")

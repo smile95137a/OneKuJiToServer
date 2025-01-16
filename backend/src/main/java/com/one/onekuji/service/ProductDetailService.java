@@ -123,98 +123,104 @@ public class ProductDetailService {
 
     public DetailRes updateProductDetail(Long id, DetailReq productDetailReq) throws Exception {
 
-        // 1. 先检查是否有已经被抽中的奖品编号（isDrawn 为 true）
-        List<PrizeNumber> drawnPrizeNumbers = prizeNumberMapper.isTrue(productDetailReq.getProductId());
-        boolean hasDrawnPrize = drawnPrizeNumbers.stream().anyMatch(PrizeNumber::getIsDrawn);
-
-        // 如果存在已被抽中的奖品，不允许更新库存
-        if (hasDrawnPrize) {
-            throw new Exception("已有抽過獎，不允许更新庫存");
-        }
-
-        // 2. 更新商品细节
-        productDetailReq.setProductDetailId(Math.toIntExact(id));
+        // 获取产品信息
         Product productById = productRepository.getProductById(Long.valueOf(productDetailReq.getProductId()));
+        DetailRes byId = productDetailMapper.findById(id);
+        // 检查商品状态
+        boolean isDrawnPrize = prizeNumberMapper.isTrue(productDetailReq.getProductId())
+                .stream().anyMatch(PrizeNumber::getIsDrawn);
+        boolean isProductAvailable = productById.getStatus().equals(ProductStatus.AVAILABLE);
 
-        // 检查商品状态，若已上架则不能更新库存
-        if (productById.getStatus().equals(ProductStatus.AVAILABLE)) {
-            throw new Exception("此商品已上架，不得更新库存");
+        // 如果产品已抽奖或已上架，仅允许更新指定字段
+        if (isDrawnPrize || isProductAvailable) {
+            // 仅允许更新银币、尺寸和概率
+            productDetailReq.setDescription(null);    // 禁止更新描述
+            productDetailReq.setNote(null);           // 禁止更新备注
+            productDetailReq.setQuantity(null);       // 禁止更新数量
+            productDetailReq.setStockQuantity(null);  // 禁止更新库存
+            productDetailReq.setProductName(null);    // 禁止更新商品名称
+            productDetailReq.setGrade(null);          // 禁止更新等级
+            productDetailReq.setPrice(null);          // 禁止更新价格
+            productDetailReq.setImageUrls(null);      // 禁止更新图片链接
+            productDetailReq.setSpecification(null);  // 禁止更新规格
+            productDetailReq.setIsPrize(null);        // 禁止更新是否奖品
         } else {
+            // 未抽奖且未上架，允许完整更新
             productDetailReq.setStockQuantity(productDetailReq.getQuantity());
+
+            // 转义 HTML 字符
+            productDetailReq.setDescription(escapeTextForHtml(productDetailReq.getDescription()));
+            productDetailReq.setSpecification(escapeTextForHtml(productDetailReq.getSpecification()));
         }
 
-        // 转义 HTML 字符
-        productDetailReq.setDescription(escapeTextForHtml(productDetailReq.getDescription()));
-        productDetailReq.setSpecification(escapeTextForHtml(productDetailReq.getSpecification()));
 
-        // 计算尺寸
-
-        productDetailReq.setSize(productDetailReq.getSize());
-        if(productDetailReq.getIsPrize() == null){
-            productDetailReq.setIsPrize(String.valueOf(false));
-        }
         // 更新商品细节
+        productDetailReq.setProductDetailId(Math.toIntExact(id));
         productDetailMapper.update(productDetailReq);
 
-        // 3. 更新产品库存
-        List<ProductDetail> productDetails = productDetailMapper.getProductDetailByProductId(Long.valueOf(productDetailReq.getProductId()));
-        int totalQuantity = 0;
+        // 如果未抽奖且未上架，则更新库存和奖品编号
+        if (!isDrawnPrize && !isProductAvailable) {
+            // 更新产品库存
+            List<ProductDetail> productDetails = productDetailMapper.getProductDetailByProductId(Long.valueOf(productDetailReq.getProductId()));
+            int totalQuantity = 0;
 
-        // 计算产品总数量，排除 grade 为 "LAST" 的项
-        for (ProductDetail detail : productDetails) {
-            if (shouldIncludeInPrizeNumbers(detail)) {
-                totalQuantity += detail.getQuantity();
-            }
-        }
-
-        // 更新产品总数量
-        productRepository.updateTotalQua(totalQuantity, productDetailReq.getProductId());
-
-        // 4. 删除当前产品下所有的奖品编号
-        prizeNumberMapper.deleteProductById(Long.valueOf(productDetailReq.getProductId()));
-
-        // 5. 重新生成并排序奖品编号（排除 "LAST" 项）
-        List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
-        int currentIndex = 0;
-
-        // 创建并打乱奖品编号
-        List<Integer> shuffledNumbers = new ArrayList<>();
-        for (int i = 1; i <= totalQuantity; i++) {
-            shuffledNumbers.add(i);
-        }
-        Collections.shuffle(shuffledNumbers);
-
-        // 为每个产品细节重新生成奖品编号，排除 grade 为 "LAST" 的项
-        for (ProductDetail detail : productDetails) {
-            if (!shouldIncludeInPrizeNumbers(detail)) {
-                continue; // 跳过 "LAST" 的项
+            // 计算产品总数量，排除 grade 为 "LAST" 的项
+            for (ProductDetail detail : productDetails) {
+                if (shouldIncludeInPrizeNumbers(detail)) {
+                    totalQuantity += detail.getQuantity();
+                }
             }
 
-            List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
-            for (int i = 0; i < detail.getQuantity(); i++) {
-                PrizeNumber prizeNumber = new PrizeNumber();
-                prizeNumber.setProductId(detail.getProductId());
-                prizeNumber.setProductDetailId(Math.toIntExact(detail.getProductDetailId()));
-                prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
-                prizeNumber.setIsDrawn(false);
-                prizeNumber.setLevel(detail.getGrade());
-                detailPrizeNumbers.add(prizeNumber);
-                currentIndex++;
+            // 更新产品总数量
+            productRepository.updateTotalQua(totalQuantity, productDetailReq.getProductId());
+
+            // 删除当前产品下所有的奖品编号
+            prizeNumberMapper.deleteProductById(Long.valueOf(productDetailReq.getProductId()));
+
+            // 重新生成奖品编号
+            List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
+            int currentIndex = 0;
+
+            // 创建并打乱奖品编号
+            List<Integer> shuffledNumbers = new ArrayList<>();
+            for (int i = 1; i <= totalQuantity; i++) {
+                shuffledNumbers.add(i);
+            }
+            Collections.shuffle(shuffledNumbers);
+
+            // 为每个产品细节重新生成奖品编号
+            for (ProductDetail detail : productDetails) {
+                if (!shouldIncludeInPrizeNumbers(detail)) {
+                    continue; // 跳过 "LAST" 的项
+                }
+
+                List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
+                for (int i = 0; i < detail.getQuantity(); i++) {
+                    PrizeNumber prizeNumber = new PrizeNumber();
+                    prizeNumber.setProductId(detail.getProductId());
+                    prizeNumber.setProductDetailId(Math.toIntExact(detail.getProductDetailId()));
+                    prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
+                    prizeNumber.setIsDrawn(false);
+                    prizeNumber.setLevel(detail.getGrade());
+                    detailPrizeNumbers.add(prizeNumber);
+                    currentIndex++;
+                }
+
+                // 打乱当前产品细节的奖品编号
+                Collections.shuffle(detailPrizeNumbers);
+                allPrizeNumbers.addAll(detailPrizeNumbers);
             }
 
-            // 打乱当前产品细节的奖品编号
-            Collections.shuffle(detailPrizeNumbers);
-            allPrizeNumbers.addAll(detailPrizeNumbers);
-        }
-
-        // 批量插入新的奖品编号
-        if (!allPrizeNumbers.isEmpty()) {
-            prizeNumberMapper.insertBatch(allPrizeNumbers);
+            // 批量插入新的奖品编号
+            if (!allPrizeNumbers.isEmpty()) {
+                prizeNumberMapper.insertBatch(allPrizeNumbers);
+            }
         }
 
         // 返回更新后的商品详情
         return productDetailMapper.findById(id);
     }
+
 
 
     // 判断是否应将该项包括在奖品编号中
