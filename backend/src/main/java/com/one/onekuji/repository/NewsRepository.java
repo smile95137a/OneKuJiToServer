@@ -23,7 +23,7 @@ public interface NewsRepository {
     int insertNews(News news);
 
     // 更新新闻
-    @Update("UPDATE news SET title = #{title}, preview = #{preview}, created_date = #{createdDate}, " +
+    @Update("UPDATE news SET title = #{title}, preview = #{preview}," +
             "image_urls = #{imageUrls}, content = #{content}, status = #{status}, start_date = #{startDate}, " +
             "end_date = #{endDate}, is_display_on_home = #{isDisplayOnHome} WHERE news_uid = #{newsUid}")
     int updateNews(News news);

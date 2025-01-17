@@ -59,7 +59,6 @@ public class NewsService {
         the_news.setPreview(news.getPreview());
         the_news.setUpdatedDate(LocalDateTime.now());
         the_news.setStatus(news.getStatus());
-        the_news.setCreatedDate(news.getCreatedDate());
         the_news.setStartDate(news.getStartDate()); // 确保设置 startDate
         the_news.setEndDate(news.getEndDate());
         the_news.setIsDisplayOnHome(news.getIsDisplayOnHome());
