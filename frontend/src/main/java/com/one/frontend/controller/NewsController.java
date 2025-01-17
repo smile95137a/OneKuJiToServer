@@ -23,6 +23,19 @@ public class NewsController {
     @Autowired
     private NewsService newsService;
 
+    @GetMapping("/display")
+    public ResponseEntity<ApiResponse<List<News>>> getDisPlayNews() {
+        try {
+            List<News> newsList = newsService.getDisplayNews();
+            ApiResponse<List<News>> response = ResponseUtils.success(200, null, newsList);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ApiResponse<List<News>> response = ResponseUtils.failure(500, "獲取新聞列表失敗", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
     @GetMapping
     public ResponseEntity<ApiResponse<List<News>>> getAllNews() {
         try {
