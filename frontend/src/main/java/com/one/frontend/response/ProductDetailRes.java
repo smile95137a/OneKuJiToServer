@@ -30,6 +30,5 @@ public class ProductDetailRes {
     private String status;
     private String prizeNumber;
     private String drawnNumbers;
-    private Double probability;
     private String isPrize;
 }
