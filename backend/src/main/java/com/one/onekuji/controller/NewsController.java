@@ -154,13 +154,8 @@ public class NewsController {
             int result = newsService.updateNews(newsUid, newsReq);
 
             // 返回成功响应
-            if (result > 0) {
                 ApiResponse<Void> response = ResponseUtils.success(200, "新闻更新成功", null);
                 return ResponseEntity.ok(response);
-            } else {
-                ApiResponse<Void> response = ResponseUtils.failure(400, "新闻更新失败", null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Void> response = ResponseUtils.failure(500, "更新新闻时发生错误", null);

@@ -24,8 +24,10 @@ public interface NewsRepository {
 
     // 更新新闻
     @Update("UPDATE news SET title = #{title}, preview = #{preview}, created_date = #{createdDate}, " +
-            "image_urls = #{imageUrls},content = #{content}, status = #{status} , title = #{title} , start_date = #{startDate} , end_date = #{end_date} , is_display_on_home = #{#{isDisplayOnHome}} WHERE news_uid = #{newsUid}")
+            "image_urls = #{imageUrls}, content = #{content}, status = #{status}, start_date = #{startDate}, " +
+            "end_date = #{endDate}, is_display_on_home = #{isDisplayOnHome} WHERE news_uid = #{newsUid}")
     int updateNews(News news);
+
 
     // 删除新闻
     @Delete("DELETE FROM news WHERE  news_uid = #{newsUid}")
