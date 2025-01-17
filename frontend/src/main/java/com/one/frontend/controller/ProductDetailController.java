@@ -1,7 +1,7 @@
 package com.one.frontend.controller;
 
+import com.one.frontend.dto.ProductDetailRes;
 import com.one.frontend.model.ApiResponse;
-import com.one.frontend.response.ProductDetailRes;
 import com.one.frontend.service.ProductDetailService;
 import com.one.frontend.util.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +26,7 @@ public class ProductDetailController {
     @Operation(summary = "獲取所有獎品", description = "檢索所有獎品的列表")
     @GetMapping("/query")
     public ResponseEntity<ApiResponse<List<ProductDetailRes>>> getAllProduct() {
-        List<ProductDetailRes> products = productDetailService.getAllProductDetail();
+        List<ProductDetailRes> products = productDetailService.getAllProductDetailNoP();
         if (products == null || products.isEmpty()) {
             ApiResponse<List<ProductDetailRes>> response = ResponseUtils.failure(404, null, null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -40,7 +40,7 @@ public class ProductDetailController {
     @GetMapping("/query/{productId}")
     public ResponseEntity<ApiResponse<List<ProductDetailRes>>> getProductById(
             @Parameter(description = "獎品的 ID", example = "1") @PathVariable Long productId) {
-        List<ProductDetailRes> products = productDetailService.getProductDetailByProductId(productId);
+        List<ProductDetailRes> products = productDetailService.getProductDetailByProductIdNoP(productId);
         if (products == null || products.isEmpty()) {
             ApiResponse<List<ProductDetailRes>> response = ResponseUtils.failure(999, "此商品已下架或全售完，無法查看此商品", null);
             return ResponseEntity.ok(response);
