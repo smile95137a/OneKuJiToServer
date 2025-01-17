@@ -513,7 +513,6 @@ public class DrawResultService {
 			drawResult.setUpdateDate(LocalDateTime.now());
 			drawResult.setImageUrls(LastPrize.getImageUrls());
 			drawResult.setProductName(LastPrize.getProductName());
-
 			drawRepository.insertDrawResult(drawResult);
 		} else {
 			// 如果没有抽到 LAST 奖品，打印出原因

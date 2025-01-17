@@ -138,7 +138,7 @@ public class NewsController {
                     }
                 }
             }else{
-                News storeProductRes = newsService.getNewsById(newsReq.getNewsUid());
+                News storeProductRes = newsService.getNewsById(newsUid);
                 List<String> list = storeProductRes.getImageUrls();
                 fileUrls.addAll(list);
             }
