@@ -260,7 +260,7 @@ public class ReportController {
             case "SLIVER_COIN_RECYCLE":
                 return Arrays.asList("time_group", "total_sliver_coin");
             case "PRIZE_RECYCLE_REPORT":
-                return Arrays.asList("time_group", "p_product_name", "product_detail_name", "grade", "total_sliver_coin");
+                return Arrays.asList("time_group" , "nickname" , "p_product_name", "product_detail_name", "grade", "total_sliver_coin");
             case "DRAW_RESULT_SUMMARY":
                 return Arrays.asList("time_group", "product_name", "product_detail_name", "nickname" , "gold_amount", "silver_amount", "bonus_amount" , "grade");
             default:
