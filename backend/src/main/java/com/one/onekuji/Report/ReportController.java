@@ -1,5 +1,8 @@
 package com.one.onekuji.Report;
 
+import com.one.onekuji.response.UserRes;
+import com.one.onekuji.service.UserService;
+import com.one.onekuji.util.SecurityUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -27,6 +30,11 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
+    @Autowired
+    private UserService userService;
+
+    List<String> strList = Arrays.asList("TOTAL_DEPOSIT", "TOTAL_CONSUMPTION" , "DRAW_AMOUNT" , "DRAW_RESULT_SUMMARY");
+
     // 通用的報表查詢接口
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> getReport(
@@ -36,6 +44,31 @@ public class ReportController {
             @RequestParam("groupType") String groupType) { // 默认分页参数
 
         try {
+            // 獲取當前用戶信息
+            var userDetails = SecurityUtils.getCurrentUserPrinciple();
+            assert userDetails != null;
+            Long id = userDetails.getId();
+            UserRes userById = userService.getUserById(id);
+
+            // 獲取用戶角色 ID
+            Long userRoleId = userById.getRoleId(); // 假設每個用戶只有一個角色
+
+
+
+// 根據 reportType 和角色進行權限校驗
+            if (strList.contains(reportType.toUpperCase())) {
+                // TOTAL_DEPOSIT 和 TOTAL_CONSUMPTION: 角色 1 和 2 都可查看
+                if (!userRoleId.equals(1L) && !userRoleId.equals(2L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            } else {
+                // 其他類型: 只有角色 1 可查看
+                if (!userRoleId.equals(1L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            }
+
+
             LocalDateTime start;
             LocalDateTime end;
 
@@ -101,6 +134,31 @@ public class ReportController {
             HttpServletResponse response) {
 
         try {
+
+
+            var userDetails = SecurityUtils.getCurrentUserPrinciple();
+            assert userDetails != null;
+            Long id = userDetails.getId();
+            UserRes userById = userService.getUserById(id);
+
+            // 獲取用戶角色 ID
+            Long userRoleId = userById.getRoleId(); // 假設每個用戶只有一個角色
+
+// 根據 reportType 和角色進行權限校驗
+            if (strList.contains(reportType.toUpperCase())) {
+                // TOTAL_DEPOSIT 和 TOTAL_CONSUMPTION: 角色 1 和 2 都可查看
+                if (!userRoleId.equals(1L) && !userRoleId.equals(2L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            } else {
+                // 其他類型: 只有角色 1 可查看
+                if (!userRoleId.equals(1L)) {
+                    throw new Exception("您無權查看此報表");
+                }
+            }
+
+
+
             LocalDateTime start;
             LocalDateTime end;
 
@@ -194,17 +252,17 @@ public class ReportController {
             case "TOTAL_CONSUMPTION":
                 return Arrays.asList("time_group", "total_amount");
             case "TOTAL_DEPOSIT":
-                return Arrays.asList("time_group", "total_amount", "nickname", "phone_number");
+                return Arrays.asList("time_group", "total_amount", "nickname", "phone_number" , "address_name");
             case "USER_UPDATE_LOG":
-                return Arrays.asList("time_group", "total_sliver_coin", "total_bonus");
+                return Arrays.asList("time_group", "user_id" , "total_sliver_coin", "total_bonus", "address_name");
             case "DAILY_SIGN_IN":
                 return Arrays.asList("time_group", "total_sliver_coin");
             case "SLIVER_COIN_RECYCLE":
                 return Arrays.asList("time_group", "total_sliver_coin");
             case "PRIZE_RECYCLE_REPORT":
-                return Arrays.asList("time_group", "p_product_name", "product_detail_name", "grade", "total_sliver_coin");
+                return Arrays.asList("time_group" , "nickname" , "p_product_name", "product_detail_name", "grade", "total_sliver_coin");
             case "DRAW_RESULT_SUMMARY":
-                return Arrays.asList("time_group", "product_name", "product_detail_name", "nickname", "amount_with_type");
+                return Arrays.asList("time_group", "product_name", "product_detail_name", "nickname" , "gold_amount", "silver_amount", "bonus_amount" , "grade");
             default:
                 // 如果沒有定義的字段順序，返回一個默認值
                 return Arrays.asList("time_group", "total_amount", "product_name", "nickname");

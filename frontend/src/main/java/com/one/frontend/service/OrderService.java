@@ -166,11 +166,10 @@ public class OrderService {
 
 		//取得用戶資訊
 		UserRes userRes = userRepository.getUserById(userId);
-
+		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 		PaymentResponse paymentResponse = new PaymentResponse();
 		if("1".equals(payCartRes.getPaymentMethod())){
 			paymentResponse.setResult("1");
-			String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 			paymentResponse.setOrderId(orderNumber);
 			paymentResponse.setEPayAccount(String.valueOf(totalAmount));
 		}else if("2".equals(payCartRes.getPaymentMethod())){
@@ -182,12 +181,11 @@ public class OrderService {
 			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
 			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
 			paymentRequest.setBuyerMemo("再來一抽備註");
-			String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 			paymentResponse.setOrderId(orderNumber);
 			paymentResponse.setEPayAccount(String.valueOf(totalAmount));
 		}
 
-		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+
 		//paymentResponse result = 1 等於成功
 
 				// 創建訂單實體，這裡包含了支付和運輸方式、收貨人、賬單信息等字段
@@ -373,38 +371,35 @@ public class OrderService {
 					orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
 				}
 
-
-				//訂單成立開立發票並且傳送至email
-//				ReceiptReq invoiceRequest = new ReceiptReq();
-//				if(payCartRes.getVehicle() != null){
-//					invoiceRequest.setOrderCode(payCartRes.getVehicle());
-//				}
-//				invoiceRequest.setEmail(userRes.getUsername());
-//				if(payCartRes.getState() != null){
-//					invoiceRequest.setState(1);
-//					invoiceRequest.setDonationCode(payCartRes.getDonationCode());
-//				}else{
-//					invoiceRequest.setState(0);
-//				}
-//				int amountToSend = shippingCost.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
-//				invoiceRequest.setTotalFee(String.valueOf(amountToSend));
-//				List<ReceiptReq.Item> items = new ArrayList<>();
-//				for(PrizeCartItem cartItem : prizeCartItemList){
-//					ReceiptReq.Item item = new ReceiptReq.Item();
-//					ProductDetailRes byId = productDetailRepository.getProductDetailById(cartItem.getProductDetailId());
-//					item.setName(byId.getProductName());
-//					item.setNumber(cartItem.getQuantity());
-//					item.setMoney(shippingCost.intValue());
-//					items.add(item);
-//				}
-//				invoiceRequest.setItems(items);
-//
-//				ResponseEntity<ReceiptRes> res = invoiceService.addB2CInvoice(invoiceRequest);
-//				ReceiptRes receiptRes = res.getBody();
-//				invoiceService.getInvoicePicture(receiptRes.getCode() , userId);
 			}else if("2".equals(payCartRes.getPaymentMethod())){
 				// 插入訂單到資料庫
 				orderEntity.setResultStatus(OrderStatus.NO_PAY);
+				orderRepository.insertOrder(orderEntity);
+
+				// 根據訂單號查詢訂單ID
+				Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
+
+				// 根據訂單號查詢訂單ID
+				List<OrderDetail> orderDetails = prizeCartItemList.stream()
+						.filter(Objects::nonNull)  // 過濾掉 null 元素
+						.map(cartItem -> mapCartItemToPrizeOrderDetail(cartItem, orderId, shippingCost ,  finalPaymentResponse.getEPayAccount()))
+						.filter(Objects::nonNull)  // 過濾掉映射結果為 null 的元素
+						.collect(Collectors.toList());
+
+				// 批量保存訂單詳情
+				if (!orderDetails.isEmpty()) {
+					orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
+				}
+
+				// 獲取所有購物車項的ID並移除
+				List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+
+				// 移除購物車項
+				prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+
+			}else if("3".equals(payCartRes.getPaymentMethod())){
+// 插入訂單到資料庫
+				orderEntity.setResultStatus(OrderStatus.PREPARING_SHIPMENT);
 				orderRepository.insertOrder(orderEntity);
 
 				// 根據訂單號查詢訂單ID

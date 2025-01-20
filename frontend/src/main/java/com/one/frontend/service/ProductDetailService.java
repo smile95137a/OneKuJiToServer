@@ -29,9 +29,21 @@ public class ProductDetailService {
 
     public List<ProductDetailRes> getProductDetailByProductId(Long productId) {
         ProductRes productById = productRepository.getProductById(productId);
-        if(productById.getStatus() == ProductStatus.UNAVAILABLE || productById.getStatus() == ProductStatus.NOT_AVAILABLE_YET){
+        if(productById.getStatus() == ProductStatus.UNAVAILABLE){
             return null;
         }
         return productDetailRepository.getProductDetailByProductId(productId);
+    }
+
+    public List<com.one.frontend.dto.ProductDetailRes> getAllProductDetailNoP() {
+        return productDetailRepository.getAllProductDetailNoP();
+    }
+
+    public List<com.one.frontend.dto.ProductDetailRes> getProductDetailByProductIdNoP(Long productId) {
+        ProductRes productById = productRepository.getProductById(productId);
+        if(productById.getStatus() == ProductStatus.UNAVAILABLE){
+            return null;
+        }
+        return productDetailRepository.getProductDetailByProductIdNoP(productId);
     }
 }

@@ -85,4 +85,8 @@ public interface ProductDetailRepository {
 
     @Update("update product_detail set is_prize = 'false' where product_detail_id = #{productDetailId}")
     void updateIsPrize(Long productDetailId);
+    @Select("select * from product_detail")
+    List<com.one.frontend.dto.ProductDetailRes> getAllProductDetailNoP();
+    @Select("select * from product_detail where product_id = #{productId}")
+    List<com.one.frontend.dto.ProductDetailRes> getProductDetailByProductIdNoP(Long productId);
 }

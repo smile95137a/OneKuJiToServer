@@ -78,52 +78,53 @@ public interface ProductRepository {
     Long getProductByCategoryId(String uuid);
     @Select("SELECT * FROM product WHERE category_id = #{categoryId}")
     ProductRes getProductByCId(Long categoryId);
-    @Select("SELECT p.*, " +
-            "       p.stock_quantity AS detailQuantity " +
-            "FROM product p " +
-            "WHERE product_type = #{type} " +
-            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
-            "         p.product_id DESC")
+    @Select("""
+    WITH product_summary AS (
+        SELECT 
+            product_id,
+            SUM(quantity) AS detailQuantity,           -- 總數量
+            SUM(stock_quantity) AS detailStockQuantity -- 庫存總數量
+        FROM product_detail
+        WHERE grade <> 'LAST'                         -- 排除等級為 'LAST' 的產品
+        GROUP BY product_id                           -- 按 product_id 分組
+    )
+    SELECT 
+        p.*,                                          -- 主產品表的所有欄位
+        pc.category_uuid,                             -- 類別的唯一識別碼
+        COALESCE(ps.detailQuantity, 0) AS detailQuantity,       -- 若明細數量為 NULL，則返回 0
+        COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity -- 若明細庫存為 NULL，則返回 0
+    FROM 
+        product p
+    LEFT JOIN 
+        product_summary ps ON p.product_id = ps.product_id -- 將主產品與明細彙總數據關聯
+    LEFT JOIN 
+        product_category pc ON p.category_id = pc.category_id -- 將產品與類別表關聯
+    WHERE 
+        p.product_type = #{type}             -- 篩選產品類型為 'CUSTMER_PRIZE'
+    ORDER BY 
+        CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, -- 尚未可用的產品優先排序
+        p.product_id DESC                             -- 根據 product_id 倒序排列
+    """)
     List<ProductRes> getProductByType(String type);
 
 
-    @Select("""
-        WITH product_summary AS (
-                                      SELECT product_id,
-                                             SUM(quantity) AS detailQuantity,
-                                             SUM(stock_quantity) AS detailStockQuantity
-                                      FROM product_detail
-                                      WHERE grade <> 'LAST'
-                                      GROUP BY product_id
-                                  ),
-                                  first_detail AS (
-                                      SELECT pd.*
-                                      FROM (
-                                          SELECT product_id,
-                                                 quantity AS detailQuantityPerGrade,
-                                                 stock_quantity AS detailStockQuantityPerGrade,
-                                                 grade,
-                                                 product_name,
-                                                 ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY grade) AS rn
-                                          FROM product_detail
-                                      ) pd
-                                      WHERE pd.rn = 1
-                                  )
-                                  SELECT p.*,
-                                         pc.category_uuid,
-                                         COALESCE(ps.detailQuantity, 0) AS detailQuantity,
-                                         COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity,
-                                         fd.detailQuantityPerGrade,
-                                         fd.detailStockQuantityPerGrade,
-                                         fd.grade,
-                                         fd.product_name
-                                  FROM product p
-                                  LEFT JOIN product_summary ps ON p.product_id = ps.product_id
-                                  LEFT JOIN product_category pc ON p.category_id = pc.category_id
-                                  LEFT JOIN first_detail fd ON p.product_id = fd.product_id
-                                  ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END,
-                                           p.product_id DESC;
-    """)
+    @Select("WITH product_summary AS ( " +
+            "  SELECT product_id, " +
+            "    SUM(quantity) AS detailQuantity, " +
+            "    SUM(stock_quantity) AS detailStockQuantity " +
+            "  FROM product_detail " +
+            "  WHERE grade <> 'LAST' " + // 移到 WITH 子句中，減少需要處理的數據量
+            "  GROUP BY product_id " +
+            ") " +
+            "SELECT p.*, " +
+            "       pc.category_uuid, " +
+            "       COALESCE(ps.detailQuantity, 0) AS detailQuantity, " + // 使用 COALESCE 處理 NULL
+            "       COALESCE(ps.detailStockQuantity, 0) AS detailStockQuantity " +
+            "FROM product p " +
+            "LEFT JOIN product_summary ps ON p.product_id = ps.product_id " +
+            "LEFT JOIN product_category pc ON p.category_id = pc.category_id " +
+            "ORDER BY CASE WHEN p.status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
+            "         p.product_id DESC")
     List<ProductRes> getAll();
 
 

@@ -115,9 +115,10 @@ public interface StoreConsumptionRepository {
             "            YEAR(ut.created_at) AS time_group",
             "        </when>",
             "    </choose>,",
-            "    SUM(ut.amount) AS total_amount,",
-            "    u.nickname,",
-            "    u.phone_number",
+            "    COALESCE(SUM(ut.amount), 0) AS total_amount,",
+            "    COALESCE(u.nickname, '') AS nickname,",
+            "    COALESCE(u.phone_number, '') AS phone_number,",
+            "    COALESCE(u.address_name, '') AS address_name",
             "FROM user_transaction ut",
             "LEFT JOIN `user` u ON ut.user_id = u.id",
             "WHERE ut.transaction_type = 'DEPOSIT'",
@@ -126,12 +127,13 @@ public interface StoreConsumptionRepository {
             "GROUP BY time_group, u.nickname, u.phone_number",
             "ORDER BY time_group DESC",
             "</script>"
-    })
+            })
     List<Map<String, Object>> getTotalDepositByTimeGroup(
             @Param("groupType") String groupType,
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
@@ -145,20 +147,16 @@ public interface StoreConsumptionRepository {
             "        WHEN #{groupType} = 'year' THEN YEAR(u.created_at)",
             "        WHEN #{groupType} = 'all' THEN DATE(u.created_at)",
             "        ELSE DATE(u.created_at)",
-            "    END AS time_group,",
-            "    SUM(u.sliver_coin_delta) AS total_sliver_coin,",
-            "    SUM(u.bonus_delta) AS total_bonus",
+            "    END AS time_group,",  // 分组时间段
+            "    u.user_ids AS user_id,",  // 原始存储的 user_ids 列表
+            "    IFNULL(us.address_name, 'Anonymous') AS address_name,", // 用户地址
+            "    u.sliver_coin_delta AS silver_amount,",  // 每条记录的 sliver_coin_delta 原始值
+            "    u.bonus_delta AS bonus_amount",  // 每条记录的 bonus_delta 原始值
             "FROM user_update_log u",
+            "LEFT JOIN `user` us ON FIND_IN_SET(us.id, u.user_ids)",  // 使用 FIND_IN_SET 检查 user.id 是否在 user_ids 列表中
             "WHERE u.created_at BETWEEN #{startDate} AND #{endDate}",
-            "<choose>",
-            "   <when test='groupType == \"all\"'>",
-            "       GROUP BY time_group",
-            "   </when>",
-            "   <otherwise>",
-            "       GROUP BY time_group",
-            "   </otherwise>",
-            "</choose>",
-            "ORDER BY time_group DESC",  // 按 time_group 降序排列
+            "GROUP BY time_group, address_name, u.user_ids, u.sliver_coin_delta, u.bonus_delta",  // 按时间、地址和记录内容分组
+            "ORDER BY u.created_at DESC",  // 按创建时间降序排列
             "</script>"
     })
     List<Map<String, Object>> getUserUpdateLogSummary(
@@ -166,6 +164,10 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+
+
+
 
 
 
@@ -291,13 +293,10 @@ public interface StoreConsumptionRepository {
             "    IFNULL(pd.product_name, 'Unknown Product Detail') AS product_detail_name,",
             "    IFNULL(pd.image_urls, 'No Image') AS image_urls,",
             "    IFNULL(u.nickname, 'Anonymous') AS nickname,",
-            "    CONCAT(dr.amount, ' (',",
-            "        CASE",
-            "            WHEN dr.pay_type = 1 THEN '金幣'",
-            "            WHEN dr.pay_type = 2 THEN '銀幣'",
-            "            WHEN dr.pay_type = 3 THEN '紅利'",
-            "            ELSE '未知類型'",
-            "        END, ')') AS amount_with_type",
+            "    IFNULL(pd.grade, 'Anonymous') AS grade,",
+            "    CASE WHEN dr.pay_type = 1 THEN dr.amount ELSE 0 END AS gold_amount,",
+            "    CASE WHEN dr.pay_type = 2 THEN dr.amount ELSE 0 END AS silver_amount,",
+            "    CASE WHEN dr.pay_type = 3 THEN dr.amount ELSE 0 END AS bonus",
             "FROM draw_result dr",
             "LEFT JOIN product_detail pd ON dr.product_detail_id = pd.product_detail_id",
             "LEFT JOIN product p ON dr.product_id = p.product_id",
@@ -314,6 +313,7 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 

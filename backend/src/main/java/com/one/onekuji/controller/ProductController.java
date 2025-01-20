@@ -23,9 +23,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.one.onekuji.dto.ProductDTO;
 import com.one.onekuji.eenum.PrizeCategory;
 import com.one.onekuji.eenum.ProductType;
 import com.one.onekuji.model.ApiResponse;
+import com.one.onekuji.model.Product;
 import com.one.onekuji.request.ProductReq;
 import com.one.onekuji.response.ProductRes;
 import com.one.onekuji.service.ProductService;
@@ -38,9 +40,8 @@ import io.swagger.v3.oas.annotations.Operation;
 @RequestMapping("/api/product")
 public class ProductController {
 
-	@Autowired
-	private ProductService productService;
-
+    @Autowired
+    private ProductService productService;
 
 	@Operation(summary = "獲取所有獎品", description = "檢索所有獎品的列表")
 	@GetMapping("/query")
@@ -328,4 +329,23 @@ public class ProductController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		}
 	}
+
+    @Operation(summary = "更新產品", description = "更新現有產品的詳細信息")
+    @PutMapping("/updateProduct/{id}")
+    public ResponseEntity<ApiResponse<Product>> updateProduct2(
+            @PathVariable Long id,
+            @RequestBody ProductDTO productDTO){
+        try {
+
+            // 调用 service 更新产品
+        Product productRes = productService.updateProduct(id, productDTO);
+
+            ApiResponse<Product> response = ResponseUtils.success(200, "產品更新成功", productRes);
+            return ResponseEntity.ok(response);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

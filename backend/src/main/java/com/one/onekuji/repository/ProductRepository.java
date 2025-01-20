@@ -25,9 +25,16 @@ public interface ProductRepository {
     Product selectProductById(Long id);
 
     @Select("SELECT * FROM product " +
-            "ORDER BY CASE WHEN status = 'NOT_AVAILABLE_YET' THEN 1 ELSE 0 END, " +
+            "ORDER BY CASE " +
+            "           WHEN status = 'AVAILABLE' THEN 1 " +   // 上架的奖品排在最前面
+            "           WHEN status = 'NOT_AVAILABLE_YET' THEN 2 " + // 未上架的奖品
+            "           WHEN status = 'SOLD_OUT' THEN 3 " +    // 上架已售完
+            "           WHEN status = 'UNAVAILABLE' THEN 4 " + // 已下架的奖品排最后
+            "           ELSE 5 " +
+            "         END, " +
             "         product_id DESC")
     List<Product> selectAllProducts();
+
 
 
     @Select("SELECT * FROM product WHERE product_id = #{productId}")
@@ -79,6 +86,8 @@ public interface ProductRepository {
             "VALUES (#{productName}, #{description}, #{price}, #{sliverPrice}, #{imageUrls}, #{createdAt}, #{productType}, #{prizeCategory}, #{status}, #{bonusPrice}, #{specification}, #{categoryId})")
     @Options(useGeneratedKeys = true, keyProperty = "productId", keyColumn = "product_id")
     int duplicateProduct(Product duplicatedProduct);
+    @Update("update `product` set price = #{price} , sliver_price = #{sliverPrice} , status = #{status} where product_id = #{id}")
+    void updateProductPrice(Product product);
 
     //ENUM('FIGURE', 'BONUS', 'C3')
 }

@@ -45,7 +45,8 @@ public class News {
     @Enumerated(EnumType.STRING) // 将枚举映射为其名称，例如存储 'AVAILABLE'
     @Column(name = "status", nullable = false)
     private NewsStatus status;
-    @Column(name = "created_date", nullable = false) // 创建时间，不能为空
+
+    @Column(name = "created_date") // 创建时间，不能为空
     private LocalDateTime createdDate;
 
     @Column(name = "updated_date") // 最后更新时间，可为空
@@ -53,5 +54,11 @@ public class News {
 
     @Column(name = "author", length = 100) // 作者信息，最大长度 100
     private String author;
+    @Column(name = "start_date", length = 100)
+    private LocalDateTime startDate;
+    @Column(name = "end_date", length = 100)
+    private LocalDateTime endDate;
+    @Column(name = "is_display_on_home", length = 100)
+    private Boolean isDisplayOnHome;
 
 }

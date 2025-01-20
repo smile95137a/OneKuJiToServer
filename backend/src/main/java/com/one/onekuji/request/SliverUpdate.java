@@ -17,4 +17,6 @@ public class SliverUpdate {
     private BigDecimal sliverCoin;
 
     private BigDecimal bonus;
+
+    private BigDecimal balance;
 }

@@ -34,6 +34,9 @@ public class FieldTranslator {
         fieldMapping.put("amount_with_type" , "金幣與幣種");
         fieldMapping.put("user_email" , "信箱帳號");
         fieldMapping.put("user_nickname" , "暱稱");
+        fieldMapping.put("address_name" , "姓名");
+        fieldMapping.put("user_id" , "會員編號");
+        fieldMapping.put("grade" , "賞品等級");
     }
 
     public static String translate(String fieldName) {

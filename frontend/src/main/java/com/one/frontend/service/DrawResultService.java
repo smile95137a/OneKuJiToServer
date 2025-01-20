@@ -211,8 +211,6 @@ public class DrawResultService {
 	public List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
 		try {
 
-			LocalDateTime localDateTime = handleDrawForLock(userId, productId, prizeNumbers);
-
 			// 验证用户
 			Long prizeCartId = prizeCartRepository.getCartIdByUserId(userId);
 			if (prizeCartId == null) {
@@ -256,6 +254,11 @@ public class DrawResultService {
 
 			// 为每个选择的编号随机抽奖（按概率）
 			List<PrizeNumber> drawnPrizeNumbers = drawPrizesForNumbersWithStock(selectedPrizeNumbers, productDetails , productId);
+
+			// **在确认有抽奖结果后，开启保护模式**
+			if (!drawnPrizeNumbers.isEmpty()) {
+				handleDrawForLock(userId, productId, prizeNumbers);
+			}
 
 			// 处理抽奖结果
 			List<DrawResult> drawResults = processDrawResults(userId, productId, drawnPrizeNumbers, product, payMethod);
@@ -515,6 +518,7 @@ public class DrawResultService {
 			drawResult.setUpdateDate(LocalDateTime.now());
 			drawResult.setImageUrls(LastPrize.getImageUrls());
 			drawResult.setProductName(LastPrize.getProductName());
+			drawRepository.insertDrawResult(drawResult);
 		} else {
 			// 如果没有抽到 LAST 奖品，打印出原因
 			if (totalQuantity != 1) {

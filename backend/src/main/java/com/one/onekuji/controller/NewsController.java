@@ -1,6 +1,7 @@
 package com.one.onekuji.controller;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.model.News;
@@ -119,7 +120,7 @@ public class NewsController {
     @PutMapping("/{newsUid}")
     public ResponseEntity<ApiResponse<Void>> updateNews(@PathVariable String newsUid,
                                                         @RequestPart("newsReq") String news,
-                                                        @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+                                                        @RequestPart(value = "images", required = false) List<MultipartFile> images) throws JsonProcessingException {
         try {
             // 将传入的 newsReq 转换为 News 对象
             ObjectMapper objectMapper = new ObjectMapper();
@@ -156,13 +157,8 @@ public class NewsController {
             int result = newsService.updateNews(newsUid, newsReq);
 
             // 返回成功响应
-            if (result > 0) {
                 ApiResponse<Void> response = ResponseUtils.success(200, "新闻更新成功", null);
                 return ResponseEntity.ok(response);
-            } else {
-                ApiResponse<Void> response = ResponseUtils.failure(400, "新闻更新失败", null);
-                return ResponseEntity.ok(response);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Void> response = ResponseUtils.failure(500, "更新新闻时发生错误", null);

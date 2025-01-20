@@ -1,17 +1,28 @@
 package com.one.onekuji.model;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.eenum.NewsStatus;
 import com.one.onekuji.util.StringListConverter;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -55,5 +66,13 @@ public class News {
 
     @Column(name = "author", length = 100) // 作者信息，最大长度 100
     private String author;
+    @Column(name = "start_date", length = 100)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private Date startDate;
+    @Column(name = "end_date", length = 100)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private Date endDate;
+    @Column(name = "is_display_on_home", length = 100)
+    private Boolean isDisplayOnHome;
 
 }

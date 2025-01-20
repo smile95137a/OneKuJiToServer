@@ -13,7 +13,7 @@ public interface UserRepository {
     @Select("SELECT * FROM user")
     List<UserRes> findAll();
 
-    @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin,, updated_at, draw_count FROM user WHERE id = #{userId}")
+    @Select("SELECT id, username, password, nickname, email, phone_number, address, role_id, balance, bonus, sliver_coin, updated_at, draw_count FROM user WHERE id = #{userId}")
     UserRes findById(Long userId);
 
     // 插入新用戶
@@ -43,24 +43,24 @@ public interface UserRepository {
             "<script>",
             "UPDATE `user`",
             "SET sliver_coin = sliver_coin + #{sliverCoin},",
-            "bonus = bonus + #{bonus}",  // 新增对 bonus 字段的更新
+            "bonus = bonus + #{bonus} , balance = balance + #{balance}",  // 新增对 bonus 字段的更新
             "WHERE id IN",
             "<foreach item='userId' collection='userIdList' open='(' separator=',' close=')'>",
             "#{userId}",
             "</foreach>",
             "</script>"
     })
-    void updateSliverCoinBatch(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus);
+    void updateSliverCoinBatch(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus , @Param("balance") BigDecimal balance);
 
 
     @Insert({
             "<script>",
-            "INSERT INTO user_update_log (user_ids, sliver_coin_delta, bonus_delta)",
+            "INSERT INTO user_update_log (user_ids, sliver_coin_delta, bonus_delta , balance)",
             "VALUES",
             "<foreach item='userId' collection='userIdList' separator=','>",
-            "(#{userId}, #{sliverCoin}, #{bonus})",
+            "(#{userId}, #{sliverCoin}, #{bonus} , #{balance})",
             "</foreach>",
             "</script>"
     })
-    void logUpdate(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus);
+    void logUpdate(@Param("userIdList") List<Long> userIdList, @Param("sliverCoin") BigDecimal sliverCoin, @Param("bonus") BigDecimal bonus , @Param("balance") BigDecimal balance);
 }
