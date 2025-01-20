@@ -2,6 +2,7 @@ package com.one.frontend.service;
 
 import com.google.gson.Gson;
 import com.one.frontend.dto.CreditDto;
+import com.one.frontend.eenum.OrderStatus;
 import com.one.frontend.model.*;
 import com.one.frontend.repository.*;
 import com.one.frontend.request.ReceiptReq;
@@ -754,8 +755,11 @@ return null;
                 .build();
     }
 
-    public void rePrizeCart(String orderID) {
+    public void rePrizeCart(String orderID) throws Exception {
         OrderRes orderByOrderNumber = orderMapper.findOrderByOrderNumber(orderID);
+        if(orderByOrderNumber.getResultStatus().equals(OrderStatus.FAILED_PAYMENT.toString())){
+            throw new Exception("已經取消過了，無須取消");
+        }
         orderMapper.updateStatusByFail(orderByOrderNumber.getId());
         List<OrderDetailRes> orderDetailsByOrderId = orderDetailMapper.findOrderDetailsByOrderId(orderByOrderNumber.getId());
         Long cartIdByUserId = cartRepository.getCartIdByUserId(orderByOrderNumber.getUserId());
@@ -788,4 +792,5 @@ return null;
         }
 
     }
+
 }

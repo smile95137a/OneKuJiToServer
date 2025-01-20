@@ -84,6 +84,18 @@ public class PaymentController {
         return ResponseEntity.ok("Received payment callback successfully");
     }
 
+    @PostMapping("/cancelOrder")
+    public ResponseEntity<ApiResponse<?>> cancelOrder(@RequestBody CreditDto creditDto) {
+        try {
+            paymentService.rePrizeCart(creditDto.getOrderNumber());
+        } catch (Exception e) {
+            e.printStackTrace();
+            ApiResponse<Object> error = ResponseUtils.failure(500, e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+        return null;
+    }
+
     @PostMapping("/creditMP")
     public ResponseEntity<ApiResponse<?>> creditpaymentCallback(@RequestBody CreditDto creditDto) {
         try {

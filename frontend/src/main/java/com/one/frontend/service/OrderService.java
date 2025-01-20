@@ -139,7 +139,7 @@ public class OrderService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public OrderPayRes createOrder(PayCartRes payCartRes, List<CartItem> cartItemList, Long userId) throws Exception {
+	public synchronized  OrderPayRes createOrder(PayCartRes payCartRes, List<CartItem> cartItemList, Long userId) throws Exception {
 
 		// 計算所有購物車商品的總價格
 		BigDecimal totalProductAmount = cartItemList.stream().map(CartItem::getTotalPrice).reduce(BigDecimal.ZERO,
@@ -275,7 +275,7 @@ public class OrderService {
 	}
 
 	@Transactional(rollbackFor = Exception.class)
-	public OrderPayRes createPrizeOrder(PayCartRes payCartRes, List<PrizeCartItem> prizeCartItemList, Long userId) throws Exception {
+	public synchronized OrderPayRes createPrizeOrder(PayCartRes payCartRes, List<PrizeCartItem> prizeCartItemList, Long userId) throws Exception {
 
 		// 生成訂單號
 
