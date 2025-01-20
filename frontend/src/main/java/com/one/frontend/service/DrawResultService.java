@@ -212,17 +212,21 @@ public class DrawResultService {
 		long protectionTime = 600L; // 默认保护时间为 600 秒
 
 		if (protection != null) {
+			// 计算上次抽奖时间与当前时间之间的秒数
 			long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, LocalDateTime.now()).getSeconds();
 			long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
 
-			// 如果在保护期内
+			// 如果保护期内，剩余时间大于 0
 			if (remainingProtectionTime > 0) {
-				return LocalDateTime.now().plusSeconds(remainingProtectionTime);
+				return LocalDateTime.now().plusSeconds(remainingProtectionTime); // 返回新的保护期结束时间
 			}
 		}
 
-		return LocalDateTime.now();  // 如果没有保护期，返回当前时间
+		// 如果没有保护期或者保护期已经结束，返回当前时间
+		return LocalDateTime.now();
 	}
+
+
 
 
 	public List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
@@ -315,7 +319,7 @@ public class DrawResultService {
 
 			return drawResults;
 		} catch (Exception e) {
-			throw new Exception("抽奖过程中出现错误: " + e.getMessage());
+			throw new Exception("抽獎錯誤: " + e.getMessage());
 		}
 	}
 
