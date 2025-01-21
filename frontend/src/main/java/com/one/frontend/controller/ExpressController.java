@@ -2,6 +2,7 @@ package com.one.frontend.controller;
 
 import com.one.frontend.model.ApiResponse;
 import com.one.frontend.request.CodeRequest;
+import com.one.frontend.util.RandomUtils;
 import com.one.frontend.util.ResponseUtils;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -67,22 +68,29 @@ public class ExpressController {
 
     @PostMapping("/express")
     public ResponseEntity<ApiResponse<?>> logisticsCallback(@RequestBody CodeRequest codeRequest) {
-        String url = "https://logistics.gomypay.asia/Logisticstm.aspx";
+        String url = "https://logistics-stage.ecpay.com.tw/Express/map";
 
         // 提取 code 值
         String code = codeRequest.getCode();
 
         // 設定 POST 的參數
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        if("1".equals(codeRequest.getX())){ //1是mall 2是賞品盒S
-            params.add("Url", "https://onemorelottery.tw/mall-checkout");
+        String s = RandomUtils.genRandom(20);
+        params.add("MerchantID", "2000933");
+        params.add("MerchantTradeNo", s);
+        params.add("LogisticsType", "CVS");
+        params.add("IsCollection", "N");
+        params.add("ExtraData", "");
+        params.add("Device", "");
+        if("1".equals(codeRequest.getX())){ //1是mall 2是賞品盒
+            params.add("ServerReplyURL", "http://chichi-player.s3-website.ap-northeast-3.amazonaws.com/cart");
 //            params.add("Url", "http://localhost:5173/mall-checkout");
         }else if ("2".equals(codeRequest.getX())){
-            params.add("Url", "https://onemorelottery.tw/member-center/prize-checkout");
+            params.add("ServerReplyURL", "http://chichi-player.s3-website.ap-northeast-3.amazonaws.com/prizeBox");
 //            params.add("Url", "http://localhost:5173/member-center/prize-checkout");
         }
 
-        params.add("Opmode", "711".equals(code) ? "3" : ("family".equals(code) ? "1" : "0"));
+        params.add("LogisticsSubType", "711".equals(code) ? "UNIMARTC2C" : ("family".equals(code) ? "FAMIC2C" : "0"));
 
         // 設定 Headers
         HttpHeaders headers = new HttpHeaders();
