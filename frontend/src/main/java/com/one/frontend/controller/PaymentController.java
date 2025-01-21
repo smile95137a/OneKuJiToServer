@@ -88,12 +88,13 @@ public class PaymentController {
     public ResponseEntity<ApiResponse<?>> cancelOrder(@RequestBody CreditDto creditDto) {
         try {
             paymentService.rePrizeCart(creditDto.getOrderNumber());
+            ApiResponse<Object> success = ResponseUtils.success(200, "訂單刪除成功", null);
+            return ResponseEntity.ok(success);
         } catch (Exception e) {
             e.printStackTrace();
             ApiResponse<Object> error = ResponseUtils.failure(500, e.getMessage(), null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-        return null;
     }
 
     @PostMapping("/creditMP")

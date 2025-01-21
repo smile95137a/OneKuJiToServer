@@ -1,5 +1,6 @@
 package com.one.frontend.response;
 
+import com.one.frontend.eenum.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ public class OrderRes {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private LocalDateTime paidAt;
-	private String resultStatus;
+	private OrderStatus resultStatus;
 	private String paymentMethod;
 	private String shippingMethod;
 	private String shippingName;
