@@ -42,12 +42,16 @@ public class LogisticsController {
         logger.info("ExtraData: {}", request.getExtraData());
 
         try {
+            String cvsStoreID = (request.getCvsStoreID() != null) ? request.getCvsStoreID() : "defaultStoreID"; // 默认值
+            String cvsStoreName = (request.getCvsStoreName() != null) ? request.getCvsStoreName() : "defaultStoreName"; // 默认值
+            String cvsAddress = (request.getCvsAddress() != null) ? request.getCvsAddress() : "defaultAddress"; // 默认值
+            String cvsTelephone = (request.getCvsTelephone() != null) ? request.getCvsTelephone() : "defaultTelephone"; // 默认值
             // 模拟数据保存逻辑
             CvsStoreInfo storeInfo = new CvsStoreInfo();
-            storeInfo.setCvsStoreID(request.getCvsStoreID());
-            storeInfo.setCvsStoreName(request.getCvsStoreName());
-            storeInfo.setCvsAddress(request.getCvsAddress());
-            storeInfo.setCvsTelephone(request.getCvsTelephone());
+            storeInfo.setCvsStoreID(cvsStoreID);
+            storeInfo.setCvsStoreName(cvsStoreName);
+            storeInfo.setCvsAddress(cvsAddress);
+            storeInfo.setCvsTelephone(cvsTelephone);
             storeInfo.setCvsOutside(request.getCvsOutside() != null ? request.getCvsOutside() : "0");
             storeInfo.setUuid(request.getExtraData() != null ? request.getExtraData() : UUID.randomUUID().toString());
             cvsStoreInfoRepository.save(storeInfo);
