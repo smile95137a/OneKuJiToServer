@@ -26,7 +26,7 @@ public class LogisticsController {
     private static final Logger logger = LoggerFactory.getLogger(LogisticsController.class);
 
     @PostMapping(value = "/callback", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<String> handleCallback(@RequestBody LogisticsRequest request) {
+    public ResponseEntity<String> handleCallback(@ModelAttribute LogisticsRequest request) {
         // 打印所有参数
         logger.info("Received LogisticsRequest: {}", request);
 
