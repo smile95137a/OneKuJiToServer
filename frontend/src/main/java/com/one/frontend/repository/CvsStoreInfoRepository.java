@@ -14,7 +14,7 @@ public interface CvsStoreInfoRepository {
             VALUES 
             (#{uuid}, #{cvsStoreID}, #{cvsStoreName}, #{cvsAddress}, #{cvsTelephone}, #{cvsOutside})
             """)
-    CvsStoreInfo save(CvsStoreInfo storeInfo);
+    void save(CvsStoreInfo storeInfo);
 
     @Select("SELECT * FROM cvs_store_info WHERE uuid = #{uuid}")
     CvsStoreInfo findByUuid(String uuid);

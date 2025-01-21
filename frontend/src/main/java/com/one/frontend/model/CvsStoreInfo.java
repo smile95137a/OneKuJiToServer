@@ -1,11 +1,15 @@
 package com.one.frontend.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @Table(name = "cvs_store_info")
+@NoArgsConstructor
+@AllArgsConstructor
 public class CvsStoreInfo {
     @Id
     private String uuid;
