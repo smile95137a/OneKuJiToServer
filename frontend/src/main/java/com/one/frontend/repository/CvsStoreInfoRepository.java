@@ -1,12 +1,21 @@
 package com.one.frontend.repository;
 
 import com.one.frontend.model.CvsStoreInfo;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
-import java.util.Optional;
+@Mapper
+public interface CvsStoreInfoRepository {
 
-@Repository
-public interface CvsStoreInfoRepository extends JpaRepository<CvsStoreInfo, Long> {
-    Optional<CvsStoreInfo> findByUuid(String uuid);
+    @Insert("""
+            INSERT INTO cvs_store_info 
+            (uuid, cvs_store_id, cvs_store_name, cvs_address, cvs_telephone, cvs_outside)
+            VALUES 
+            (#{uuid}, #{cvsStoreID}, #{cvsStoreName}, #{cvsAddress}, #{cvsTelephone}, #{cvsOutside})
+            """)
+    CvsStoreInfo save(CvsStoreInfo storeInfo);
+
+    @Select("SELECT * FROM cvs_store_info WHERE uuid = #{uuid}")
+    CvsStoreInfo findByUuid(String uuid);
 }

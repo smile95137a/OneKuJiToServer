@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -46,9 +45,11 @@ public class LogisticsController {
     // 根据 UUID 查询 CVS 门市数据
     @GetMapping("/{uuid}")
     public ResponseEntity<CvsStoreInfo> getStoreInfoByUUID(@PathVariable String uuid) {
-        Optional<CvsStoreInfo> storeInfo = cvsStoreInfoRepository.findByUuid(uuid);
-
-        return storeInfo.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        CvsStoreInfo storeInfo = cvsStoreInfoRepository.findByUuid(uuid);
+        if (storeInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(storeInfo);
     }
+
 }
