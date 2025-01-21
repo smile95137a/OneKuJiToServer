@@ -6,6 +6,7 @@ import com.one.frontend.repository.CvsStoreInfoRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +25,7 @@ public class LogisticsController {
     // 接收第三方回调接口
     private static final Logger logger = LoggerFactory.getLogger(LogisticsController.class);
 
-    @PostMapping("/callback")
+    @PostMapping(value = "/callback", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity<String> handleCallback(@RequestBody LogisticsRequest request) {
         // 打印所有参数
         logger.info("Received LogisticsRequest: {}", request);
