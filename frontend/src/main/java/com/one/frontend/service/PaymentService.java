@@ -793,4 +793,7 @@ return null;
 
     }
 
+    public void cancelStatus(String eOrderno) {
+        orderMapper.updateStatusByFail(Long.valueOf(eOrderno));
+    }
 }
