@@ -3,13 +3,14 @@ package com.one.frontend.controller;
 import com.one.frontend.dto.LogisticsRequest;
 import com.one.frontend.model.CvsStoreInfo;
 import com.one.frontend.repository.CvsStoreInfoRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -24,9 +25,8 @@ public class LogisticsController {
 
     // 接收第三方回调接口
     private static final Logger logger = LoggerFactory.getLogger(LogisticsController.class);
-
     @PostMapping(value = "/callback", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<String> handleCallback(@ModelAttribute LogisticsRequest request) {
+    public void handleCallback(@ModelAttribute LogisticsRequest request, HttpServletResponse response) {
         // 打印所有参数
         logger.info("Received LogisticsRequest: {}", request);
 
@@ -50,16 +50,23 @@ public class LogisticsController {
             storeInfo.setCvsTelephone(request.getCvsTelephone());
             storeInfo.setCvsOutside(request.getCvsOutside() != null ? request.getCvsOutside() : "0");
             storeInfo.setUuid(request.getExtraData() != null ? request.getExtraData() : UUID.randomUUID().toString());
-
+            cvsStoreInfoRepository.save(storeInfo);
             // 假设这里有保存操作
             logger.info("Saving store info: {}", storeInfo);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(storeInfo.getUuid());
+            // 重定向到指定页面并附加 UUID 参数
+            String redirectUrl = "http://chichi-player.s3-website.ap-northeast-3.amazonaws.com/cart?uuid=" + storeInfo.getUuid();
+            response.sendRedirect(redirectUrl);
         } catch (Exception e) {
             logger.error("Error handling logistics callback", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred");
+            try {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error occurred");
+            } catch (IOException ex) {
+                logger.error("Error sending error response", ex);
+            }
         }
     }
+
 
     // 根据 UUID 查询 CVS 门市数据
     @GetMapping("/{uuid}")
