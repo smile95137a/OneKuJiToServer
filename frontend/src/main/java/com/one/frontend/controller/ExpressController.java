@@ -109,11 +109,11 @@ public class ExpressController {
             System.out.println("Response: " + responseBody);
 
             // 使用正則表達式提取 href 的 URL
-            String extractedUrl = extractHrefUrl(responseBody);
-            System.out.println("提取的 URL: " + extractedUrl);
+//            String extractedUrl = extractHrefUrl(responseBody);
+//            System.out.println("提取的 URL: " + extractedUrl);
 
             // 根據業務邏輯處理
-            return ResponseEntity.ok(ResponseUtils.success(200, "查詢成功", extractedUrl));
+            return ResponseEntity.ok(ResponseUtils.success(200, "查詢成功", responseBody));
         } catch (Exception e) {
             // 錯誤處理
             e.printStackTrace();
