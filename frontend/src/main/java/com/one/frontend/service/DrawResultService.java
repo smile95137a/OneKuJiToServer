@@ -289,6 +289,7 @@ public class DrawResultService {
 
 			return drawResults;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new Exception("抽獎過程中出現錯誤: " + e.getMessage());
 		}
 	}
