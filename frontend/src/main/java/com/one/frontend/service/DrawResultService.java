@@ -100,28 +100,21 @@ public class DrawResultService {
 				DrawProtection protection = productDrawProtectionMap.get(productId); // 获取该产品的保护信息
 				long protectionTime = 600L; // 默认保护时间为 600 秒
 
-				if (protection != null) {
-					long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, now).getSeconds();
-					long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
-
-					// 如果在保护期内
-					if (remainingProtectionTime > 0) {
-						System.out.println("Remaining protection time: " + remainingProtectionTime + " seconds");
-
-						// 如果是其他用户，抛出异常并显示剩余时间
-						if (!Objects.equals(userId, protection.userId)) {
-							long minutes = remainingProtectionTime / 60;
-							long seconds = remainingProtectionTime % 60;
-							throw new Exception("抽獎保護期內，其他用戶不能抽獎。剩餘時間：" + minutes + "分" + seconds + "秒");
-						}
-
-
-						// 如果是同一用户，延长保护时间
-						protectionTime = remainingProtectionTime + 30L; // 增加 30 秒
+				// 获取保护期结束时间
+				LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
+				if (protectionEndTime != null) {
+					long remainingSeconds = Duration.between(now, protectionEndTime).getSeconds();
+					if (remainingSeconds > 0) {
+						long minutes = remainingSeconds / 60;
+						long seconds = remainingSeconds % 60;
+						throw new Exception("您仍然處於保護期內，無法進行抽獎。剩餘時間：" + minutes + " 分 " + seconds + " 秒");
 					}
 				}
 
-				// 更新或设置新的保护信息
+				// 在保護期外或同一用戶的情況下進行抽獎操作
+				// 進行抽獎邏輯
+
+				// 更新保护信息
 				LocalDateTime newProtectionEndTime = now.plusSeconds(protectionTime);
 				productDrawProtectionMap.put(productId, new DrawProtection(now, userId));
 				System.out.println("Updated DrawProtection for productId: " + productId + ", userId: " + userId);
@@ -137,6 +130,8 @@ public class DrawResultService {
 			throw new Exception("目前有其他用戶正在抽獎，請稍後。");
 		}
 	}
+
+
 
 
 
@@ -207,11 +202,47 @@ public class DrawResultService {
 	}
 
 
+	public LocalDateTime getProtectionEndTime(Long userId, Long productId) {
+		DrawProtection protection = productDrawProtectionMap.get(productId);
+		long protectionTime = 600L; // 默认保护时间为 600 秒
+
+		if (protection != null) {
+			// 如果是同一個使用者，則延長保護期或放行
+			if (Objects.equals(protection.userId, userId)) {
+				return null;
+			} else {
+				long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, LocalDateTime.now()).getSeconds();
+				long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
+
+				// 如果保護期內，剩餘時間大於 0
+				if (remainingProtectionTime > 0) {
+					return LocalDateTime.now().plusSeconds(remainingProtectionTime); // 返回新的保护期结束时间
+				}
+			}
+		}
+
+		// 如果没有保护期或者保护期已经结束，返回当前时间
+		return LocalDateTime.now();
+	}
+
+
+
+
 
 	public List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
 		try {
+			// 获取保护期结束时间
+			LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
+			if (protectionEndTime != null) {
+				long remainingSeconds = Duration.between(LocalDateTime.now(), protectionEndTime).getSeconds();
+				if (remainingSeconds > 0) {
+					long minutes = remainingSeconds / 60;
+					long seconds = remainingSeconds % 60;
+					throw new Exception("您仍然處於保護期內，無法進行抽獎。剩餘時間：" + minutes + " 分 " + seconds + " 秒");
+				}
+			}
 
-			// 验证用户
+			// 验证用户是否有奖品盒
 			Long prizeCartId = prizeCartRepository.getCartIdByUserId(userId);
 			if (prizeCartId == null) {
 				throw new Exception("沒有賞品盒不能抽獎，請聯繫客服人員");
@@ -230,34 +261,30 @@ public class DrawResultService {
 
 			// 获取选中的奖品编号
 			List<PrizeNumber> selectedPrizeNumbers = prizeNumberMapper.getPrizeNumbersByProductIdAndNumbers(productId, prizeNumbers);
-
-// 如果奖品数量不匹配，抛出异常
 			if (selectedPrizeNumbers.size() != prizeNumbers.size()) {
 				throw new Exception("部分指定的獎品編號不存在或重複");
 			}
 
-// 检查是否有奖品已被抽走
+			// 检查是否有奖品已被抽走
 			for (PrizeNumber prizeNumber : selectedPrizeNumbers) {
 				if (prizeNumber.getIsDrawn()) {
 					throw new Exception("獎品編號 " + prizeNumber.getNumber() + " 已被抽走");
 				}
 			}
 
-
 			// 验证并扣除用户余额
 			BigDecimal totalAmount = calculateTotalAmount(product, prizeNumbers.size(), payMethod);
 			deductUserBalance(userId, totalAmount, product.getPrizeCategory(), payMethod);
 
-			// **记录消费** (在扣除用户余额后)
-
+			// 记录消费
 			recordConsume(userId, totalAmount , payMethod);
 
 			// 为每个选择的编号随机抽奖（按概率）
-			List<PrizeNumber> drawnPrizeNumbers = drawPrizesForNumbersWithStock(selectedPrizeNumbers, productDetails , productId);
+			List<PrizeNumber> drawnPrizeNumbers = drawPrizesForNumbersWithStock(selectedPrizeNumbers, productDetails, productId);
 
 			// **在确认有抽奖结果后，开启保护模式**
 			if (!drawnPrizeNumbers.isEmpty()) {
-				handleDrawForLock(userId, productId, prizeNumbers);
+				handleDrawForLock(userId, productId, prizeNumbers); // 延长保护期
 			}
 
 			// 处理抽奖结果
@@ -274,16 +301,19 @@ public class DrawResultService {
 			if (spDrawResult != null) {
 				drawResults.add(spDrawResult);
 			}
-			if("1".equals(payMethod) || "2".equals(payMethod) ){
+
+			// 更新用户红利
+			if("1".equals(payMethod) || "2".equals(payMethod)) {
 				updateUserBonus(userId, totalAmount, prizeNumbers.size(), payMethod);
 			}
 
+			// 检查是否需要发送邮件
 			Long cartIdByUserId = prizeCartRepository.getCartIdByUserId(userId);
 			List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId);
 			int total = prizeCartItemList.size();
 			UserRes userById = userRepository.getUserById(userId);
 
-			if(total >= 100){
+			if (total >= 100) {
 				mailService.sendPrizeMail(userById.getEmail());
 			}
 

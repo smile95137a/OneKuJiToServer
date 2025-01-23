@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductDetailService {
@@ -42,6 +43,21 @@ public class ProductDetailService {
         List<DetailRes> detailResList = new ArrayList<>();
         List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
         int totalQuantity = 0;
+
+        List<ProductDetail> productDetailByProductId = productDetailMapper.getProductDetailByProductId(Long.valueOf(detailReqs.get(0).getProductId()));
+
+        // 获取现有的 ProductDetail 列表中的所有 grade
+        List<String> existingGrades = productDetailByProductId.stream()
+                .map(ProductDetail::getGrade)
+                .collect(Collectors.toList());
+
+        // 检查新增的 detailReqs 中是否有重复的 grade
+        for (DetailReq detailReq : detailReqs) {
+            if (existingGrades.contains(detailReq.getGrade())) {
+                throw new IllegalArgumentException("已經有重複的 grade: " + detailReq.getGrade() + "，請勿重複！");
+            }
+        }
+
 
         // 计算总数量，排除 grade 为 "LAST" 的项
         // 1. 计算总数量，排除等级为 "LAST" 的项。
@@ -121,6 +137,17 @@ public class ProductDetailService {
 
     public DetailRes updateProductDetail(Long id, DetailReq productDetailReq) throws Exception {
 
+        List<ProductDetail> productDetailByProductId = productDetailMapper.getProductDetailByProductId(Long.valueOf(productDetailReq.getProductId()));
+
+        // 获取现有的 ProductDetail 列表中的所有 grade
+        List<String> existingGrades = productDetailByProductId.stream()
+                .map(ProductDetail::getGrade)
+                .collect(Collectors.toList());
+
+        // 检查新增的 detailReqs 中是否有重复的 grade
+            if (existingGrades.contains(productDetailReq.getGrade())) {
+                throw new IllegalArgumentException("已經有重複的 grade: " + productDetailReq.getGrade() + "，請勿重複！");
+            }
         // 获取产品信息
         Product productById = productRepository.getProductById(Long.valueOf(productDetailReq.getProductId()));
         DetailRes byId = productDetailMapper.findById(id);
