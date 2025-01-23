@@ -141,13 +141,15 @@ public class ProductDetailService {
 
         // 获取现有的 ProductDetail 列表中的所有 grade
         List<String> existingGrades = productDetailByProductId.stream()
+                .filter(detail -> !detail.getProductDetailId().equals(productDetailReq.getProductDetailId())) // 排除当前更新的记录
                 .map(ProductDetail::getGrade)
                 .collect(Collectors.toList());
 
-        // 检查新增的 detailReqs 中是否有重复的 grade
-            if (existingGrades.contains(productDetailReq.getGrade())) {
-                throw new IllegalArgumentException("已經有重複的 grade: " + productDetailReq.getGrade() + "，請勿重複！");
-            }
+// 检查新增的 grade 是否重复
+        if (existingGrades.contains(productDetailReq.getGrade())) {
+            throw new IllegalArgumentException("已經有重複的 grade: " + productDetailReq.getGrade() + "，請勿重複！");
+        }
+
         // 获取产品信息
         Product productById = productRepository.getProductById(Long.valueOf(productDetailReq.getProductId()));
         DetailRes byId = productDetailMapper.findById(id);

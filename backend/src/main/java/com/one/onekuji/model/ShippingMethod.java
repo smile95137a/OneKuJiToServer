@@ -34,7 +34,7 @@ public class ShippingMethod {
     @Schema(description = "創建日期", example = "2024-08-22T15:30:00")
     @Column(name = "create_date")
     private LocalDateTime createDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新日期", example = "2024-08-22T15:30:00")
     @Column(name = "update_date")
     private LocalDateTime updateDate;

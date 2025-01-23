@@ -1,5 +1,6 @@
 package com.one.onekuji.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.one.onekuji.util.StringListConverter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -27,11 +28,11 @@ public class ProductRecommendationMapping {
     @Schema(description = "推薦類別 ID", example = "1")
     @Column(name = "store_product_recommendation_id")
     private Long storeProductRecommendationId;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "創建時間", example = "2024-08-22T15:30:00")
     @Column(name = "created_date")
     private LocalDateTime createdDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Taipei")
     @Schema(description = "更新時間", example = "2024-08-22T15:30:00")
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
