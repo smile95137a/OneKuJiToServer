@@ -112,14 +112,14 @@ public class ProductService {
     private void convertReqToEntity(ProductReq req, Product product) {
         product.setProductName(req.getProductName());
         product.setDescription((req.getDescription()));
-        product.setPrice(BigDecimal.valueOf(req.getPrice()));
-        product.setSliverPrice(req.getSliverPrice());
+        product.setPrice(req.getPrice() != null ? BigDecimal.valueOf(req.getPrice()) : BigDecimal.ZERO);
+        product.setSliverPrice(req.getSliverPrice() != null ? req.getSliverPrice() : BigDecimal.ZERO);
         product.setStockQuantity(req.getStockQuantity());
         product.setImageUrls(req.getImageUrls());
         product.setProductType(req.getProductType());
         product.setPrizeCategory(req.getPrizeCategory());
         product.setStatus(req.getStatus());
-        product.setBonusPrice(req.getBonusPrice());
+        product.setBonusPrice(req.getBonusPrice() != null ? req.getBonusPrice() : BigDecimal.ZERO);
         product.setSpecification((req.getSpecification()));
         product.setBannerImageUrl(req.getBannerImageUrl());
         if(req.getProductType().equals(ProductType.GACHA)){
