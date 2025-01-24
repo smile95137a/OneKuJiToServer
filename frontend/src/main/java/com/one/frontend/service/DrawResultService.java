@@ -313,9 +313,9 @@ public class DrawResultService {
 			int total = prizeCartItemList.size();
 			UserRes userById = userRepository.getUserById(userId);
 
-			if (total >= 100) {
-				mailService.sendPrizeMail(userById.getEmail());
-			}
+//			if (total >= 100) {
+//				mailService.sendPrizeMail(userById.getEmail());
+//			}
 
 			return drawResults;
 		} catch (Exception e) {
