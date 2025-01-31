@@ -10,6 +10,7 @@ import com.one.frontend.repository.PaymentResponseMapper;
 import com.one.frontend.repository.UserRepository;
 import com.one.frontend.response.PaymentResponse;
 import com.one.frontend.service.PaymentService;
+import com.one.frontend.util.EcpayFunction;
 import com.one.frontend.util.ResponseUtils;
 import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/payment")
@@ -46,85 +48,74 @@ public class PaymentController {
 
     @PostMapping("/paymentCallback")
     public ResponseEntity<String> paymentCallback(
-            @RequestParam String Send_Type,
-            @RequestParam String result,
-            @RequestParam String ret_msg,
-            @RequestParam String OrderID,
-            @RequestParam String e_money,
-            @RequestParam String PayAmount,
-            @RequestParam String e_date,
-            @RequestParam String e_time,
-            @RequestParam String e_orderno,
-            @RequestParam String e_payaccount,
-            @RequestParam String e_PayInfo,
-            @RequestParam String str_check
+            @RequestParam Map<String, String> paymentData
     ) throws MessagingException {
         // 打印接收到的参数
-        System.out.println("Send_Type: " + Send_Type);
-        System.out.println("Result: " + result);
-        System.out.println("Return Message: " + ret_msg);
-        System.out.println("Order ID: " + OrderID);
-        System.out.println("e_money: " + e_money);
-        System.out.println("Pay Amount: " + PayAmount);
-        System.out.println("e_date: " + e_date);
-        System.out.println("e_time: " + e_time);
-        System.out.println("e_orderno: " + e_orderno);
-        System.out.println("e_payaccount: " + e_payaccount);
-        System.out.println("e_PayInfo: " + e_PayInfo);
-        System.out.println("str_check: " + str_check);
-        try {
-            if("1".equals(result)){
-                paymentService.transferOrderFromTemp(e_orderno);
-            } else {
-                paymentService.rePrizeCart(e_orderno);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        String merchantId = paymentData.get("MerchantID");
+        String merchantTradeNo = paymentData.get("MerchantTradeNo");
+        String rtnCode = paymentData.get("RtnCode");
+        String rtnMsg = paymentData.get("RtnMsg");
+        String tradeNo = paymentData.get("TradeNo");
+        String tradeAmt = paymentData.get("TradeAmt");
+        String paymentDate = paymentData.get("PaymentDate");
+        String checkMacValue = paymentData.get("CheckMacValue");
+        System.out.println(merchantId);
+        System.out.println(merchantTradeNo);
+        System.out.println(rtnCode);
+        System.out.println(rtnMsg);
+        System.out.println(tradeNo);
+        System.out.println(tradeAmt);
+        System.out.println(paymentDate);
+        System.out.println(checkMacValue);
+//        try {
+//            if("1".equals(result)){
+//                paymentService.transferOrderFromTemp(e_orderno);
+//            } else {
+//                paymentService.rePrizeCart(e_orderno);
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
         return ResponseEntity.ok("Received payment callback successfully");
     }
 
     @PostMapping("/creditCallback")
     public ResponseEntity<?> creditCallback(
-            @RequestParam String Send_Type,
-            @RequestParam String result,
-            @RequestParam String ret_msg,
-            @RequestParam String OrderID,
-            @RequestParam String e_money,
-            @RequestParam String PayAmount,
-            @RequestParam String e_date,
-            @RequestParam String e_time,
-            @RequestParam String e_orderno,
-            @RequestParam String e_payaccount,
-            @RequestParam String str_check
+            @RequestParam Map<String, String> paymentData
     ) throws MessagingException {
         // 打印接收到的参数
-        System.out.println("Send_Type: " + Send_Type);
-        System.out.println("Result: " + result);
-        System.out.println("Return Message: " + ret_msg);
-        System.out.println("Order ID: " + OrderID);
-        System.out.println("e_money: " + e_money);
-        System.out.println("Pay Amount: " + PayAmount);
-        System.out.println("e_date: " + e_date);
-        System.out.println("e_time: " + e_time);
-        System.out.println("e_orderno: " + e_orderno);
-        System.out.println("e_payaccount: " + e_payaccount);
-        System.out.println("str_check: " + str_check);
-        try {
-            if(paymentService.checkStatus(e_orderno) && "1".equals(result)){
-                String s = paymentService.transferOrderFromTemp(e_orderno);
-                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
-                return ResponseEntity.ok(sc);
-            }else{
-                paymentService.cancelStatus(e_orderno);
-                ApiResponse<Object> sc = ResponseUtils.failure(999, null, null);
-                return ResponseEntity.ok(sc);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+        String merchantId = paymentData.get("MerchantID");
+        String merchantTradeNo = paymentData.get("MerchantTradeNo");
+        String rtnCode = paymentData.get("RtnCode");
+        String rtnMsg = paymentData.get("RtnMsg");
+        String tradeNo = paymentData.get("TradeNo");
+        String tradeAmt = paymentData.get("TradeAmt");
+        String paymentDate = paymentData.get("PaymentDate");
+        String checkMacValue = paymentData.get("CheckMacValue");
+        System.out.println(merchantId);
+        System.out.println(merchantTradeNo);
+        System.out.println(rtnCode);
+        System.out.println(rtnMsg);
+        System.out.println(tradeNo);
+        System.out.println(tradeAmt);
+        System.out.println(paymentDate);
+        System.out.println(checkMacValue);
+//        try {
+//            if(paymentService.checkStatus(e_orderno) && "1".equals(result)){
+//                String s = paymentService.transferOrderFromTemp(e_orderno);
+//                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
+//                return ResponseEntity.ok(sc);
+//            }else{
+//                paymentService.cancelStatus(e_orderno);
+//                ApiResponse<Object> sc = ResponseUtils.failure(999, null, null);
+//                return ResponseEntity.ok(sc);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+//        }
+        return null;
     }
 
     @PostMapping("/cancelOrder")
@@ -159,74 +150,79 @@ public class PaymentController {
     }
 
     @PostMapping("/paymentCallbackMP")
-    public ResponseEntity<ApiResponse<?>> paymentCallbackMP( @RequestParam String Send_Type,
-                                                             @RequestParam String result,
-                                                             @RequestParam String ret_msg,
-                                                             @RequestParam String OrderID,
-                                                             @RequestParam String e_money,
-                                                             @RequestParam String PayAmount,
-                                                             @RequestParam String e_date,
-                                                             @RequestParam String e_time,
-                                                             @RequestParam String e_orderno,
-                                                             @RequestParam String e_payaccount,
-                                                             @RequestParam String e_PayInfo,
-                                                             @RequestParam String str_check) {
-        try {
-            if(paymentService.checkStatus(e_orderno)){
-                String s = paymentService.transferOrderFromTemp(e_orderno);
-                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
-                return ResponseEntity.ok(sc);
-            }else{
-                ApiResponse<Object> sc = ResponseUtils.failure(999, "此訂單已繳費，請確認訂單狀態是否改為準備發貨", null);
-                return ResponseEntity.ok(sc);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-        }
+    public ResponseEntity<ApiResponse<?>> paymentCallbackMP( @RequestParam Map<String, String> paymentData) {
+        String merchantId = paymentData.get("MerchantID");
+        String merchantTradeNo = paymentData.get("MerchantTradeNo");
+        String rtnCode = paymentData.get("RtnCode");
+        String rtnMsg = paymentData.get("RtnMsg");
+        String tradeNo = paymentData.get("TradeNo");
+        String tradeAmt = paymentData.get("TradeAmt");
+        String paymentDate = paymentData.get("PaymentDate");
+        String checkMacValue = paymentData.get("CheckMacValue");
+        System.out.println(merchantId);
+        System.out.println(merchantTradeNo);
+        System.out.println(rtnCode);
+        System.out.println(rtnMsg);
+        System.out.println(tradeNo);
+        System.out.println(tradeAmt);
+        System.out.println(paymentDate);
+        System.out.println(checkMacValue);
+//        try {
+//            if(paymentService.checkStatus(e_orderno)){
+//                String s = paymentService.transferOrderFromTemp(e_orderno);
+//                ApiResponse<Object> sc = ResponseUtils.success(200, null, s);
+//                return ResponseEntity.ok(sc);
+//            }else{
+//                ApiResponse<Object> sc = ResponseUtils.failure(999, "此訂單已繳費，請確認訂單狀態是否改為準備發貨", null);
+//                return ResponseEntity.ok(sc);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            ApiResponse<Object> error = ResponseUtils.failure(500, "系統錯誤，請稍後再試", null);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+//        }
+        return null;
     }
 
 
     @PostMapping("/paymentCallback2")
     public ResponseEntity<String> paymentCallback2(
-            @RequestParam String Send_Type,
-            @RequestParam String result,
-            @RequestParam String ret_msg,
-            @RequestParam String OrderID,
-            @RequestParam String e_money,
-            @RequestParam String PayAmount,
-            @RequestParam String e_date,
-            @RequestParam String e_time,
-            @RequestParam String e_orderno,
-            @RequestParam String e_payaccount,
-            @RequestParam String e_PayInfo,
-            @RequestParam String str_check
+            @RequestParam Map<String, String> paymentData
     ) throws MessagingException {
         // 打印接收到的参数
-        System.out.println("Send_Type: " + Send_Type);
-        System.out.println("Result: " + result);
-        System.out.println("Return Message: " + ret_msg);
-        System.out.println("Order ID: " + OrderID);
-        System.out.println("e_money: " + e_money);
-        System.out.println("Pay Amount: " + PayAmount);
-        System.out.println("e_date: " + e_date);
-        System.out.println("e_time: " + e_time);
-        System.out.println("e_orderno: " + e_orderno);
-        System.out.println("e_payaccount: " + e_payaccount);
-        System.out.println("e_PayInfo: " + e_PayInfo);
-        System.out.println("str_check: " + str_check);
-        if("1".equals(result)){
-            // 记录储值交易
-            PaymentResponse byId = paymentResponseMapper.findById(e_orderno);
-            paymentService.recordDeposit(byId.getUserId(), new BigDecimal(PayAmount) , e_orderno);
-            ApiResponse<Void> response1 = ResponseUtils.success(200, "成功", null);
-
-            return ResponseEntity.ok("Received payment callback successfully");
-        }
+        String merchantId = paymentData.get("MerchantID");
+        String merchantTradeNo = paymentData.get("MerchantTradeNo");
+        String rtnCode = paymentData.get("RtnCode");
+        String rtnMsg = paymentData.get("RtnMsg");
+        String tradeNo = paymentData.get("TradeNo");
+        String tradeAmt = paymentData.get("TradeAmt");
+        String paymentDate = paymentData.get("PaymentDate");
+        String checkMacValue = paymentData.get("CheckMacValue");
+        System.out.println(merchantId);
+        System.out.println(merchantTradeNo);
+        System.out.println(rtnCode);
+        System.out.println(rtnMsg);
+        System.out.println(tradeNo);
+        System.out.println(tradeAmt);
+        System.out.println(paymentDate);
+        System.out.println(checkMacValue);
+        // 驗證 CheckMacValue (這步非常重要，用來確保資料的真實性)
+//        boolean isValid = EcpayFunction.genCheckMacValue(paymentData, checkMacValue);
+//        if (!isValid) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid CheckMacValue");
+//        }
+//        if("1".equals(result)){
+//            // 记录储值交易
+//            PaymentResponse byId = paymentResponseMapper.findById(e_orderno);
+//            paymentService.recordDeposit(byId.getUserId(), new BigDecimal(PayAmount) , e_orderno);
+//            ApiResponse<Void> response1 = ResponseUtils.success(200, "成功", null);
+//
+//            return ResponseEntity.ok("Received payment callback successfully");
+//        }
 
         return ResponseEntity.ok("Received payment callback successfully");
     }
+
 
 
     @PostMapping("/topOp") //儲值
