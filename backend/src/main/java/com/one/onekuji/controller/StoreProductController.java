@@ -53,7 +53,7 @@ public class StoreProductController {
         if (images != null && !images.isEmpty()) {
             for (MultipartFile image : images) {
                 if (!image.isEmpty()) {
-                    String fileUrl = ImageUtil.upload(image); // 使用 ImageUtil 上传文件
+                    String fileUrl = ImageUtil.storeUpload(image); // 使用 ImageUtil 上传文件
                     fileUrls.add(fileUrl);
                 }
             }

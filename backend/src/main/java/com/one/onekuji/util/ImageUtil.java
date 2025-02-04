@@ -29,7 +29,9 @@ public class ImageUtil {
     private static final int TARGET_SIZE = 1600;
     private static final int STORE_TARGET_SIZE = 300;
     private static final int RECT_WIDTH = 800;
+    private static final int STORE_RECT_WIDTH = 600;
     private static final int RECT_HEIGHT = 600;
+    private static final int STORE_RECT_HEIGHT = 300;
     private static final float OUTPUT_QUALITY = 0.85f;
     private static final float STORE_OUTPUT_QUALITY = 0.5f;
 
@@ -140,35 +142,35 @@ public class ImageUtil {
         int originalHeight = originalImage.getHeight();
 
         double scale = Math.min(
-                (double) STORE_TARGET_SIZE / originalWidth,
-                (double) STORE_TARGET_SIZE / originalHeight
+                (double) STORE_RECT_WIDTH / originalWidth,
+                (double) RECT_HEIGHT / originalHeight
         );
 
         int scaledWidth = (int) (originalWidth * scale);
         int scaledHeight = (int) (originalHeight * scale);
 
         BufferedImage finalImage = new BufferedImage(
-                STORE_TARGET_SIZE,
-                STORE_TARGET_SIZE,
+                STORE_RECT_WIDTH,
+                STORE_RECT_HEIGHT,
                 BufferedImage.TYPE_INT_RGB
         );
 
         Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, STORE_TARGET_SIZE, STORE_TARGET_SIZE);
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, STORE_RECT_WIDTH, STORE_RECT_HEIGHT);
 
         try {
             BufferedImage scaledImage = Thumbnails.of(originalImage)
                     .size(scaledWidth, scaledHeight)
-                    .outputQuality(STORE_OUTPUT_QUALITY)
+                    .outputQuality(OUTPUT_QUALITY)
                     .asBufferedImage();
 
-            int x = (STORE_TARGET_SIZE - scaledWidth) / 2;
-            int y = (STORE_TARGET_SIZE - scaledHeight) / 2;
+            int x = (STORE_RECT_WIDTH - scaledWidth) / 2;
+            int y = (STORE_RECT_HEIGHT - scaledHeight) / 2;
 
             g2d.drawImage(scaledImage, x, y, null);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to process image", e);
+            throw new RuntimeException("Failed to process rectangle image", e);
         } finally {
             g2d.dispose();
         }
