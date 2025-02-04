@@ -82,7 +82,7 @@ public class ExpressController {
 //            params.add("Url", "http://localhost:5173/member-center/prize-checkout");
         }
 
-        params.add("Opmode", "711".equals(code) ? "3" : ("family".equals(code) ? "1" : "0"));
+        params.add("Opmode", "sevenEleven".equals(code) ? "3" : ("family".equals(code) ? "1" : "0"));
 
         // 設定 Headers
         HttpHeaders headers = new HttpHeaders();
