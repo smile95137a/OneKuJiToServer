@@ -31,6 +31,7 @@ public class ImageUtil {
     private static final int RECT_WIDTH = 800;
     private static final int RECT_HEIGHT = 600;
     private static final float OUTPUT_QUALITY = 0.85f;
+    private static final float STORE_OUTPUT_QUALITY = 0.5f;
 
     @PostConstruct
     public void init() {
@@ -159,7 +160,7 @@ public class ImageUtil {
         try {
             BufferedImage scaledImage = Thumbnails.of(originalImage)
                     .size(scaledWidth, scaledHeight)
-                    .outputQuality(OUTPUT_QUALITY)
+                    .outputQuality(STORE_OUTPUT_QUALITY)
                     .asBufferedImage();
 
             int x = (STORE_TARGET_SIZE - scaledWidth) / 2;
