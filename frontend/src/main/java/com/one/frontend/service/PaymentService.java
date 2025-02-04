@@ -709,7 +709,7 @@ return null;
         ).collect(Collectors.toList());
     }
 
-    public Boolean recordDeposit2(CreditDto creditDto) throws MessagingException {
+    public Boolean  recordDeposit2(CreditDto creditDto) throws MessagingException {
         String status = userTransactionRepository.findByOrderNumber(creditDto.getOrderNumber());
         UserTransaction userTransaction = userTransactionRepository.findByOrderNumber2(creditDto.getOrderNumber());
         if(status == null){
@@ -793,4 +793,7 @@ return null;
 
     }
 
+    public void cancelStatus(String eOrderno) {
+        orderMapper.updateStatusByFail(Long.valueOf(eOrderno));
+    }
 }

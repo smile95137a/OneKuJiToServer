@@ -100,28 +100,21 @@ public class DrawResultService {
 				DrawProtection protection = productDrawProtectionMap.get(productId); // 获取该产品的保护信息
 				long protectionTime = 600L; // 默认保护时间为 600 秒
 
-				if (protection != null) {
-					long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, now).getSeconds();
-					long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
-
-					// 如果在保护期内
-					if (remainingProtectionTime > 0) {
-						System.out.println("Remaining protection time: " + remainingProtectionTime + " seconds");
-
-						// 如果是其他用户，抛出异常并显示剩余时间
-						if (!Objects.equals(userId, protection.userId)) {
-							long minutes = remainingProtectionTime / 60;
-							long seconds = remainingProtectionTime % 60;
-							throw new Exception("抽獎保護期內，其他用戶不能抽獎。剩餘時間：" + minutes + "分" + seconds + "秒");
-						}
-
-
-						// 如果是同一用户，延长保护时间
-						protectionTime = remainingProtectionTime + 30L; // 增加 30 秒
+				// 获取保护期结束时间
+				LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
+				if (protectionEndTime != null) {
+					long remainingSeconds = Duration.between(now, protectionEndTime).getSeconds();
+					if (remainingSeconds > 0) {
+						long minutes = remainingSeconds / 60;
+						long seconds = remainingSeconds % 60;
+						throw new Exception("您仍然處於保護期內，無法進行抽獎。剩餘時間：" + minutes + " 分 " + seconds + " 秒");
 					}
 				}
 
-				// 更新或设置新的保护信息
+				// 在保護期外或同一用戶的情況下進行抽獎操作
+				// 進行抽獎邏輯
+
+				// 更新保护信息
 				LocalDateTime newProtectionEndTime = now.plusSeconds(protectionTime);
 				productDrawProtectionMap.put(productId, new DrawProtection(now, userId));
 				System.out.println("Updated DrawProtection for productId: " + productId + ", userId: " + userId);
@@ -137,6 +130,8 @@ public class DrawResultService {
 			throw new Exception("目前有其他用戶正在抽獎，請稍後。");
 		}
 	}
+
+
 
 
 
@@ -212,19 +207,24 @@ public class DrawResultService {
 		long protectionTime = 600L; // 默认保护时间为 600 秒
 
 		if (protection != null) {
-			// 计算上次抽奖时间与当前时间之间的秒数
-			long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, LocalDateTime.now()).getSeconds();
-			long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
+			// 如果是同一個使用者，則延長保護期或放行
+			if (Objects.equals(protection.userId, userId)) {
+				return null;
+			} else {
+				long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, LocalDateTime.now()).getSeconds();
+				long remainingProtectionTime = protectionTime - secondsSinceLastDraw;
 
-			// 如果保护期内，剩余时间大于 0
-			if (remainingProtectionTime > 0) {
-				return LocalDateTime.now().plusSeconds(remainingProtectionTime); // 返回新的保护期结束时间
+				// 如果保護期內，剩餘時間大於 0
+				if (remainingProtectionTime > 0) {
+					return LocalDateTime.now().plusSeconds(remainingProtectionTime); // 返回新的保护期结束时间
+				}
 			}
 		}
 
 		// 如果没有保护期或者保护期已经结束，返回当前时间
 		return LocalDateTime.now();
 	}
+
 
 
 

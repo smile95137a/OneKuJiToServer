@@ -107,30 +107,8 @@ public class OrderService {
 				.collect(Collectors.toList());
 
 		// 处理订单状态描述
-		List<OrderRes> orderStatusDescriptions = list.stream()
-				.map(order -> {
-					String statusDescription;
-					switch (order.getResultStatus()) {
-						case "PREPARING_SHIPMENT":
-							statusDescription = "訂單準備中";
-							break;
-						case "SHIPPED":
-							statusDescription = "已發貨";
-							break;
-						case "NO_PAY":
-							statusDescription = "未付款";
-							break;
-						default:
-							statusDescription = "未知狀態";
-							break;
-					}
-					// 设置状态描述
-					order.setResultStatus(statusDescription);
-					return order;
-				})
-				.collect(Collectors.toList());
 
-		return orderStatusDescriptions;
+		return list;
 	}
 
 
@@ -489,32 +467,6 @@ public class OrderService {
 				// 获取订单详情并设置到订单对象中
 				List<OrderDetailRes> orderDetails = orderDetailRepository.findOrderDetailsByOrderId(order.getId());
 				order.setOrderDetails(orderDetails);
-
-				// 获取订单状态并进行状态描述转换
-				String statusDescription;
-				String resultStatus = order.getResultStatus();
-
-				if (resultStatus != null) {
-					switch (resultStatus) {
-						case "PREPARING_SHIPMENT":
-							statusDescription = "訂單準備中";
-							break;
-						case "SHIPPED":
-							statusDescription = "已發貨";
-							break;
-						case "NO_PAY":
-							statusDescription = "未付款";
-							break;
-						default:
-							statusDescription = "未知狀態";
-							break;
-					}
-				} else {
-					statusDescription = "狀態不可用";
-				}
-
-				// 将状态描述设置到 OrderRes 对象中
-				order.setResultStatus(statusDescription);
 			}
 
 			return order;
