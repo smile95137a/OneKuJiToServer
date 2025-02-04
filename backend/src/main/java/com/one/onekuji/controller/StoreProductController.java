@@ -144,7 +144,7 @@ public class StoreProductController {
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String fileUrl = ImageUtil.upload(file);
+						String fileUrl = ImageUtil.storeUpload(file);
 						uploadedFilePaths.add(fileUrl);
 					}
 				}

@@ -27,13 +27,13 @@ public class ImageUtil {
     private static String staticPicturePath;
     private static String staticPicturePathMapping;
     private static final int TARGET_SIZE = 1600;
-    private static final int STORE_TARGET_SIZE = 300;
+    private static final int STORE_TARGET_SIZE = 2000;
     private static final int RECT_WIDTH = 800;
-    private static final int STORE_RECT_WIDTH = 600;
+    private static final int STORE_TARGET_WIDTH = 380;
     private static final int RECT_HEIGHT = 600;
-    private static final int STORE_RECT_HEIGHT = 300;
+    private static final int STORE_TARGET_HEIGHT  = 216;
     private static final float OUTPUT_QUALITY = 0.85f;
-    private static final float STORE_OUTPUT_QUALITY = 0.5f;
+    private static final float STORE_OUTPUT_QUALITY = 0.85f;
 
     @PostConstruct
     public void init() {
@@ -141,23 +141,28 @@ public class ImageUtil {
         int originalWidth = originalImage.getWidth();
         int originalHeight = originalImage.getHeight();
 
+        // 定义目标尺寸
+        final int TARGET_WIDTH = 400;
+        final int TARGET_HEIGHT = 250;
+
+        // 计算缩放比例
         double scale = Math.min(
-                (double) STORE_RECT_WIDTH / originalWidth,
-                (double) RECT_HEIGHT / originalHeight
+                (double) TARGET_WIDTH / originalWidth,
+                (double) TARGET_HEIGHT / originalHeight
         );
 
         int scaledWidth = (int) (originalWidth * scale);
         int scaledHeight = (int) (originalHeight * scale);
 
         BufferedImage finalImage = new BufferedImage(
-                STORE_RECT_WIDTH,
-                STORE_RECT_HEIGHT,
+                TARGET_WIDTH,
+                TARGET_HEIGHT,
                 BufferedImage.TYPE_INT_RGB
         );
 
         Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.BLACK);
-        g2d.fillRect(0, 0, STORE_RECT_WIDTH, STORE_RECT_HEIGHT);
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, TARGET_WIDTH, TARGET_HEIGHT);
 
         try {
             BufferedImage scaledImage = Thumbnails.of(originalImage)
@@ -165,18 +170,20 @@ public class ImageUtil {
                     .outputQuality(OUTPUT_QUALITY)
                     .asBufferedImage();
 
-            int x = (STORE_RECT_WIDTH - scaledWidth) / 2;
-            int y = (STORE_RECT_HEIGHT - scaledHeight) / 2;
+            // 居中放置图片
+            int x = (TARGET_WIDTH - scaledWidth) / 2;
+            int y = (TARGET_HEIGHT - scaledHeight) / 2;
 
             g2d.drawImage(scaledImage, x, y, null);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to process rectangle image", e);
+            throw new RuntimeException("Failed to process image", e);
         } finally {
             g2d.dispose();
         }
 
         return finalImage;
     }
+
 
 
     private static String uploadRectangleFile(MultipartFile file) {
