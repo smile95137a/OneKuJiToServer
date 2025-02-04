@@ -27,6 +27,7 @@ public class ImageUtil {
     private static String staticPicturePath;
     private static String staticPicturePathMapping;
     private static final int TARGET_SIZE = 1600;
+    private static final int STORE_TARGET_SIZE = 300;
     private static final int RECT_WIDTH = 800;
     private static final int RECT_HEIGHT = 600;
     private static final float OUTPUT_QUALITY = 0.85f;
@@ -39,6 +40,10 @@ public class ImageUtil {
 
     public static String upload(MultipartFile file) {
         return uploadFile(file, false);
+    }
+
+    public static String storeUpload(MultipartFile file) {
+        return storeUploadFile(file, false);
     }
 
     public static String uploadForCKEditor(MultipartFile file) {
@@ -88,6 +93,88 @@ public class ImageUtil {
 
         return staticPicturePathMapping + uniqueFileName;
     }
+
+    private static String storeUploadFile(MultipartFile file, boolean isForCKEditor) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+
+        String originalFileName = file.getOriginalFilename();
+        String uniqueFileName = UUID.randomUUID().toString() + "_" + (originalFileName != null ? originalFileName : "image");
+        String fileExtension = getFileExtension(originalFileName);
+
+        if (fileExtension == null) {
+            throw new IllegalArgumentException("Invalid file extension");
+        }
+
+        String filePath = staticPicturePath + uniqueFileName;
+        File dest = new File(filePath);
+
+        try {
+            Files.createDirectories(Paths.get(staticPicturePath));
+
+            BufferedImage originalImage = ImageIO.read(file.getInputStream());
+            if (originalImage == null) {
+                throw new IOException("Failed to read image file");
+            }
+
+            if (isForCKEditor) {
+                Thumbnails.of(originalImage)
+                        .scale(1)
+                        .toFile(dest);
+            } else {
+                BufferedImage processedImage = storeProcessImageWithAspectRatio(originalImage);
+                ImageIO.write(processedImage, fileExtension, dest);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("File upload failed", e);
+        }
+
+        return staticPicturePathMapping + uniqueFileName;
+    }
+
+    private static BufferedImage storeProcessImageWithAspectRatio(BufferedImage originalImage) {
+        int originalWidth = originalImage.getWidth();
+        int originalHeight = originalImage.getHeight();
+
+        double scale = Math.min(
+                (double) STORE_TARGET_SIZE / originalWidth,
+                (double) STORE_TARGET_SIZE / originalHeight
+        );
+
+        int scaledWidth = (int) (originalWidth * scale);
+        int scaledHeight = (int) (originalHeight * scale);
+
+        BufferedImage finalImage = new BufferedImage(
+                STORE_TARGET_SIZE,
+                STORE_TARGET_SIZE,
+                BufferedImage.TYPE_INT_RGB
+        );
+
+        Graphics2D g2d = finalImage.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, STORE_TARGET_SIZE, STORE_TARGET_SIZE);
+
+        try {
+            BufferedImage scaledImage = Thumbnails.of(originalImage)
+                    .size(scaledWidth, scaledHeight)
+                    .outputQuality(OUTPUT_QUALITY)
+                    .asBufferedImage();
+
+            int x = (STORE_TARGET_SIZE - scaledWidth) / 2;
+            int y = (STORE_TARGET_SIZE - scaledHeight) / 2;
+
+            g2d.drawImage(scaledImage, x, y, null);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to process image", e);
+        } finally {
+            g2d.dispose();
+        }
+
+        return finalImage;
+    }
+
 
     private static String uploadRectangleFile(MultipartFile file) {
         if (file.isEmpty()) {
