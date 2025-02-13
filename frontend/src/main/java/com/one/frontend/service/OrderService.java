@@ -185,8 +185,8 @@ public class OrderService {
 				}
 				break;
 			default:
-				System.out.println("無效的付款方式");
-				// TODO: 處理錯誤情況
+				paymentResponse.setOrderId(orderNumber);
+				paymentResponse.setEPayAccount(String.valueOf(totalAmount));
 				break;
 		}
 
@@ -349,8 +349,8 @@ public class OrderService {
 				}
 				break;
 			default:
-				System.out.println("無效的付款方式");
-				// TODO: 處理錯誤情況
+				paymentResponse.setOrderId(orderNumber);
+				paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 				break;
 		}
 
