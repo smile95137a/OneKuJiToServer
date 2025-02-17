@@ -142,8 +142,8 @@ public class ImageUtil {
         int originalHeight = originalImage.getHeight();
 
         // 定义目标尺寸
-        final int TARGET_WIDTH = 400;
-        final int TARGET_HEIGHT = 250;
+        final int TARGET_WIDTH = 1600;
+        final int TARGET_HEIGHT = 910;
 
         // 计算缩放比例
         double scale = Math.min(
