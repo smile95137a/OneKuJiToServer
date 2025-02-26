@@ -122,6 +122,7 @@ public class ProductService {
         product.setBonusPrice(req.getBonusPrice() != null ? req.getBonusPrice() : BigDecimal.ZERO);
         product.setSpecification((req.getSpecification()));
         product.setBannerImageUrl(req.getBannerImageUrl());
+        product.setCreatedAt(product.getCreatedAt());
         if(req.getProductType().equals(ProductType.GACHA)){
             product.setCategoryId(0L);
         }else{
