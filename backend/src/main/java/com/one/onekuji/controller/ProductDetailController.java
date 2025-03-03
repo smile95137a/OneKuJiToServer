@@ -54,100 +54,6 @@ public class ProductDetailController {
        return null;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse<List<DetailRes>>> addProductDetails(
-            @RequestParam("productDetailReq") String productDetailReqsJson,
-            @RequestParam(value = "images", required = false) List<MultipartFile> images) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS , true);
-        List<DetailReq> detailReqs = objectMapper.readValue(productDetailReqsJson, new TypeReference<List<DetailReq>>() {});
-
-        // 如果有传递图片，清空现有的 imageUrls 列表
-        for(DetailReq req : detailReqs){
-            if (images != null && !images.isEmpty()) {
-                req.setImageUrls(new ArrayList<>()); // 清空列表，确保只保留新图片
-            }
-        }
-
-
-
-        Map<Integer, String> imageUrlsMap = new HashMap<>();
-        if (images != null && !images.isEmpty()) {
-            // 上传图片并获取其 URL
-            for (int i = 0; i < images.size(); i++) {
-                MultipartFile image = images.get(i);
-                if (!image.isEmpty() && i < detailReqs.size()) {
-                    String fileUrl = ImageUtil.upload(image);
-                    // 这里检查 fileUrl 是否为空字符串
-                    if (fileUrl != null && !fileUrl.trim().isEmpty()) {
-                        imageUrlsMap.put(i, fileUrl);
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < detailReqs.size(); i++) {
-            DetailReq detailReq = detailReqs.get(i);
-            String imageUrl = imageUrlsMap.get(i);
-            if (imageUrl != null && !imageUrl.trim().isEmpty()) {
-                if (detailReq.getImageUrls() == null) {
-                    detailReq.setImageUrls(new ArrayList<>());
-                }
-                detailReq.getImageUrls().add(imageUrl);
-            }
-        }
-
-        List<DetailRes> detailResList = productDetailService.addProductDetails(detailReqs);
-        ApiResponse<List<DetailRes>> response = ResponseUtils.success(201, null, detailResList);
-        return ResponseEntity.ok(response);
-    }
-
-
-
-    @PutMapping(value = "/update/{id}")
-    public ResponseEntity<ApiResponse<DetailRes>> updateProductDetail(
-            @PathVariable Long id,
-            @RequestPart("productDetailReq") String productDetailReqJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS , true);
-            DetailReq productDetailReq = objectMapper.readValue(productDetailReqJson, DetailReq.class);
-
-            if (productDetailReq == null) {
-                ApiResponse<DetailRes> response = ResponseUtils.failure(404, "未找到該商品", null);
-                return ResponseEntity.ok(response);
-            }
-
-            // 如果有传递图片，清空现有的 imageUrls 列表
-            if (images != null && !images.isEmpty()) {
-                productDetailReq.setImageUrls(new ArrayList<>()); // 清空列表，确保只保留新图片
-            }
-
-            List<String> fileUrls = new ArrayList<>();
-            if (images != null && !images.isEmpty()) {
-                for (MultipartFile image : images) {
-                    if (!image.isEmpty()) {
-                        String fileUrl = ImageUtil.upload(image);
-                        if (fileUrl != null && !fileUrl.trim().isEmpty()) {
-                            fileUrls.add(fileUrl);
-                        }
-                    }
-                }
-            }
-
-            if (!fileUrls.isEmpty()) {
-                productDetailReq.getImageUrls().addAll(fileUrls); // 只添加新上传的图片 URL
-            }
-
-            DetailRes productDetailRes = productDetailService.updateProductDetail(id, productDetailReq);
-            ApiResponse<DetailRes> response = ResponseUtils.success(200, "商品已成功更新", productDetailRes);
-            return ResponseEntity.ok(response);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
 
 
 
@@ -199,23 +105,46 @@ public class ProductDetailController {
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
+			List<String> uploadedFilePathsLG = new ArrayList<>();
+			List<String> uploadedFilePathsMD = new ArrayList<>();
+			List<String> uploadedFilePathsXS = new ArrayList<>();
+			int[][] rwdSizes = { 
+					{ 1920, 1080 },
+					{ 1280, 720 }, 
+					{ 1024, 768 },
+					{ 750, 750 },
+			};
 
-			// Handle new file uploads
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String fileUrl = ImageUtil.upload(file);
-						uploadedFilePaths.add(fileUrl);
+						String[] fileUrl = ImageUtil.upload(file, rwdSizes);
+						uploadedFilePaths.add(fileUrl[0]);
+						uploadedFilePathsLG.add(fileUrl[1]);
+						uploadedFilePathsMD.add(fileUrl[2]);
+						uploadedFilePathsXS.add(fileUrl[3]);
 					}
 				}
 			}
 
-			// Add existing URLs
 			if (existingUrls != null && !existingUrls.isEmpty()) {
 				uploadedFilePaths.addAll(existingUrls);
+				uploadedFilePathsLG.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[0][0], rwdSizes[0][1]),
+								String.format("%sx%s", rwdSizes[1][0], rwdSizes[1][1])))
+						.toList());
+				uploadedFilePathsMD.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1]),
+								String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1])))
+						.toList());
+				uploadedFilePathsXS.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1]),
+								String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1])))
+						.toList());
 			}
+			productDetailService.uploadProductDetailImg(productDetailId, uploadedFilePaths, uploadedFilePathsLG, uploadedFilePathsMD,
+					uploadedFilePathsXS);
 
-			productDetailService.uploadProductDetailImg(productDetailId, uploadedFilePaths);
 
 			ApiResponse<List<String>> response = ResponseUtils.success(200, "Files uploaded successfully",
 					uploadedFilePaths);

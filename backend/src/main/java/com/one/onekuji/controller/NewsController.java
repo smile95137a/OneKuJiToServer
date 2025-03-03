@@ -112,8 +112,14 @@ public class NewsController {
 
     @PostMapping("/img/upload")
     public ResponseEntity<ApiResponse<String>> updateNews(@RequestParam(value="file") MultipartFile file){
-        String upload = ImageUtil.upload(file);
-        ApiResponse<String> response = ResponseUtils.success(200, "upload", upload);
+		int[][] rwdSizes = { 
+				{ 1920, 1080 },
+				{ 1280, 720 }, 
+				{ 1024, 768 },
+				{ 750, 750 },
+		};
+        String[] upload = ImageUtil.upload(file, rwdSizes);
+        ApiResponse<String> response = ResponseUtils.success(200, "upload", upload[0]);
         return ResponseEntity.ok(response);
     }
 

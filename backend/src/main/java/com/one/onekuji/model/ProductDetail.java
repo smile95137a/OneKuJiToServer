@@ -80,6 +80,21 @@ public class ProductDetail{
     @Column(name = "image_urls", columnDefinition = "JSON")
     @Convert(converter = StringListConverter.class)
     private List<String> imageUrls;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/image.jpg")
+    @Column(name = "image_urls_LG", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsLG;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/image.jpg")
+    @Column(name = "image_urls_MD", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsMD;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/image.jpg")
+    @Column(name = "image_urls_XS", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsXS;
 
     @Schema(description = "獎品編號", example = "PRIZE001")
     @Column(name = "prize_number", length = 50)

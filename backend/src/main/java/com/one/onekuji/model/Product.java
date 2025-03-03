@@ -48,6 +48,21 @@ public class Product{
     @Column(name = "image_urls", columnDefinition = "JSON")
     @Convert(converter = StringListConverter.class)
     private List<String> imageUrls;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
+    @Column(name = "image_urls_lg", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsLG;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
+    @Column(name = "image_urls_md", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsMD;
+    
+    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
+    @Column(name = "image_urls_xs", columnDefinition = "JSON")
+    @Convert(converter = StringListConverter.class)
+    private List<String> imageUrlsXS;
 
     @Schema(description = "稀有度", example = "Rare")
     @Column(name = "rarity", length = 50)
@@ -104,5 +119,17 @@ public class Product{
     @Column(name = "banner_image_url")
     @Convert(converter = StringListConverter.class)
     private List<String> bannerImageUrl;
+    
+    @Column(name = "banner_image_url_lg")
+    @Convert(converter = StringListConverter.class)
+    private List<String> bannerImageUrlLG;
+    
+    @Column(name = "banner_image_url_md")
+    @Convert(converter = StringListConverter.class)
+    private List<String> bannerImageUrlMD;
+    
+    @Column(name = "banner_image_url_xs")
+    @Convert(converter = StringListConverter.class)
+    private List<String> bannerImageUrlXS;
 
 }

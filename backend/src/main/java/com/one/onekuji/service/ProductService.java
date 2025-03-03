@@ -25,228 +25,224 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
 
-    @Autowired
-    private ProductRepository productRepository;
+	@Autowired
+	private ProductRepository productRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private PrizeNumberMapper prizeNumberMapper;
+	@Autowired
+	private PrizeNumberMapper prizeNumberMapper;
 
-    @Autowired
-    private ProductDetailRepository productDetailRepository;
+	@Autowired
+	private ProductDetailRepository productDetailRepository;
 
-    public List<ProductRes> getAllProductByType(ProductType productType) {
-        return productRepository.getAllProductByType(productType);
-    }
+	public List<ProductRes> getAllProductByType(ProductType productType) {
+		return productRepository.getAllProductByType(productType);
+	}
 
-    public List<ProductRes> getOneKuJiType(PrizeCategory type) {
-        return productRepository.getOneKuJiType(type);
-    }
+	public List<ProductRes> getOneKuJiType(PrizeCategory type) {
+		return productRepository.getOneKuJiType(type);
+	}
 
-    public ProductRes createProduct(ProductReq productReq) {
-        try {
-            Product product = new Product();
-            convertReqToEntity(productReq, product);
-            productRepository.insertProduct(product);
-            return convertEntityToRes(product);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	public ProductRes createProduct(ProductReq productReq) {
+		try {
+			Product product = new Product();
+			convertReqToEntity(productReq, product);
+			productRepository.insertProduct(product);
+			return convertEntityToRes(product);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-    public List<ProductRes> getAllProduct() {
-        List<Product> products = productRepository.selectAllProducts();
-        return products.stream().map(this::convertEntityToRes).collect(Collectors.toList());
-    }
+	public List<ProductRes> getAllProduct() {
+		List<Product> products = productRepository.selectAllProducts();
+		return products.stream().map(this::convertEntityToRes).collect(Collectors.toList());
+	}
 
-    public ProductRes getProductById(Long id) {
-        Product product = productRepository.selectProductById(id);
-        return product != null ? convertEntityToRes(product) : null;
-    }
+	public ProductRes getProductById(Long id) {
+		Product product = productRepository.selectProductById(id);
+		return product != null ? convertEntityToRes(product) : null;
+	}
 
-    public ProductRes updateProduct(Long id, ProductReq productReq) {
-        Product product = productRepository.selectProductById(id);
-        if (product != null) {
-            convertReqToEntity(productReq, product);
-            productRepository.updateProduct(product);
-            return convertEntityToRes(product);
-        }
-        return null;
-    }
-    
-    public ProductRes uploadProductImg(Long id, List<String> paths) {
-        Product product = productRepository.selectProductById(id);
-        if (product != null) {
-            product.setImageUrls(paths);
-            productRepository.updateProduct(product);
-            return convertEntityToRes(product);
-        }
-        return null;
-    }
-    
-    public ProductRes uploadProductBannerImg(Long id, List<String> paths) {
-        Product product = productRepository.selectProductById(id);
-        if (product != null) {
-            product.setBannerImageUrl(paths);
-            productRepository.updateProduct(product);
-            return convertEntityToRes(product);
-        }
-        return null;
-    }
+	public ProductRes updateProduct(Long id, ProductReq productReq) {
+		Product product = productRepository.selectProductById(id);
+		if (product != null) {
+			convertReqToEntity(productReq, product);
+			productRepository.updateProduct(product);
+			return convertEntityToRes(product);
+		}
+		return null;
+	}
 
-    public boolean deleteProduct(Long id) {
-        Product product = productRepository.getProductById(id);
-        if (product == null) {
-            return false;
-        }
-        prizeNumberMapper.deleteProductById(id);
-        productDetailRepository.deleteProductDetailByProductId(Math.toIntExact(id));
-        productRepository.deleteProduct(id);
+	public ProductRes uploadProductImg(
+			Long id, 
+			List<String> paths, 
+			List<String> pathsLG, 
+			List<String> pathsMD,
+			List<String> pathsXS) {
+		Product product = productRepository.selectProductById(id);
+		if (product != null) {
+			product.setImageUrls(paths);
+			product.setImageUrlsLG(pathsLG);
+			product.setImageUrlsMD(pathsMD);
+			product.setImageUrlsXS(pathsXS);
+			productRepository.updateProduct(product);
+			return convertEntityToRes(product);
+		}
+		return null;
+	}
 
-        return true;
-    }
+	public ProductRes uploadProductBannerImg(
+			Long id,
+			List<String> paths, 
+			List<String> pathsLG, 
+			List<String> pathsMD,
+			List<String> pathsXS) {
+		Product product = productRepository.selectProductById(id);
+		if (product != null) {
+			product.setBannerImageUrl(paths);
+			product.setBannerImageUrlLG(pathsLG);
+			product.setBannerImageUrlMD(pathsMD);
+			product.setBannerImageUrlXS(pathsXS);
+			productRepository.updateProduct(product);
+			return convertEntityToRes(product);
+		}
+		return null;
+	}
 
-    private void convertReqToEntity(ProductReq req, Product product) {
-        product.setProductName(req.getProductName());
-        product.setDescription((req.getDescription()));
-        product.setPrice(req.getPrice() != null ? BigDecimal.valueOf(req.getPrice()) : BigDecimal.ZERO);
-        product.setSliverPrice(req.getSliverPrice() != null ? req.getSliverPrice() : BigDecimal.ZERO);
-        product.setStockQuantity(req.getStockQuantity());
-        product.setImageUrls(req.getImageUrls());
-        product.setProductType(req.getProductType());
-        product.setPrizeCategory(req.getPrizeCategory());
-        product.setStatus(req.getStatus());
-        product.setBonusPrice(req.getBonusPrice() != null ? req.getBonusPrice() : BigDecimal.ZERO);
-        product.setSpecification((req.getSpecification()));
-        product.setBannerImageUrl(req.getBannerImageUrl());
-        product.setCreatedAt(product.getCreatedAt());
-        if(req.getProductType().equals(ProductType.GACHA)){
-            product.setCategoryId(0L);
-        }else{
-            product.setCategoryId(req.getCategoryId());
-        }
+	public boolean deleteProduct(Long id) {
+		Product product = productRepository.getProductById(id);
+		if (product == null) {
+			return false;
+		}
+		prizeNumberMapper.deleteProductById(id);
+		productDetailRepository.deleteProductDetailByProductId(Math.toIntExact(id));
+		productRepository.deleteProduct(id);
 
-    }
+		return true;
+	}
 
+	private void convertReqToEntity(ProductReq req, Product product) {
+		product.setProductName(req.getProductName());
+		product.setDescription((req.getDescription()));
+		product.setPrice(req.getPrice() != null ? BigDecimal.valueOf(req.getPrice()) : BigDecimal.ZERO);
+		product.setSliverPrice(req.getSliverPrice() != null ? req.getSliverPrice() : BigDecimal.ZERO);
+		product.setStockQuantity(req.getStockQuantity());
+		product.setImageUrls(req.getImageUrls());
+		product.setProductType(req.getProductType());
+		product.setPrizeCategory(req.getPrizeCategory());
+		product.setStatus(req.getStatus());
+		product.setBonusPrice(req.getBonusPrice() != null ? req.getBonusPrice() : BigDecimal.ZERO);
+		product.setSpecification((req.getSpecification()));
+		product.setBannerImageUrl(req.getBannerImageUrl());
+		product.setCreatedAt(product.getCreatedAt());
+		if (req.getProductType().equals(ProductType.GACHA)) {
+			product.setCategoryId(0L);
+		} else {
+			product.setCategoryId(req.getCategoryId());
+		}
 
-    private ProductRes convertEntityToRes(Product product) {
-        List<ProductDetail> productDetailByProductId = productDetailRepository.getProductDetailByProductId(Long.valueOf(product.getProductId()));
-        int totalQuantity = productDetailByProductId.stream()
-                .mapToInt(ProductDetail::getQuantity)
-                .sum();
-        product.setStockQuantity(totalQuantity);
-        return new ProductRes(
-                product.getProductId(),
-                product.getProductName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getSliverPrice(),
-                product.getStockQuantity(),
-                product.getImageUrls(),
-                product.getProductType(),
-                product.getPrizeCategory(),
-                product.getStatus(),
-                product.getBonusPrice(),
-                product.getSpecification(),
-                product.getCategoryId(),
-                product.getBannerImageUrl()
-        );
-    }
+	}
 
-    private String escapeTextForHtml(String text) {
-        if (text == null) return "";
-        // 先保留換行符的處理
-        String escapedText = text.replace("\n", "<br/>").replace("\r", "");
+	private ProductRes convertEntityToRes(Product product) {
+		List<ProductDetail> productDetailByProductId = productDetailRepository
+				.getProductDetailByProductId(Long.valueOf(product.getProductId()));
+		int totalQuantity = productDetailByProductId.stream().mapToInt(ProductDetail::getQuantity).sum();
+		product.setStockQuantity(totalQuantity);
+		return new ProductRes(product.getProductId(), product.getProductName(), product.getDescription(),
+				product.getPrice(), product.getSliverPrice(), product.getStockQuantity(), product.getImageUrls(),
+				product.getProductType(), product.getPrizeCategory(), product.getStatus(), product.getBonusPrice(),
+				product.getSpecification(), product.getCategoryId(), product.getBannerImageUrl());
+	}
 
-        // 再進行其他字符轉義
-        return escapedText.replace("&", "&amp;")
-                .replace("<", "&lt;")
-                .replace(">", "&gt;")
-                .replace("\"", "&quot;")
-                .replace("'", "&#39;")
-                // 恢復 <br/> 原來的形式，避免被轉義
-                .replace("&lt;br/&gt;", "<br/>");
-    }
+	private String escapeTextForHtml(String text) {
+		if (text == null)
+			return "";
+		// 先保留換行符的處理
+		String escapedText = text.replace("\n", "<br/>").replace("\r", "");
 
+		// 再進行其他字符轉義
+		return escapedText.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;")
+				.replace("'", "&#39;")
+				// 恢復 <br/> 原來的形式，避免被轉義
+				.replace("&lt;br/&gt;", "<br/>");
+	}
 
-    public void duplicateProduct(ProductRes originalProduct) {
-        Product duplicatedProduct = new Product();
-        duplicatedProduct.setProductName(originalProduct.getProductName());
-        duplicatedProduct.setDescription(originalProduct.getDescription());
-        duplicatedProduct.setPrice(originalProduct.getPrice());
-        duplicatedProduct.setSliverPrice(originalProduct.getSliverPrice());
-        duplicatedProduct.setImageUrls(originalProduct.getImageUrls());
-        duplicatedProduct.setCreatedAt(LocalDateTime.now());
-        duplicatedProduct.setProductType(originalProduct.getProductType());
-        duplicatedProduct.setPrizeCategory(originalProduct.getPrizeCategory());
-        duplicatedProduct.setStatus(ProductStatus.UNAVAILABLE); // 設置為未上架
-        duplicatedProduct.setBonusPrice(originalProduct.getBonusPrice());
-        duplicatedProduct.setSpecification(originalProduct.getSpecification());
-        duplicatedProduct.setCategoryId(originalProduct.getCategoryId());
+	public void duplicateProduct(ProductRes originalProduct) {
+		Product duplicatedProduct = new Product();
+		duplicatedProduct.setProductName(originalProduct.getProductName());
+		duplicatedProduct.setDescription(originalProduct.getDescription());
+		duplicatedProduct.setPrice(originalProduct.getPrice());
+		duplicatedProduct.setSliverPrice(originalProduct.getSliverPrice());
+		duplicatedProduct.setImageUrls(originalProduct.getImageUrls());
+		duplicatedProduct.setCreatedAt(LocalDateTime.now());
+		duplicatedProduct.setProductType(originalProduct.getProductType());
+		duplicatedProduct.setPrizeCategory(originalProduct.getPrizeCategory());
+		duplicatedProduct.setStatus(ProductStatus.UNAVAILABLE); // 設置為未上架
+		duplicatedProduct.setBonusPrice(originalProduct.getBonusPrice());
+		duplicatedProduct.setSpecification(originalProduct.getSpecification());
+		duplicatedProduct.setCategoryId(originalProduct.getCategoryId());
 
-        int result = productRepository.duplicateProduct(duplicatedProduct);
+		int result = productRepository.duplicateProduct(duplicatedProduct);
 
-        if (result <= 0) {
-            throw new RuntimeException("Failed to duplicate product");
-        }
+		if (result <= 0) {
+			throw new RuntimeException("Failed to duplicate product");
+		}
 
-        // 從對象中獲取生成的 ID
-        Long newProductId = Long.valueOf(duplicatedProduct.getProductId());
+		// 從對象中獲取生成的 ID
+		Long newProductId = Long.valueOf(duplicatedProduct.getProductId());
 
-        if (newProductId == null || newProductId == 0) {
-            throw new RuntimeException("Failed to get generated product ID");
-        }
+		if (newProductId == null || newProductId == 0) {
+			throw new RuntimeException("Failed to get generated product ID");
+		}
 
-        // 獲取原始產品的詳細資料
-        List<ProductDetail> productDetails = productDetailRepository.getProductDetailByProductId(
-                Long.valueOf(originalProduct.getProductId())
-        );
+		// 獲取原始產品的詳細資料
+		List<ProductDetail> productDetails = productDetailRepository
+				.getProductDetailByProductId(Long.valueOf(originalProduct.getProductId()));
 
-        // 使用生成的 ID
-        List<DetailReq> detailReqs = convertToDetailReqList(productDetails, newProductId);
+		// 使用生成的 ID
+		List<DetailReq> detailReqs = convertToDetailReqList(productDetails, newProductId);
 
-        // 插入每個詳細資料
-        for (DetailReq detailReq : detailReqs) {
-            productDetailRepository.insert(detailReq);
-        }
-    }
+		// 插入每個詳細資料
+		for (DetailReq detailReq : detailReqs) {
+			productDetailRepository.insert(detailReq);
+		}
+	}
 
+	public List<DetailReq> convertToDetailReqList(List<ProductDetail> productDetails, Long id) {
+		List<DetailReq> detailReqs = new ArrayList<>();
+		for (ProductDetail detail : productDetails) {
+			DetailReq detailReq = new DetailReq();
+			detailReq.setProductId(Math.toIntExact(id));
+			detailReq.setDescription(detail.getDescription());
+			detailReq.setNote(detail.getNote());
+			detailReq.setSize(detail.getSize());
+			detailReq.setQuantity(0);
+			detailReq.setStockQuantity(0);
+			detailReq.setProductName(detail.getProductName());
+			detailReq.setGrade(detail.getGrade());
+			detailReq.setPrice(detail.getPrice());
+			detailReq.setSliverPrice(detail.getSliverPrice());
+			detailReq.setImageUrls(detail.getImageUrls());
+			detailReq.setLength(detail.getLength());
+			detailReq.setWidth(detail.getWidth());
+			detailReq.setHeight(detail.getHeight());
+			detailReq.setSpecification(detail.getSpecification());
+			detailReq.setProbability(detail.getProbability());
+			detailReqs.add(detailReq);
+		}
+		return detailReqs;
+	}
 
-    public List<DetailReq> convertToDetailReqList(List<ProductDetail> productDetails , Long id) {
-        List<DetailReq> detailReqs = new ArrayList<>();
-        for (ProductDetail detail : productDetails) {
-            DetailReq detailReq = new DetailReq();
-            detailReq.setProductId(Math.toIntExact(id));
-            detailReq.setDescription(detail.getDescription());
-            detailReq.setNote(detail.getNote());
-            detailReq.setSize(detail.getSize());
-            detailReq.setQuantity(0);
-            detailReq.setStockQuantity(0);
-            detailReq.setProductName(detail.getProductName());
-            detailReq.setGrade(detail.getGrade());
-            detailReq.setPrice(detail.getPrice());
-            detailReq.setSliverPrice(detail.getSliverPrice());
-            detailReq.setImageUrls(detail.getImageUrls());
-            detailReq.setLength(detail.getLength());
-            detailReq.setWidth(detail.getWidth());
-            detailReq.setHeight(detail.getHeight());
-            detailReq.setSpecification(detail.getSpecification());
-            detailReq.setProbability(detail.getProbability());
-            detailReqs.add(detailReq);
-        }
-        return detailReqs;
-    }
-
-
-    public Product updateProduct(Long id, ProductDTO productDTO) {
-        Product product = productRepository.selectProductById(id);
-        product.setPrice(productDTO.getPrice());
-        product.setSliverPrice(productDTO.getSliverPrice());
-        product.setStatus(productDTO.getStatus());
-        productRepository.updateProductPrice(product);
-        return product;
-    }
+	public Product updateProduct(Long id, ProductDTO productDTO) {
+		Product product = productRepository.selectProductById(id);
+		product.setPrice(productDTO.getPrice());
+		product.setSliverPrice(productDTO.getSliverPrice());
+		product.setStatus(productDTO.getStatus());
+		productRepository.updateProductPrice(product);
+		return product;
+	}
 }
