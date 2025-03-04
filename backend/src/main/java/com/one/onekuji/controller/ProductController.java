@@ -151,11 +151,13 @@ public class ProductController {
 			List<String> uploadedFilePathsMD = new ArrayList<>();
 			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
-					 { 1024, 560 },
-					    { 540, 295 }, 
-					    { 360, 197 },
-					    { 140, 77 },
-			};
+				    { 1920 , 1051 },
+				    { 540, 295 }, 
+				    { 460, 252 }, 
+				    { 360, 197 },
+				    { 256, 149 },
+				    { 140, 77 },
+				};
 
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
