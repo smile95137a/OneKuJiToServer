@@ -97,7 +97,7 @@ public class ImageUtil {
 				for (int[] size : rwdSizes) {
 					String rwdFilePath = staticPicturePath + size[0] + "x" + size[1] + "_" + uniqueFileName;
 					File rwdDest = new File(rwdFilePath);
-					BufferedImage processedImage = cropImageFromCenter(originalImage, size[0], size[1]);
+					BufferedImage processedImage = cropImageFromCenter(originalImage, size[0]);
 					ImageIO.write(processedImage, fileExtension, rwdDest);
 					filePaths.add(staticPicturePathMapping + size[0] + "x" + size[1] + "_" + uniqueFileName);
 				}
