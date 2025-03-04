@@ -110,10 +110,28 @@ public class ImageUtil {
 		return filePaths.toArray(new String[0]);
 	}
 
-	private static BufferedImage cropImageFromCenter(BufferedImage image, double targetWidth, double targetHeight)
-			throws IOException {
-		return Thumbnails.of(image).size((int) targetWidth, (int) targetHeight).crop(Positions.CENTER)
-				.asBufferedImage();
+//	private static BufferedImage cropImageFromCenter(BufferedImage image, double targetWidth, double targetHeight)
+//			throws IOException {
+//		return Thumbnails.of(image).size((int) targetWidth, (int) targetHeight).crop(Positions.CENTER)
+//				.asBufferedImage();
+//	}
+
+
+	public static BufferedImage cropImageFromCenter(BufferedImage image, double targetWidth) throws IOException {
+	    int originalWidth = image.getWidth();
+	    int originalHeight = image.getHeight();
+
+	    // 計算左右裁切的起始 x 位置，確保垂直方向不裁切
+	    int x = (originalWidth - (int) targetWidth) / 2;
+	    int y = 0; // 保持上下不變
+
+	    // 確保裁切範圍在合法區間內
+	    if (x < 0 || targetWidth > originalWidth) {
+	        throw new IllegalArgumentException("Target width exceeds the original image width.");
+	    }
+
+	    // 執行裁剪
+	    return image.getSubimage(x, y, (int) targetWidth, originalHeight);
 	}
 
 	private static String storeUploadFile(MultipartFile file, boolean isForCKEditor) {
