@@ -56,9 +56,9 @@ public interface ProductRepository {
             "bonus_price = #{bonusPrice}, " +
             "specification = #{specification}, " +
             "category_id = #{categoryId}, " +
-            "banner_image_url = #{bannerImageUrl} " +
-            "banner_image_url_LG = #{bannerImageUrlLG} " +
-            "banner_image_url_MD = #{bannerImageUrlMD} " +
+            "banner_image_url = #{bannerImageUrl}, " +
+            "banner_image_url_LG = #{bannerImageUrlLG}, " +
+            "banner_image_url_MD = #{bannerImageUrlMD}, " +
             "banner_image_url_XS = #{bannerImageUrlXS} " +
             "WHERE product_id = #{productId}")
     void updateProduct(Product product);
