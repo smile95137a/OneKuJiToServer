@@ -21,6 +21,9 @@
         private BigDecimal sliverPrice;
         private Integer stockQuantity;
         private List<String> imageUrls;
+        private List<String> imageUrlsLg;
+        private List<String> imageUrlsMd;
+        private List<String> imageUrlsXs;
         private ProductType productType;
         private PrizeCategory prizeCategory;
         private ProductStatus status;
