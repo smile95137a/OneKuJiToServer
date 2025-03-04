@@ -151,10 +151,10 @@ public class ProductController {
 			List<String> uploadedFilePathsMD = new ArrayList<>();
 			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
-					{ 1920, 1080 },
-					{ 1280, 720 }, 
-					{ 1024, 768 },
-					{ 750, 750 },
+					{ 377, 216 },
+					{ 500 , 216}, 
+					{ 350, 136 },
+					{ 225, 80 },
 			};
 
 			if (files != null && !files.isEmpty()) {
