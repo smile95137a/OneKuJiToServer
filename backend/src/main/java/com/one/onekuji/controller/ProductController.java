@@ -209,7 +209,7 @@ public class ProductController {
 			List<String> uploadedFilePathsMD = new ArrayList<>();
 			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
-					{ 1920, 1080 },
+					{ 1920, 1450 },
 					{ 1280, 720 }, 
 					{ 1024, 768 },
 					{ 750, 750 },
