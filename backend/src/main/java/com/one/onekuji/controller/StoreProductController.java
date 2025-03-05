@@ -139,20 +139,42 @@ public class StoreProductController {
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
+			List<String> uploadedFilePathsLG = new ArrayList<>();
+			List<String> uploadedFilePathsMD = new ArrayList<>();
+			List<String> uploadedFilePathsXS = new ArrayList<>();
+			int[][] rwdSizes = { 
+				    { 2000 , 2000 },
+				    { 1500, 1500 }, 
+				    { 1000, 1000 }, 
+				    { 500, 500 },
+				};
 
-			// Handle new file uploads
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String fileUrl = ImageUtil.storeUpload(file);
-						uploadedFilePaths.add(fileUrl);
+						String[] fileUrl = ImageUtil.upload(file, rwdSizes);
+						uploadedFilePaths.add(fileUrl[0]);
+						uploadedFilePathsLG.add(fileUrl[1]);
+						uploadedFilePathsMD.add(fileUrl[2]);
+						uploadedFilePathsXS.add(fileUrl[3]);
 					}
 				}
 			}
 
-			// Add existing URLs
 			if (existingUrls != null && !existingUrls.isEmpty()) {
 				uploadedFilePaths.addAll(existingUrls);
+				uploadedFilePathsLG.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[0][0], rwdSizes[0][1]),
+								String.format("%sx%s", rwdSizes[1][0], rwdSizes[1][1])))
+						.toList());
+				uploadedFilePathsMD.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1]),
+								String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1])))
+						.toList());
+				uploadedFilePathsXS.addAll(existingUrls.stream()
+						.map(url -> url.replace(String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1]),
+								String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1])))
+						.toList());
 			}
 
 			storeProductService.uploadProductImg(storeProductId, uploadedFilePaths);
