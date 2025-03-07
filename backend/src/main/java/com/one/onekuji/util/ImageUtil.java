@@ -133,8 +133,8 @@ public class ImageUtil {
                     .outputQuality(OUTPUT_QUALITY)
                     .asBufferedImage();
 
-            int x = (targetWidth - scaledWidth) / 2;
-            int y = (targetHeight - scaledHeight) / 2;
+            int x = (targetWidth - scaledWidth) / 2; 
+            int y = 0; 
 
             g2d.drawImage(scaledImage, x, y, null);
         } catch (IOException e) {
@@ -145,6 +145,8 @@ public class ImageUtil {
 
         return finalImage;
     }
+
+
 
     private static String getFileExtension(String fileName) {
         if (fileName != null && fileName.contains(".")) {
