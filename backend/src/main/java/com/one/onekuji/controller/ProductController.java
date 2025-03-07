@@ -150,9 +150,9 @@ public class ProductController {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
 			int[][] rwdSizes = { 
-				    { 1920 , 1051 },
+				    { 3654 , 2000 },
 				};
-
+			
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
@@ -186,8 +186,9 @@ public class ProductController {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
 			int[][] rwdSizes = { 
-					{ 1920, 1450 },
-			};
+				    { 2648, 2000 },
+				};
+
 
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
