@@ -79,16 +79,10 @@ public class ProductService {
 
 	public ProductRes uploadProductImg(
 			Long id, 
-			List<String> paths, 
-			List<String> pathsLG, 
-			List<String> pathsMD,
-			List<String> pathsXS) {
+			List<String> paths) {
 		Product product = productRepository.selectProductById(id);
 		if (product != null) {
 			product.setImageUrls(paths);
-			product.setImageUrlsLG(pathsLG);
-			product.setImageUrlsMD(pathsMD);
-			product.setImageUrlsXS(pathsXS);
 			productRepository.updateProduct(product);
 			return convertEntityToRes(product);
 		}
@@ -97,16 +91,10 @@ public class ProductService {
 
 	public ProductRes uploadProductBannerImg(
 			Long id,
-			List<String> paths, 
-			List<String> pathsLG, 
-			List<String> pathsMD,
-			List<String> pathsXS) {
+			List<String> paths) {
 		Product product = productRepository.selectProductById(id);
 		if (product != null) {
 			product.setBannerImageUrl(paths);
-			product.setBannerImageUrlLG(pathsLG);
-			product.setBannerImageUrlMD(pathsMD);
-			product.setBannerImageUrlXS(pathsXS);
 			productRepository.updateProduct(product);
 			return convertEntityToRes(product);
 		}

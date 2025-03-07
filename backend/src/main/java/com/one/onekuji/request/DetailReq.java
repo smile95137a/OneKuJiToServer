@@ -24,9 +24,6 @@ public class DetailReq {
     private BigDecimal price;
     private BigDecimal sliverPrice;
     private List<String> imageUrls;
-    private List<String> imageUrlsLG;
-    private List<String> imageUrlsMD;
-    private List<String> imageUrlsXS;
     private BigDecimal length;
     private BigDecimal width;
     private BigDecimal height;

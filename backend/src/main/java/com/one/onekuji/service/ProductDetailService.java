@@ -169,9 +169,6 @@ public class ProductDetailService {
             productDetailReq.setGrade(null);          // 禁止更新等级
             productDetailReq.setPrice(null);          // 禁止更新价格
             productDetailReq.setImageUrls(null);      // 禁止更新图片链接
-            productDetailReq.setImageUrlsLG(null);      // 禁止更新图片链接
-            productDetailReq.setImageUrlsMD(null);      // 禁止更新图片链接
-            productDetailReq.setImageUrlsXS(null);      // 禁止更新图片链接
             productDetailReq.setSpecification(null);  // 禁止更新规格
             productDetailReq.setIsPrize(null);        // 禁止更新是否奖品
         } else {
@@ -295,19 +292,13 @@ public class ProductDetailService {
     }
 
 	public void uploadProductDetailImg(Long productDetailId,
-			List<String> uploadedFilePaths,
-			List<String> uploadedFilePathsLG,
-			List<String> uploadedFilePathsMD,
-			List<String> uploadedFilePathsXS
+			List<String> uploadedFilePaths
 			) throws Exception {
 		var detail = productDetailMapper.findById(productDetailId);
 		DetailReq updatedDetail = new DetailReq();
 	    BeanUtils.copyProperties(detail, updatedDetail);
 	    
 	    updatedDetail.setImageUrls(uploadedFilePaths);
-	    updatedDetail.setImageUrlsLG(uploadedFilePathsLG);
-	    updatedDetail.setImageUrlsMD(uploadedFilePathsMD);
-	    updatedDetail.setImageUrlsXS(uploadedFilePathsXS);
 	    this.updateProductDetail(productDetailId, updatedDetail);
 		
 	}

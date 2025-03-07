@@ -142,53 +142,31 @@ public class ProductController {
 	}
 
 	@PostMapping("/uploadProductImg")
-	public ResponseEntity<ApiResponse<List<String>>> uploadProductImg(@RequestParam("productId") Long productId,
+	public ResponseEntity<ApiResponse<List<String>>> uploadProductImg(
+			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam("productId") Long productId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
-			List<String> uploadedFilePathsLG = new ArrayList<>();
-			List<String> uploadedFilePathsMD = new ArrayList<>();
-			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
 				    { 1920 , 1051 },
-				    { 540, 295 }, 
-				    { 460, 252 }, 
-				    { 360, 197 },
-				    { 256, 149 },
-				    { 140, 77 },
 				};
 
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String[] fileUrl = ImageUtil.upload(file, rwdSizes);
+						String[] fileUrl = ImageUtil.upload(file, rwdSizes, isUseCrop);
 						uploadedFilePaths.add(fileUrl[0]);
-						uploadedFilePathsLG.add(fileUrl[1]);
-						uploadedFilePathsMD.add(fileUrl[2]);
-						uploadedFilePathsXS.add(fileUrl[3]);
 					}
 				}
 			}
 
 			if (existingUrls != null && !existingUrls.isEmpty()) {
 				uploadedFilePaths.addAll(existingUrls);
-				uploadedFilePathsLG.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[0][0], rwdSizes[0][1]),
-								String.format("%sx%s", rwdSizes[1][0], rwdSizes[1][1])))
-						.toList());
-				uploadedFilePathsMD.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1]),
-								String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1])))
-						.toList());
-				uploadedFilePathsXS.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1]),
-								String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1])))
-						.toList());
 			}
 
-			productService.uploadProductImg(productId, uploadedFilePaths, uploadedFilePathsLG, uploadedFilePathsMD,
-					uploadedFilePathsXS);
+			productService.uploadProductImg(productId, uploadedFilePaths);
 
 			ApiResponse<List<String>> response = ResponseUtils.success(200, "Files uploaded successfully",
 					uploadedFilePaths);
@@ -200,51 +178,31 @@ public class ProductController {
 	}
 
 	@PostMapping("/uploadProductBannerImg")
-	public ResponseEntity<ApiResponse<List<String>>> uploadProductBannerImg(@RequestParam("productId") Long productId,
+	public ResponseEntity<ApiResponse<List<String>>> uploadProductBannerImg(
+			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam("productId") Long productId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
-			List<String> uploadedFilePathsLG = new ArrayList<>();
-			List<String> uploadedFilePathsMD = new ArrayList<>();
-			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
 					{ 1920, 1450 },
-					{ 1280, 720 }, 
-					{ 1024, 768 },
-					{ 750, 750 },
 			};
 
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String[] fileUrl = ImageUtil.upload(file, rwdSizes);
+						String[] fileUrl = ImageUtil.upload(file, rwdSizes, isUseCrop);
 						uploadedFilePaths.add(fileUrl[0]);
-						uploadedFilePathsLG.add(fileUrl[1]);
-						uploadedFilePathsMD.add(fileUrl[2]);
-						uploadedFilePathsXS.add(fileUrl[3]);
 					}
 				}
 			}
 
 			if (existingUrls != null && !existingUrls.isEmpty()) {
 				uploadedFilePaths.addAll(existingUrls);
-				uploadedFilePathsLG.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[0][0], rwdSizes[0][1]),
-								String.format("%sx%s", rwdSizes[1][0], rwdSizes[1][1])))
-						.toList());
-				uploadedFilePathsMD.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1]),
-								String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1])))
-						.toList());
-				uploadedFilePathsXS.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1]),
-								String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1])))
-						.toList());
 			}
 
-			productService.uploadProductBannerImg(productId, uploadedFilePaths, uploadedFilePathsLG, uploadedFilePathsMD,
-					uploadedFilePathsXS);
+			productService.uploadProductBannerImg(productId, uploadedFilePaths);
 
 			ApiResponse<List<String>> response = ResponseUtils.success(200, "Files uploaded successfully",
 					uploadedFilePaths);

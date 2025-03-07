@@ -48,21 +48,6 @@ public class Product {
     @Column(name = "image_urls", columnDefinition = "JSON")
     @Convert(converter = StringListConverter.class)
     private List<String> imageUrls;
-    
-    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
-    @Column(name = "image_urls_lg", columnDefinition = "JSON")
-    @Convert(converter = StringListConverter.class)
-    private List<String> imageUrlsLG;
-    
-    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
-    @Column(name = "image_urls_md", columnDefinition = "JSON")
-    @Convert(converter = StringListConverter.class)
-    private List<String> imageUrlsMD;
-    
-    @Schema(description = "圖片 URL", example = "http://example.com/product_image.jpg")
-    @Column(name = "image_urls_xs", columnDefinition = "JSON")
-    @Convert(converter = StringListConverter.class)
-    private List<String> imageUrlsXS;
 
     @Schema(description = "稀有度", example = "Rare")
     @Column(name = "rarity", length = 50)

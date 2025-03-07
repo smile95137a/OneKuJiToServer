@@ -100,50 +100,30 @@ public class ProductDetailController {
 
     
 	@PostMapping("/uploadProductDetailImg")
-	public ResponseEntity<ApiResponse<List<String>>> uploadProductDetailImg(@RequestParam("productDetailId") Long productDetailId,
+	public ResponseEntity<ApiResponse<List<String>>> uploadProductDetailImg(
+			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam("productDetailId") Long productDetailId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
 		try {
 			List<String> uploadedFilePaths = new ArrayList<>();
-			List<String> uploadedFilePathsLG = new ArrayList<>();
-			List<String> uploadedFilePathsMD = new ArrayList<>();
-			List<String> uploadedFilePathsXS = new ArrayList<>();
 			int[][] rwdSizes = { 
 				    { 2000 , 2000 },
-				    { 1500, 1500 }, 
-				    { 1000, 1000 }, 
-				    { 500, 500 },
 			};
 
 			if (files != null && !files.isEmpty()) {
 				for (MultipartFile file : files) {
 					if (!file.isEmpty()) {
-						String[] fileUrl = ImageUtil.upload(file, rwdSizes);
+						String[] fileUrl = ImageUtil.upload(file, rwdSizes, isUseCrop);
 						uploadedFilePaths.add(fileUrl[0]);
-						uploadedFilePathsLG.add(fileUrl[1]);
-						uploadedFilePathsMD.add(fileUrl[2]);
-						uploadedFilePathsXS.add(fileUrl[3]);
 					}
 				}
 			}
 
 			if (existingUrls != null && !existingUrls.isEmpty()) {
 				uploadedFilePaths.addAll(existingUrls);
-				uploadedFilePathsLG.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[0][0], rwdSizes[0][1]),
-								String.format("%sx%s", rwdSizes[1][0], rwdSizes[1][1])))
-						.toList());
-				uploadedFilePathsMD.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1]),
-								String.format("%sx%s", rwdSizes[2][0], rwdSizes[2][1])))
-						.toList());
-				uploadedFilePathsXS.addAll(existingUrls.stream()
-						.map(url -> url.replace(String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1]),
-								String.format("%sx%s", rwdSizes[3][0], rwdSizes[3][1])))
-						.toList());
 			}
-			productDetailService.uploadProductDetailImg(productDetailId, uploadedFilePaths, uploadedFilePathsLG, uploadedFilePathsMD,
-					uploadedFilePathsXS);
+			productDetailService.uploadProductDetailImg(productDetailId, uploadedFilePaths);
 
 
 			ApiResponse<List<String>> response = ResponseUtils.success(200, "Files uploaded successfully",

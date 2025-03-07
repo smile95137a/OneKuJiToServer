@@ -20,8 +20,8 @@ public interface ProductDetailRepository {
     @Select("SELECT * FROM product_detail WHERE product_detail_id = #{id}")
     ProductDetailRes findById2(@Param("id") Long id);
 
-    @Insert("INSERT INTO product_detail (product_id, description, note, size, quantity, stock_quantity, product_name, grade, price, sliver_price, image_urls, image_urls_LG, image_urls_MD, image_urls_XS, length, width, height, specification , probability , is_prize) " +
-            "VALUES (#{productId}, #{description}, #{note}, #{size}, #{quantity}, #{stockQuantity}, #{productName}, #{grade}, #{price}, #{sliverPrice}, #{imageUrls}, #{imageUrlsLG}, #{imageUrlsMD}, #{imageUrlsXS}, #{length}, #{width}, #{height}, #{specification} , #{probability} , #{isPrize})")
+    @Insert("INSERT INTO product_detail (product_id, description, note, size, quantity, stock_quantity, product_name, grade, price, sliver_price, image_urls, length, width, height, specification , probability , is_prize) " +
+            "VALUES (#{productId}, #{description}, #{note}, #{size}, #{quantity}, #{stockQuantity}, #{productName}, #{grade}, #{price}, #{sliverPrice}, #{imageUrls}, #{length}, #{width}, #{height}, #{specification} , #{probability} , #{isPrize})")
     @Options(useGeneratedKeys = true, keyProperty = "productDetailId")
     int insert(DetailReq productDetailReq);
 
@@ -40,9 +40,6 @@ public interface ProductDetailRepository {
             "<if test='price != null'>price = #{price},</if>" +
             "<if test='sliverPrice != null'>sliver_price = #{sliverPrice},</if>" +
             "<if test='imageUrls != null'>image_urls = #{imageUrls},</if>" +
-            "<if test='imageUrlsLG != null'>image_urls_LG = #{imageUrlsLG},</if>" +
-            "<if test='imageUrlsMD != null'>image_urls_MD = #{imageUrlsMD},</if>" +
-            "<if test='imageUrlsXS != null'>image_urls_XS = #{imageUrlsXS},</if>" +
             "<if test='length != null'>length = #{length},</if>" +
             "<if test='width != null'>width = #{width},</if>" +
             "<if test='height != null'>height = #{height},</if>" +
