@@ -74,7 +74,7 @@ public class DrawResultService {
 	// 获取抽奖保护时间，根据抽奖次数计算保护期时间
 	private long getDrawProtectionTime(int drawCount) {
 		long protectionTime = 300 + (30 * (drawCount - 1)); // 初始保护时间300秒，每多抽一次加30秒
-		return Math.min(protectionTime, 600); // 最大保护时间为600秒
+		return Math.min(protectionTime, 900); // 最大保护时间为600秒
 	}
 
 	public Boolean checkPrize(Long userId) {
@@ -98,7 +98,7 @@ public class DrawResultService {
 			try {
 				LocalDateTime now = LocalDateTime.now(); // 当前时间
 				DrawProtection protection = productDrawProtectionMap.get(productId); // 获取该产品的保护信息
-				long protectionTime = 600L; // 默认保护时间为 600 秒
+				long protectionTime = 900L; // 默认保护时间为 600 秒
 
 				// 获取保护期结束时间
 				LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
@@ -204,7 +204,7 @@ public class DrawResultService {
 
 	public LocalDateTime getProtectionEndTime(Long userId, Long productId) {
 		DrawProtection protection = productDrawProtectionMap.get(productId);
-		long protectionTime = 600L; // 默认保护时间为 600 秒
+		long protectionTime = 900L; // 默认保护时间为 600 秒
 
 		if (protection != null) {
 			// 如果是同一個使用者，則延長保護期或放行
@@ -546,6 +546,7 @@ public class DrawResultService {
 			drawResult.setUpdateDate(LocalDateTime.now());
 			drawResult.setImageUrls(LastPrize.getImageUrls());
 			drawResult.setProductName(LastPrize.getProductName());
+			drawResult.setPayType("1");
 			drawRepository.insertDrawResult(drawResult);
 		} else {
 			// 如果没有抽到 LAST 奖品，打印出原因
