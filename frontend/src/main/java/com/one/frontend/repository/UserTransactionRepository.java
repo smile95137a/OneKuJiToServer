@@ -20,12 +20,20 @@ public interface UserTransactionRepository {
                            @Param("localDate") LocalDateTime localDate,
     @Param("payMethod") String payMethod);
 
-    @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , order_number , status) " +
-            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{orderNumber} , 'NO_PAY')")
+    @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , order_number , status , type) " +
+            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{orderNumber} , 'NO_PAY' , 'MASTER')")
     void insertTransaction2(@Param("userId") Long userId,
                            @Param("transactionType") String transactionType,
                            @Param("amount") BigDecimal amount,
                            @Param("orderNumber") String orderNumber,
+                            @Param("localDate") LocalDateTime localDate);
+
+    @Insert("INSERT INTO user_transaction (user_id, transaction_type, amount, transaction_date, created_at , order_number , status , type) " +
+            "VALUES (#{userId}, #{transactionType}, #{amount}, #{localDate}, #{localDate} , #{orderNumber} , 'IS_PAY' , 'AFTEE')")
+    void insertTransaction3(@Param("userId") Long userId,
+                            @Param("transactionType") String transactionType,
+                            @Param("amount") BigDecimal amount,
+                            @Param("orderNumber") String orderNumber,
                             @Param("localDate") LocalDateTime localDate);
 
 

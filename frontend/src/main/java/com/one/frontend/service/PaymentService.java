@@ -269,6 +269,13 @@ return null;
             LocalDateTime localDateTime = LocalDateTime.now();
             userTransactionRepository.insertTransaction2(userId, "DEPOSIT", amount , orderNumber , localDateTime);
             response.setOrderNo(orderNumber);
+        }else if("4".equals(payMethod)){
+            String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+            String amountInCents = paymentRequest.getAmount();
+            BigDecimal amount = new BigDecimal(amountInCents);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            userTransactionRepository.insertTransaction3(userId, "DEPOSIT", amount , orderNumber , localDateTime);
+            response.setOrderNo(orderNumber);
         }
 
 

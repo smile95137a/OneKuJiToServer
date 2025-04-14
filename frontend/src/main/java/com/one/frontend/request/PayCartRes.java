@@ -54,6 +54,7 @@ public class PayCartRes {
     private String shippingMethodId;
     private String shopName; //門市名稱
     private String shopAddress;
+    private String priceType;
 }
 
 

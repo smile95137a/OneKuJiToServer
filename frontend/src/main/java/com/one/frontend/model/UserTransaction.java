@@ -50,6 +50,9 @@ public class UserTransaction {
     @Column(name = "pay_method")
     private String payMethod;
 
+    @Column
+    private String type;
+
     // 在保存实体时自动生成创建和更新时间
     @PrePersist
     protected void onCreate() {

@@ -316,6 +316,90 @@ public interface StoreConsumptionRepository {
 
 
 
+    @Select({
+            "<script>",
+            "SELECT",
+            "    CASE",
+            "        WHEN #{groupType} = 'day' THEN 'day'",
+            "        WHEN #{groupType} = 'week' THEN 'week'",
+            "        WHEN #{groupType} = 'month' THEN 'month'",
+            "        WHEN #{groupType} = 'year' THEN 'year'",
+            "    END AS group_type,",
+            "    <choose>",
+            "        <when test='groupType == \"day\"'>",
+            "            DATE_FORMAT(ut.created_at, '%Y-%m-%d') AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"week\"'>",
+            "            CONCAT(YEAR(ut.created_at), '-', WEEK(ut.created_at)) AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"month\"'>",
+            "            DATE_FORMAT(ut.created_at, '%Y-%m') AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"year\"'>",
+            "            YEAR(ut.created_at) AS time_group",
+            "        </when>",
+            "    </choose>,",
+            "    COALESCE(SUM(ut.amount), 0) AS total_amount,",
+            "    COALESCE(u.nickname, '') AS nickname,",
+            "    COALESCE(u.phone_number, '') AS phone_number,",
+            "    COALESCE(u.address_name, '') AS address_name",
+            "FROM user_transaction ut",
+            "LEFT JOIN `user` u ON ut.user_id = u.id",
+            "WHERE ut.transaction_type = 'DEPOSIT'",
+            "AND ut.type = 'MASTER' AND ut.status != 'NO_PAY'",
+            "AND ut.created_at BETWEEN #{startDate} AND #{endDate}",
+            "GROUP BY time_group, u.nickname, u.phone_number",
+            "ORDER BY time_group DESC",
+            "</script>"
+    })
+    List<Map<String, Object>> getTotalDepositByTimeGroupByMaster(
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
+
+
+    @Select({
+            "<script>",
+            "SELECT",
+            "    CASE",
+            "        WHEN #{groupType} = 'day' THEN 'day'",
+            "        WHEN #{groupType} = 'week' THEN 'week'",
+            "        WHEN #{groupType} = 'month' THEN 'month'",
+            "        WHEN #{groupType} = 'year' THEN 'year'",
+            "    END AS group_type,",
+            "    <choose>",
+            "        <when test='groupType == \"day\"'>",
+            "            DATE_FORMAT(ut.created_at, '%Y-%m-%d') AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"week\"'>",
+            "            CONCAT(YEAR(ut.created_at), '-', WEEK(ut.created_at)) AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"month\"'>",
+            "            DATE_FORMAT(ut.created_at, '%Y-%m') AS time_group",
+            "        </when>",
+            "        <when test='groupType == \"year\"'>",
+            "            YEAR(ut.created_at) AS time_group",
+            "        </when>",
+            "    </choose>,",
+            "    COALESCE(SUM(ut.amount), 0) AS total_amount,",
+            "    COALESCE(u.nickname, '') AS nickname,",
+            "    COALESCE(u.phone_number, '') AS phone_number,",
+            "    COALESCE(u.address_name, '') AS address_name",
+            "FROM user_transaction ut",
+            "LEFT JOIN `user` u ON ut.user_id = u.id",
+            "WHERE ut.transaction_type = 'DEPOSIT'",
+            "AND ut.type = 'AFTEE' AND ut.status != 'NO_PAY'",
+            "AND ut.created_at BETWEEN #{startDate} AND #{endDate}",
+            "GROUP BY time_group, u.nickname, u.phone_number",
+            "ORDER BY time_group DESC",
+            "</script>"
+    })
+    List<Map<String, Object>> getTotalDepositByTimeGroupByAFTEE(
+            @Param("groupType") String groupType,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 
 
 

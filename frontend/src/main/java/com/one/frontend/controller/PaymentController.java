@@ -243,10 +243,16 @@ public class PaymentController {
                 String s = paymentService.recordDeposit3(userId, BigDecimal.valueOf(amount));
                 ApiResponse<Object> success = ResponseUtils.success(200, "信用卡訂單編號", s);
                 return ResponseEntity.ok(success);
+            }else if("4".equals(paymentRequest.getPaymentMethod())){
+                PaymentResponse response = paymentService.topOp(paymentRequest , paymentRequest.getPaymentMethod() , userId);
+                ApiResponse<Object> response1 = ResponseUtils.success(200, null, response);
+                return ResponseEntity.ok(response1);
             }else{
                 ApiResponse<Object> response1 = ResponseUtils.failure(200, "轉帳單筆不得超過兩萬", new ArrayList<>());
                 return ResponseEntity.ok(response1);
             }
+
+
         }catch (Exception e){
             e.printStackTrace();
         }

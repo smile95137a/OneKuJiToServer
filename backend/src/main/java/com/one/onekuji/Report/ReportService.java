@@ -40,6 +40,10 @@ public class ReportService {
                 return storeConsumptionRepository.getPrizeRecycleReport(groupType, startDate, endDate);
             case "DRAW_RESULT_SUMMARY":
                 return storeConsumptionRepository.getDrawResultSummary(groupType, startDate, endDate);
+            case "Master_DEPOSIT":
+                return storeConsumptionRepository.getTotalDepositByTimeGroupByMaster(groupType, startDate, endDate);
+            case "AFTEE_DEPOSIT":
+                return storeConsumptionRepository.getTotalDepositByTimeGroupByAFTEE(groupType, startDate, endDate);
             default:
                 throw new IllegalArgumentException("Invalid report type: " + reportType);
         }
