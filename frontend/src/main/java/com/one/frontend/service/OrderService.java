@@ -440,7 +440,28 @@ public class OrderService {
 				// 移除購物車項
 				prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
 
-			}
+			}else if("4".equals(payCartRes.getPaymentMethod())) {
+					// 插入訂單到資料庫
+					orderEntity.setResultStatus(OrderStatus.NO_PAY);
+					orderRepository.insertOrder(orderEntity);
+
+					// 根據訂單號查詢訂單ID
+					Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
+
+					// 根據訂單號查詢訂單ID
+
+					List<OrderDetail> orderDetails = prizeCartItemList.stream()
+							.filter(Objects::nonNull)  // 過濾掉 null 元素
+							.map(cartItem -> mapCartItemToPrizeOrderDetail(cartItem, orderId, shippingCost , finalPaymentResponse.getEPayAccount()))
+							.filter(Objects::nonNull)  // 過濾掉映射結果為 null 的元素
+							.collect(Collectors.toList());
+
+					// 批量保存訂單詳情
+					if (!orderDetails.isEmpty()) {
+						orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
+					}
+
+				}
 			this.recordConsume(userId , shippingCost);
 		return new OrderPayRes(orderNumber , "2" , paymentResponse); // 返回訂單號
 	}

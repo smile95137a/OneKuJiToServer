@@ -487,7 +487,7 @@ return null;
         Long cartIdByUserId1 = prizeCartRepository.getCartIdByUserId(order.getUserId());
         List<PrizeCartItem> prizeCartItemList = prizeCartItemRepository.find(cartIdByUserId1);
 
-        if("1".equals(order.getPaymentMethod())){
+        if("1".equals(order.getPaymentMethod()) || "4".equals(order.getPaymentMethod())){
             if("1".equals(order.getType())){
                 // 獲取所有購物車項的ID並移除
                 // 按 product_detail_id 分组
