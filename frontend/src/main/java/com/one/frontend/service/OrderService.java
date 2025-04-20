@@ -271,6 +271,7 @@ public class OrderService {
 					userRes.setBalance(userRes.getBalance().subtract(shippingCost));
 					paymentResponse.setOrderId(orderNumber);
 					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					payCartRes.setPaymentMethod("3");
 				} else {
 					throw new IllegalArgumentException("金幣餘額不足");
 				}
@@ -280,6 +281,7 @@ public class OrderService {
 					userRes.setBalance(userRes.getSliverCoin().subtract(shippingCost));
 					paymentResponse.setOrderId(orderNumber);
 					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					payCartRes.setPaymentMethod("3");
 				} else {
 					throw new IllegalArgumentException("銀幣餘額不足");
 				}
