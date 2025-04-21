@@ -229,7 +229,7 @@ public class DrawResultService {
 
 
 
-	public List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
+	public synchronized List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
 		try {
 			// 获取保护期结束时间
 			LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
