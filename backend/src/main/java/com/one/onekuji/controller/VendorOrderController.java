@@ -74,6 +74,8 @@ public class VendorOrderController {
             // 更新資料庫
             vendorOrderRepository.update2(existingVendorOrder);
 
+            orderRepository.updateTrackNumber(request.getTrackingNumber() , Long.valueOf(request.getOrderId()));
+
             return ResponseUtils.success(200, "訂單更新成功", existingVendorOrder);
         } else {
             // 如果不存在則插入新訂單
@@ -88,6 +90,7 @@ public class VendorOrderController {
                 // 插入資料庫，如果已存在主鍵，則會拋出錯誤
                 vendorOrderRepository.insert2(vendorOrderEntity);
 
+            orderRepository.updateTrackNumber(request.getTrackingNumber() , Long.valueOf(request.getOrderId()));
 
             return ResponseUtils.success(200, "訂單插入成功", vendorOrderEntity);
         }

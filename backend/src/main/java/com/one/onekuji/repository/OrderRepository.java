@@ -82,4 +82,7 @@ public interface OrderRepository {
     @ResultMap("orderResultMap")
     List<OrderRes> findOrdersByDateRange(Map<String, Object> params);
 
+    @Update("UPDATE `order` SET tracking_number = #{trackingNumber} WHERE id = #{orderId}")
+    void updateTrackNumber(@Param("trackingNumber") String trackingNumber, @Param("orderId") Long orderId);
+
 }
