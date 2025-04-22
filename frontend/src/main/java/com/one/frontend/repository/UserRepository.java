@@ -102,4 +102,10 @@ public interface UserRepository {
 
 	@Update("update `user` set password = #{user.password} , updated_at = #{user.updatedAt} where id = #{user.id}")
 	void resetUser(@Param("user") User user);
+
+	@Update("update `user` set sliver_coin = #{sliverCoin} where id = #{userId}")
+	void updateSliverCoin2(@Param("userId") Long userId, @Param("sliverCoin") BigDecimal sliverCoin);
+
+	@Update("update `user` set balance = #{balance} where id = #{userId}")
+	void updateBalance2(@Param("userId") Long userId, @Param("balance") int balance);
 }

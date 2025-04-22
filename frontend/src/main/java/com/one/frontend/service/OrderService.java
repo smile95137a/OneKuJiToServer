@@ -272,16 +272,18 @@ public class OrderService {
 					paymentResponse.setOrderId(orderNumber);
 					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 					payCartRes.setPaymentMethod("3");
+					userRepository.updateBalance2(userId , userRes.getBalance().intValue());
 				} else {
 					throw new IllegalArgumentException("金幣餘額不足");
 				}
 				break;
 			case "2":
 				if (userRes.getSliverCoin().compareTo(shippingCost) >= 0) {
-					userRes.setBalance(userRes.getSliverCoin().subtract(shippingCost));
+					userRes.setSliverCoin(userRes.getSliverCoin().subtract(shippingCost));
 					paymentResponse.setOrderId(orderNumber);
 					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 					payCartRes.setPaymentMethod("3");
+					userRepository.updateSliverCoin2(userId , userRes.getSliverCoin());
 				} else {
 					throw new IllegalArgumentException("銀幣餘額不足");
 				}
