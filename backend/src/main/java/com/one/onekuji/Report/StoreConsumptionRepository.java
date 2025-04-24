@@ -147,16 +147,17 @@ public interface StoreConsumptionRepository {
             "        WHEN #{groupType} = 'year' THEN YEAR(u.created_at)",
             "        WHEN #{groupType} = 'all' THEN DATE(u.created_at)",
             "        ELSE DATE(u.created_at)",
-            "    END AS time_group,",  // 分组时间段
-            "    u.user_ids AS user_id,",  // 原始存储的 user_ids 列表
-            "    IFNULL(us.address_name, 'Anonymous') AS address_name,", // 用户地址
-            "    u.sliver_coin_delta AS silver_amount,",  // 每条记录的 sliver_coin_delta 原始值
-            "    u.bonus_delta AS bonus_amount",  // 每条记录的 bonus_delta 原始值
+            "    END AS time_group,",
+            "    MAX(u.created_at) AS created_at,",  // ⭐ 新增這個
+            "    u.user_ids AS user_id,",
+            "    IFNULL(us.address_name, 'Anonymous') AS address_name,",
+            "    u.sliver_coin_delta AS silver_amount,",
+            "    u.bonus_delta AS bonus_amount",
             "FROM user_update_log u",
-            "LEFT JOIN `user` us ON FIND_IN_SET(us.id, u.user_ids)",  // 使用 FIND_IN_SET 检查 user.id 是否在 user_ids 列表中
+            "LEFT JOIN `user` us ON FIND_IN_SET(us.id, u.user_ids)",
             "WHERE u.created_at BETWEEN #{startDate} AND #{endDate}",
-            "GROUP BY time_group, address_name, u.user_ids, u.sliver_coin_delta, u.bonus_delta",  // 按时间、地址和记录内容分组
-            "ORDER BY u.created_at DESC",  // 按创建时间降序排列
+            "GROUP BY time_group, address_name, u.user_ids, u.sliver_coin_delta, u.bonus_delta",
+            "ORDER BY created_at DESC",  // ✅ 改用 MAX 出來的別名
             "</script>"
     })
     List<Map<String, Object>> getUserUpdateLogSummary(
@@ -164,6 +165,7 @@ public interface StoreConsumptionRepository {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
 
 
 
