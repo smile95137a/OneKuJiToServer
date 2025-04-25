@@ -30,6 +30,9 @@ public interface OrderRepository {
 
 	@Select("SELECT * FROM `order` WHERE user_id = #{userId}")
 	Order getOrderByUserId(Long userId);
+	
+	@Select("SELECT * FROM `order` WHERE order_number = #{orderNumber}")
+	Order getOrderByOrderNumber(String orderNumber);
 
 	@Select("SELECT * FROM `order` WHERE user_id = #{userId} AND order_number = #{orderNumber}")
 	OrderRes getOrderByUserIdAndOrderNumber(Long userId, String orderNumber);
