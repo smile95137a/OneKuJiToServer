@@ -138,7 +138,12 @@ public class OrderService {
 		// 計算運費，根據運輸方式動態設置
 		BigDecimal shippingCost = shippingMethodRepository.getShippingPrice(payCartRes.getShippingMethod());
 
-		// 計算總金額，包括商品總價格和運費
+		if (totalProductAmount == null) {
+			totalProductAmount = BigDecimal.ZERO;
+		}
+		if (shippingCost == null) {
+			shippingCost = BigDecimal.ZERO;
+		}
 		BigDecimal totalAmount = totalProductAmount.add(shippingCost);
 
 
@@ -161,6 +166,18 @@ public class OrderService {
 			paymentRequest.setBuyerMemo("再來一抽備註");
 			paymentResponse.setOrderId(orderNumber);
 			paymentResponse.setEPayAccount(String.valueOf(totalAmount));
+		}else if("4".equals(payCartRes.getPaymentMethod())){
+			PaymentRequest paymentRequest = new PaymentRequest();
+			BigDecimal totalAmount2 = new BigDecimal(String.valueOf(shippingCost)); // 假设你的 totalAmount 是 BigDecimal
+			int amountToSend = totalAmount2.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
+			paymentRequest.setAmount(String.valueOf(amountToSend));
+			paymentRequest.setBuyerName(payCartRes.getBillingName());
+			paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
+			paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
+			paymentRequest.setBuyerMemo("再來一抽備註");
+			paymentResponse.setResult("1");
+			paymentResponse.setOrderId(orderNumber);
+			paymentResponse.setEPayAccount(String.valueOf(shippingCost));
 		}
 
 
@@ -239,6 +256,44 @@ public class OrderService {
 
 					// 移除購物車項
 					cartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+
+				}else if("3".equals(payCartRes.getPaymentMethod())){
+// 插入訂單到資料庫
+					orderEntity.setResultStatus(OrderStatus.PREPARING_SHIPMENT);
+					orderRepository.insertOrder(orderEntity);
+
+					// 根據訂單號查詢訂單ID
+					Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
+
+					// 根據訂單號查詢訂單ID
+					List<OrderDetail> orderDetails = cartItemList.stream()
+							.filter(Objects::nonNull)  // 過濾掉 null 元素
+							.map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId ,  finalPaymentResponse.getEPayAccount()))
+							.filter(Objects::nonNull)  // 過濾掉映射結果為 null 的元素
+							.collect(Collectors.toList());
+
+					// 批量保存訂單詳情
+					if (!orderDetails.isEmpty()) {
+						orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
+					}
+
+					// 獲取所有購物車項的ID並移除
+					List<Long> cartItemIds = cartItemList.stream().map(CartItem::getCartItemId).collect(Collectors.toList());
+
+					// 移除購物車項
+					prizeCartItemService.removeCartItems(cartItemIds, cartItemList.get(0).getCartId());
+
+				}else if("4".equals(payCartRes.getPaymentMethod())) {
+					// 插入訂單到資料庫
+					orderEntity.setResultStatus(OrderStatus.NO_PAY);
+					orderRepository.insertOrder(orderEntity);
+
+					// 根據訂單號查詢訂單ID
+					Long orderId = orderRepository.getOrderIdByOrderNumber(orderNumber);
+					// 轉換購物車項目到訂單詳情並保存
+					cartItemList.stream().map(cartItem -> mapCartItemToOrderDetail(cartItem, orderId , finalPaymentResponse.getEPayAccount())) // 映射購物車項目為訂單詳情
+							.forEach(orderDetail -> orderDetailRepository.saveOrderDetail(orderDetail)); // 保存訂單詳情
+
 
 				}
 

@@ -70,6 +70,7 @@ public class AuthController {
 
         } catch (Exception e) {
             // 处理其他异常，返回500
+            e.printStackTrace();
             ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(500, "服務氣出錯", null);
             return ResponseEntity.ok(response);
         }
