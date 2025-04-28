@@ -75,7 +75,7 @@ public class AfteeChecksumUtils {
 
             // Step 3: 拼接
             String finalString = secretKey + "," + values.toString();
-
+            System.out.println("拼接起來:" + finalString);
             // Step 4: sha256(finalString)
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = digest.digest(finalString.getBytes(StandardCharsets.UTF_8));
@@ -85,7 +85,7 @@ public class AfteeChecksumUtils {
 
             // Step 6: hex string 用 latin1 -> base64
             String base64Checksum = Base64.getEncoder().encodeToString(hexString.getBytes(StandardCharsets.ISO_8859_1));
-
+            System.out.println("base64回傳直:" + base64Checksum);
             return base64Checksum;
         } catch (Exception e) {
             throw new RuntimeException("AFTEE Checksum 產生失敗", e);
