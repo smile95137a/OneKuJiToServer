@@ -16,6 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.JsonObject;
+import com.nimbusds.jose.util.JSONObjectUtils;
+import com.nimbusds.jose.util.JSONStringUtils;
 import com.one.frontend.model.User;
 import com.one.frontend.model.UserTransaction;
 import com.one.frontend.repository.OrderDetailRepository;
@@ -75,7 +78,7 @@ public class AfteeService {
 				item.put("shop_item_id", detail.getProductId());
 				item.put("item_name", detail.getProductName());
 				item.put("item_category", detail.getProductDetailName() != null ? detail.getProductDetailName() : "商品盒");
-				item.put("item_price", detail.getUnitPrice());
+				item.put("item_price", detail.getUnitPrice().intValue());
 				item.put("item_count", detail.getQuantity());
 				return item;
 			}).collect(Collectors.toList());
@@ -86,12 +89,12 @@ public class AfteeService {
 			shippingItem.put("shop_item_id", "SHIPPING_FEE");
 			shippingItem.put("item_name", "運費");
 			shippingItem.put("item_category", "物流費用");
-			shippingItem.put("item_price", order.getShippingCost());
+			shippingItem.put("item_price", order.getShippingCost().intValue());
 			shippingItem.put("item_count", 1);
 			items.add(shippingItem);
 
 			Map<String, Object> payment = new HashMap<>();
-			payment.put("amount", order.getTotalAmount());
+			payment.put("amount", order.getTotalAmount().intValue());
 			payment.put("shop_transaction_no", orderNo);
 			payment.put("user_no", user.getUserUid());
 			payment.put("sales_settled", false);
@@ -132,7 +135,7 @@ public class AfteeService {
 			item.put("shop_item_id", detail.getProductId());
 			item.put("item_name", detail.getProductName());
 			item.put("item_category", detail.getProductDetailName() != null ? detail.getProductDetailName() : "商品盒");
-			item.put("item_price", detail.getUnitPrice());
+			item.put("item_price", detail.getUnitPrice().intValue());
 			item.put("item_count", detail.getQuantity());
 			return item;
 		}).collect(Collectors.toList());
@@ -143,12 +146,12 @@ public class AfteeService {
 		shippingItem.put("shop_item_id", "SHIPPING_FEE");
 		shippingItem.put("item_name", "運費");
 		shippingItem.put("item_category", "物流費用");
-		shippingItem.put("item_price", order.getShippingCost());
+		shippingItem.put("item_price", order.getShippingCost().intValue());
 		shippingItem.put("item_count", 1);
 		items.add(shippingItem);
 
 		Map<String, Object> payment = new HashMap<>();
-		payment.put("amount", order.getTotalAmount());
+		payment.put("amount", order.getTotalAmount().intValue());
 		payment.put("shop_transaction_no", orderNo);
 		payment.put("user_no", user.getUserUid());
 		payment.put("sales_settled", false);
@@ -194,11 +197,11 @@ public class AfteeService {
 		item.put("shop_item_id", "TOPUP");
 		item.put("item_name", "儲值代幣");
 		item.put("item_category", "商品");
-		item.put("item_price", amount);
+		item.put("item_price", amount.intValue());
 		item.put("item_count", 1);
 
 		Map<String, Object> payment = new HashMap<>();
-		payment.put("amount", amount);
+		payment.put("amount", amount.intValue());
 		payment.put("shop_transaction_no", orderNo);
 		payment.put("user_no", userUid);
 		payment.put("sales_settled", true);
@@ -218,7 +221,6 @@ public class AfteeService {
 		result.put("pre_token", "");
 		result.put("pub_key", afteePubKey);
 		result.put("payment", payment);
-
 		return result;
 	}
 
