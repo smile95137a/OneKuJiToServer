@@ -10,8 +10,49 @@ import java.util.TreeMap;
 
 public class AfteeChecksumUtils {
 
+//    public static String generateChecksum(Map<String, Object> payment, String secretKey) {
+//        try {
+//            Map<String, Object> paymentData = new HashMap<>();
+//            paymentData.put("amount", payment.get("amount"));
+//            paymentData.put("user_no", payment.get("user_no"));
+//            paymentData.put("sales_settled", payment.get("sales_settled"));
+//            paymentData.put("description_trans", payment.get("description_trans"));
+//            paymentData.put("customer", payment.get("customer"));
+//            paymentData.put("dest_customers", payment.get("dest_customers"));
+//            paymentData.put("items", payment.get("items"));
+//            paymentData.put("validation_datetime", payment.get("validation_datetime"));
+//
+//            // Step 1: 排序 Map（list 處理成模仿前端）
+//            Object sorted = sortRecursively(paymentData);
+//
+//            // Step 2: flatten values
+//            StringBuilder values = new StringBuilder();
+//            flattenValues(sorted, values);
+//
+//            // Step 3: 拼接
+//            String finalString = secretKey + "," + values.toString();
+//
+//            // Step 4: sha256(finalString)
+//            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+//            byte[] hashBytes = digest.digest(finalString.getBytes(StandardCharsets.UTF_8));
+//
+//            // Step 5: bytes -> hex string
+//            String hexString = bytesToHex(hashBytes);
+//
+//            // Step 6: hex string 用 latin1 -> base64
+//            String base64Checksum = Base64.getEncoder().encodeToString(hexString.getBytes(StandardCharsets.ISO_8859_1));
+//
+//            return base64Checksum;
+//        } catch (Exception e) {
+//            throw new RuntimeException("AFTEE Checksum 產生失敗", e);
+//        }
+//    }
+
     public static String generateChecksum(Map<String, Object> payment, String secretKey) {
         try {
+            // 印出原本的 payment
+            System.out.println("payment = " + payment);
+
             Map<String, Object> paymentData = new HashMap<>();
             paymentData.put("amount", payment.get("amount"));
             paymentData.put("user_no", payment.get("user_no"));
@@ -21,13 +62,16 @@ public class AfteeChecksumUtils {
             paymentData.put("dest_customers", payment.get("dest_customers"));
             paymentData.put("items", payment.get("items"));
             paymentData.put("validation_datetime", payment.get("validation_datetime"));
-            
+
             // Step 1: 排序 Map（list 處理成模仿前端）
             Object sorted = sortRecursively(paymentData);
 
             // Step 2: flatten values
             StringBuilder values = new StringBuilder();
             flattenValues(sorted, values);
+
+            // 印出 values
+            System.out.println("flattened values = " + values);
 
             // Step 3: 拼接
             String finalString = secretKey + "," + values.toString();
@@ -47,6 +91,7 @@ public class AfteeChecksumUtils {
             throw new RuntimeException("AFTEE Checksum 產生失敗", e);
         }
     }
+
 
     // 專門處理排序：Map Key 排序，List 只處理元素
     private static Object sortRecursively(Object input) {
