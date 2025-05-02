@@ -46,6 +46,7 @@ public class OrderRes {
 	private String state;
 	private String donationCode;
 	private String type;
+	private String uncode;
 
 
 }

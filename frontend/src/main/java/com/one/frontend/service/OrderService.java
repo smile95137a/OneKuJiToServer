@@ -213,6 +213,7 @@ public class OrderService {
 						.shippingMethodId(payCartRes.getShippingMethodId())
 						.shopName(payCartRes.getShopName())
 						.shopAddress(payCartRes.getShopAddress())
+						.uncode(payCartRes.getUncode())
 						.build();
 			if(paymentResponse.getEPayAccount() != null){
 				orderEntity.setBillNumber(paymentResponse.getEPayAccount());
@@ -319,65 +320,67 @@ public class OrderService {
 		UserRes userRes = userRepository.getUserById(userId);
 		String orderNumber = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
 		PaymentResponse paymentResponse = new PaymentResponse();
+		if(payCartRes.getPriceType() != null){
+			switch (payCartRes.getPriceType()) {
+				case "1":
+					if (userRes.getBalance().compareTo(shippingCost) >= 0) {
+						userRes.setBalance(userRes.getBalance().subtract(shippingCost));
+						paymentResponse.setOrderId(orderNumber);
+						paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+						payCartRes.setPaymentMethod("3");
+						userRepository.updateBalance2(userId , userRes.getBalance().intValue());
+					} else {
+						throw new IllegalArgumentException("金幣餘額不足");
+					}
+					break;
+				case "2":
+					if (userRes.getSliverCoin().compareTo(shippingCost) >= 0) {
+						userRes.setSliverCoin(userRes.getSliverCoin().subtract(shippingCost));
+						paymentResponse.setOrderId(orderNumber);
+						paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+						payCartRes.setPaymentMethod("3");
+						userRepository.updateSliverCoin2(userId , userRes.getSliverCoin());
+					} else {
+						throw new IllegalArgumentException("銀幣餘額不足");
+					}
+					break;
+				case "3":
+					if("1".equals(payCartRes.getPaymentMethod())){
+						paymentResponse.setResult("1");
+						paymentResponse.setOrderId(orderNumber);
+						paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					}else if("2".equals(payCartRes.getPaymentMethod())){
+						PaymentRequest paymentRequest = new PaymentRequest();
+						BigDecimal totalAmount2 = new BigDecimal(String.valueOf(shippingCost)); // 假设你的 totalAmount 是 BigDecimal
+						int amountToSend = totalAmount2.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
+						paymentRequest.setAmount(String.valueOf(amountToSend));
+						paymentRequest.setBuyerName(payCartRes.getBillingName());
+						paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
+						paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
+						paymentRequest.setBuyerMemo("再來一抽備註");
+						paymentResponse.setResult("1");
+						paymentResponse.setOrderId(orderNumber);
+						paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					}else if("4".equals(payCartRes.getPaymentMethod())){
+						PaymentRequest paymentRequest = new PaymentRequest();
+						BigDecimal totalAmount2 = new BigDecimal(String.valueOf(shippingCost)); // 假设你的 totalAmount 是 BigDecimal
+						int amountToSend = totalAmount2.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
+						paymentRequest.setAmount(String.valueOf(amountToSend));
+						paymentRequest.setBuyerName(payCartRes.getBillingName());
+						paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
+						paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
+						paymentRequest.setBuyerMemo("再來一抽備註");
+						paymentResponse.setResult("1");
+						paymentResponse.setOrderId(orderNumber);
+						paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					}
+					break;
+				default:
+					paymentResponse.setOrderId(orderNumber);
+					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
+					break;
+			}
 
-		switch (payCartRes.getPriceType()) {
-			case "1":
-				if (userRes.getBalance().compareTo(shippingCost) >= 0) {
-					userRes.setBalance(userRes.getBalance().subtract(shippingCost));
-					paymentResponse.setOrderId(orderNumber);
-					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-					payCartRes.setPaymentMethod("3");
-					userRepository.updateBalance2(userId , userRes.getBalance().intValue());
-				} else {
-					throw new IllegalArgumentException("金幣餘額不足");
-				}
-				break;
-			case "2":
-				if (userRes.getSliverCoin().compareTo(shippingCost) >= 0) {
-					userRes.setSliverCoin(userRes.getSliverCoin().subtract(shippingCost));
-					paymentResponse.setOrderId(orderNumber);
-					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-					payCartRes.setPaymentMethod("3");
-					userRepository.updateSliverCoin2(userId , userRes.getSliverCoin());
-				} else {
-					throw new IllegalArgumentException("銀幣餘額不足");
-				}
-				break;
-			case "3":
-				if("1".equals(payCartRes.getPaymentMethod())){
-					paymentResponse.setResult("1");
-					paymentResponse.setOrderId(orderNumber);
-					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-				}else if("2".equals(payCartRes.getPaymentMethod())){
-					PaymentRequest paymentRequest = new PaymentRequest();
-					BigDecimal totalAmount2 = new BigDecimal(String.valueOf(shippingCost)); // 假设你的 totalAmount 是 BigDecimal
-					int amountToSend = totalAmount2.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
-					paymentRequest.setAmount(String.valueOf(amountToSend));
-					paymentRequest.setBuyerName(payCartRes.getBillingName());
-					paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
-					paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
-					paymentRequest.setBuyerMemo("再來一抽備註");
-					paymentResponse.setResult("1");
-					paymentResponse.setOrderId(orderNumber);
-					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-				}else if("4".equals(payCartRes.getPaymentMethod())){
-					PaymentRequest paymentRequest = new PaymentRequest();
-					BigDecimal totalAmount2 = new BigDecimal(String.valueOf(shippingCost)); // 假设你的 totalAmount 是 BigDecimal
-					int amountToSend = totalAmount2.setScale(0, BigDecimal.ROUND_DOWN).intValue(); // 去掉小数部分
-					paymentRequest.setAmount(String.valueOf(amountToSend));
-					paymentRequest.setBuyerName(payCartRes.getBillingName());
-					paymentRequest.setBuyerTelm(payCartRes.getBillingPhone());
-					paymentRequest.setBuyerMail(payCartRes.getBillingEmail());
-					paymentRequest.setBuyerMemo("再來一抽備註");
-					paymentResponse.setResult("1");
-					paymentResponse.setOrderId(orderNumber);
-					paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-				}
-				break;
-			default:
-				paymentResponse.setOrderId(orderNumber);
-				paymentResponse.setEPayAccount(String.valueOf(shippingCost));
-				break;
 		}
 
 
@@ -412,6 +415,7 @@ public class OrderService {
 					.shippingMethodId(payCartRes.getShippingMethodId())
 					.shopName(payCartRes.getShopName())
 					.shopAddress(payCartRes.getShopAddress())
+					.uncode(payCartRes.getUncode())
 					.build();
 			if(paymentResponse.getEPayAccount() != null){
 				orderEntity.setBillNumber(paymentResponse.getEPayAccount());

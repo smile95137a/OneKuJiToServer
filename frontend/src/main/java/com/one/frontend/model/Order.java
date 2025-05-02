@@ -158,4 +158,6 @@ public class Order {
 
     @Column(name = "vehicle")
     private String vehicle;
+    @Column
+    private String uncode;
 }
