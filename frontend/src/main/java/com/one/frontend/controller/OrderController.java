@@ -82,24 +82,30 @@ public class OrderController {
 
 	@PostMapping("/storeProduct/pay")
 	public ResponseEntity<?> payCartItem(@RequestBody PayCartRes payCartRes) throws Exception {
-		CustomUserDetails userDetails = SecurityUtils.getCurrentUserPrinciple();
-		var userId = userDetails.getId();
-		Long cartId = cartService.getCartIdByUserId(userId);
+		try {
+			CustomUserDetails userDetails = SecurityUtils.getCurrentUserPrinciple();
+			var userId = userDetails.getId();
+			Long cartId = cartService.getCartIdByUserId(userId);
 
-		if (cartId == null) {
-			var response = ResponseUtils.failure(999, "無法找到購物車，請稍後重試", false);
-			return ResponseEntity.ok(response);
-		}
+			if (cartId == null) {
+				var response = ResponseUtils.failure(999, "無法找到購物車，請稍後重試", false);
+				return ResponseEntity.ok(response);
+			}
 
-		var cartItemList = cartItemService.findByCartIdAndCartItemList(cartId, payCartRes.getCartItemIds());
-		var orderNumber = orderService.createOrder(payCartRes, cartItemList, userId);
+			var cartItemList = cartItemService.findByCartIdAndCartItemList(cartId, payCartRes.getCartItemIds());
+			var orderNumber = orderService.createOrder(payCartRes, cartItemList, userId);
 
-		if(orderNumber == null){
+			if(orderNumber == null){
 				ResponseEntity.ok(ResponseUtils.failure(200, "訂單失敗,商品已無庫存", null));
-		}
+			}
 
-		return ResponseEntity.ok(ResponseUtils.success(200, "支付成功，订单已创建", orderNumber));
-	}
+			return ResponseEntity.ok(ResponseUtils.success(200, "支付成功，订单已创建", orderNumber));
+
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+		return  null;
+		}
 
 	@PostMapping("/product/pay")
 	public ResponseEntity<?> payPrizeCartItem(@RequestBody PayCartRes payCartRes) {

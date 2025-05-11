@@ -403,11 +403,14 @@ return null;
         userRepository.updateBalance(userId, amountInCents);
         userTransactionRepository.updateByTop(orderId);
         UserRes userById = userRepository.getUserById(userId);
-
+        OrderRes orderByOrderNumber = orderMapper.findOrderByOrderNumber(orderId);
         //訂單成立開立發票並且傳送至email
         ReceiptReq invoiceRequest = new ReceiptReq();
         invoiceRequest.setEmail(userById.getEmail());
         invoiceRequest.setTotalFee(String.valueOf(amount));
+        if(orderByOrderNumber != null){
+            invoiceRequest.setUncode(orderByOrderNumber.getUncode());
+        }
         List<ReceiptReq.Item> items = new ArrayList<>();
         ReceiptReq.Item item = new ReceiptReq.Item();
         item.setName("代幣");
@@ -613,6 +616,9 @@ return null;
         if(order.getVehicle() != null){
             invoiceRequest.setPhone(order.getVehicle());
         }
+        if(order != null){
+            invoiceRequest.setUncode(order.getUncode());
+        }
         invoiceRequest.setDatetime("2024-09-27 12:34:56");  // 设定日期时间
         invoiceRequest.setTaxType(null);  // 设置税种，如果没有可以为 null
         invoiceRequest.setCompanyCode(null);  // 如果有公司代码，设置
@@ -727,7 +733,7 @@ return null;
         if ("IS_PAY".equals(status)) {
             return false;
         } else {
-
+            OrderRes orderByOrderNumber = orderMapper.findOrderByOrderNumber(creditDto.getOrderNumber());
             BigDecimal amountDecimal = userTransaction.getAmount();
             int amount = amountDecimal.intValue();
             userRepository.updateBalance(userTransaction.getUserId(), amount);
@@ -737,6 +743,9 @@ return null;
             ReceiptReq invoiceRequest = new ReceiptReq();
             invoiceRequest.setEmail(userById2.getEmail());
             invoiceRequest.setTotalFee(String.valueOf(amount));
+            if(orderByOrderNumber != null){
+                invoiceRequest.setUncode(orderByOrderNumber.getUncode());
+            }
             List<ReceiptReq.Item> items = new ArrayList<>();
             ReceiptReq.Item item = new ReceiptReq.Item();
             item.setName("代幣");

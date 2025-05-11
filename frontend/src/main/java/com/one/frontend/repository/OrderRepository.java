@@ -17,12 +17,12 @@ public interface OrderRepository {
 			+ "bonus_points_earned, bonus_points_used, created_at, updated_at, paid_at, result_status, "
 			+ "payment_method, shipping_method, shipping_name, shipping_zip_code, shipping_city, shipping_area, "
 			+ "shipping_address, billing_zip_code, billing_name, billing_city, billing_area, "
-			+ "billing_address, invoice, tracking_number , shipping_phone , shop_id , OPMode , e_payaccount , bill_number , state , donation_code , type , shipping_email , shop_name , shop_address , vehicle) "
+			+ "billing_address, invoice, tracking_number , shipping_phone , shop_id , OPMode , e_payaccount , bill_number , state , donation_code , type , shipping_email , shop_name , shop_address , vehicle , uncode) "
 			+ "VALUES (#{orderNumber}, #{userId}, #{totalAmount}, #{shippingCost}, #{isFreeShipping}, "
 			+ "#{bonusPointsEarned}, #{bonusPointsUsed}, #{createdAt}, #{updatedAt}, #{paidAt}, #{resultStatus}, "
 			+ "#{paymentMethod}, #{shippingMethod}, #{shippingName}, #{shippingZipCode}, #{shippingCity}, #{shippingArea}, "
 			+ "#{shippingAddress}, #{billingZipCode}, #{billingName}, #{billingCity}, #{billingArea}, "
-			+ "#{billingAddress}, #{invoice}, #{trackingNumber} , #{shippingPhone} , #{shopId} , #{OPMode} , #{ePayAccount} , #{billNumber} , #{state} , #{donationCode} , #{type} , #{shippingEmail} , #{shopName} , #{shopAddress} , #{vehicle})")
+			+ "#{billingAddress}, #{invoice}, #{trackingNumber} , #{shippingPhone} , #{shopId} , #{OPMode} , #{ePayAccount} , #{billNumber} , #{state} , #{donationCode} , #{type} , #{shippingEmail} , #{shopName} , #{shopAddress} , #{vehicle} , #{uncode})")
 	void insertOrder(Order order);
 
 	@Select("SELECT id FROM `order` WHERE order_number = #{orderNumber}")
@@ -30,6 +30,9 @@ public interface OrderRepository {
 
 	@Select("SELECT * FROM `order` WHERE user_id = #{userId}")
 	Order getOrderByUserId(Long userId);
+	
+	@Select("SELECT * FROM `order` WHERE order_number = #{orderNumber}")
+	Order getOrderByOrderNumber(String orderNumber);
 
 	@Select("SELECT * FROM `order` WHERE user_id = #{userId} AND order_number = #{orderNumber}")
 	OrderRes getOrderByUserIdAndOrderNumber(Long userId, String orderNumber);

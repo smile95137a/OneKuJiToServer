@@ -55,6 +55,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 
     } catch (Exception e) {
+            e.printStackTrace();
         // 处理其他异常，返回500
         ApiResponse<JWTAuthResponse> response = ResponseUtils.failure(500, "服務氣出錯", null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
