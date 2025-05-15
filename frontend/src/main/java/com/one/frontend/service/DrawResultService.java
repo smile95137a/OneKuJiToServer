@@ -150,58 +150,51 @@ public class DrawResultService {
 	}
 
 	public DrawResponse getAllPrizes(Long productId) {
-		// 1. 获取产品详细信息
+		// 1. 获取产品详细信息和奖品编号
 		List<ProductDetail> productDetails = productDetailRepository.getAllProductDetailsByProductId(productId);
 		List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
 
-		// 2. 获取奖品编号
+		// 2. 获取奖品编号并设置未抽中奖品的级别为 null
 		for (ProductDetail productDetail : productDetails) {
 			List<PrizeNumber> prizeNumbers = prizeNumberMapper
 					.getAllPrizeNumbersByProductDetailId(Long.valueOf(productDetail.getProductDetailId()));
 			for (PrizeNumber prize : prizeNumbers) {
 				if (!prize.getIsDrawn()) {
-					prize.setLevel(null);  // 只显示未抽中的奖品
+					prize.setLevel(null);
 				}
 			}
 			allPrizeNumbers.addAll(prizeNumbers);
 		}
 
 		// 3. 对 allPrizeNumbers 按照 number 排序
-		allPrizeNumbers.sort(Comparator.comparing(PrizeNumber::getNumber)); // 假设 PrizeNumber 有 getNumber() 方法
-
-		// 4. 获取当前时间
-		LocalDateTime now = LocalDateTime.now();
-
-		// 5. 获取当前产品的抽奖保护状态
-		DrawProtection protection = productDrawProtectionMap.get(productId);
-		LocalDateTime endTimes = null; // 初始化 endTimes 为 null
-
-		// 6. 如果有保护状态且与当前用户无关，计算保护时间
-		if (protection != null) {
-			long secondsSinceLastDraw = Duration.between(protection.lastDrawTime, now).getSeconds();
-			int drawCount = (int) allPrizeNumbers.stream().filter(PrizeNumber::getIsDrawn).count();
-			long protectionTime = getDrawProtectionTime(drawCount);
-
-			// 判断是否在保护期内
-			if (secondsSinceLastDraw < protectionTime) {
-				endTimes = protection.lastDrawTime.plusSeconds(protectionTime);
-			}
-		}
-
 		allPrizeNumbers.sort(Comparator.comparing(prize -> {
 			try {
-				return Long.parseLong(prize.getNumber()); // 假设 number 是可以转换为 Long 类型的字符串
+				return Long.parseLong(prize.getNumber());
 			} catch (NumberFormatException e) {
-				// 如果 number 无法转换为 Long，则返回一个非常大的值，避免影响排序
 				return Long.MAX_VALUE;
 			}
 		}));
 
-		// 7. 返回结果，包括排序后的奖品列表和保护结束时间
+		// 4. 直接获取保护期结束时间
+		LocalDateTime endTimes = null;
+		DrawProtection protection = productDrawProtectionMap.get(productId);
+
+		if (protection != null) {
+			// 获取保护时间（秒）- 假设这是固定的或根据已抽奖数量计算
+			long protectionTime = 900L; // 或调用 getDrawProtectionTime() 方法
+
+			// 直接计算保护期结束时间
+			endTimes = protection.lastDrawTime.plusSeconds(protectionTime);
+
+			// 如果保护期已过，则设为 null
+			if (endTimes.isBefore(LocalDateTime.now())) {
+				endTimes = null;
+			}
+		}
+
+		// 5. 返回结果
 		return new DrawResponse(allPrizeNumbers, endTimes);
 	}
-
-
 	public LocalDateTime getProtectionEndTime(Long userId, Long productId) {
 		DrawProtection protection = productDrawProtectionMap.get(productId);
 		long protectionTime = 900L; // 默认保护时间为 600 秒
