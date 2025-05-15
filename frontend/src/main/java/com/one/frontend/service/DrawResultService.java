@@ -107,7 +107,7 @@ public class DrawResultService {
 					if (remainingSeconds > 0) {
 						long minutes = remainingSeconds / 60;
 						long seconds = remainingSeconds % 60;
-						throw new Exception("您仍然處於保護期內，無法進行抽獎。剩餘時間：" + minutes + " 分 " + seconds + " 秒");
+						throw new Exception("目前有客人正在抽，為了保障客人權益，無法進行抽獎，剩餘時間：" + minutes + " 分 " + seconds + " 秒");
 					}
 				}
 
@@ -231,7 +231,7 @@ public class DrawResultService {
 				if (remainingSeconds > 0) {
 					long minutes = remainingSeconds / 60;
 					long seconds = remainingSeconds % 60;
-					throw new Exception("您仍然處於保護期內，無法進行抽獎。剩餘時間：" + minutes + " 分 " + seconds + " 秒");
+					throw new Exception("目前有客人正在抽，為了保障客人權益，無法進行抽獎，剩餘時間：" + minutes + " 分 " + seconds + " 秒");
 				}
 			}
 
