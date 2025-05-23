@@ -793,18 +793,20 @@ return null;
                 cartItemRepository.addCartItem(cartItem);
             }
         }else if("2".equals(orderByOrderNumber.getType())){
-            List<PrizeCartItem> prizeCartItemList = new ArrayList<>();
-            for(OrderDetailRes detailRes:orderDetailsByOrderId) {
-                PrizeCartItem prizeCartItem = new PrizeCartItem();
-                prizeCartItem.setCartId(cartIdByUserId1);
-                prizeCartItem.setProductDetailId(detailRes.getProductDetailRes().getProductDetailId());
-                prizeCartItem.setQuantity(detailRes.getQuantity());
-                prizeCartItem.setSliverPrice(detailRes.getProductDetailRes().getSliverPrice());
-                prizeCartItem.setIsSelected(true);
-                prizeCartItem.setSize(detailRes.getProductDetailRes().getSize());
-                prizeCartItemList.add(prizeCartItem);
+            if("2".equals(orderByOrderNumber.getPaymentMethod())){
+                List<PrizeCartItem> prizeCartItemList = new ArrayList<>();
+                for(OrderDetailRes detailRes:orderDetailsByOrderId) {
+                    PrizeCartItem prizeCartItem = new PrizeCartItem();
+                    prizeCartItem.setCartId(cartIdByUserId1);
+                    prizeCartItem.setProductDetailId(detailRes.getProductDetailRes().getProductDetailId());
+                    prizeCartItem.setQuantity(detailRes.getQuantity());
+                    prizeCartItem.setSliverPrice(detailRes.getProductDetailRes().getSliverPrice());
+                    prizeCartItem.setIsSelected(true);
+                    prizeCartItem.setSize(detailRes.getProductDetailRes().getSize());
+                    prizeCartItemList.add(prizeCartItem);
+                }
+                prizeCartItemRepository.insertBatch(prizeCartItemList);
             }
-            prizeCartItemRepository.insertBatch(prizeCartItemList);
         }
 
     }
