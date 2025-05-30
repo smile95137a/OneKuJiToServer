@@ -221,9 +221,10 @@ public class DrawResultService {
 
 
 
-
+	@Transactional(rollbackFor = Exception.class)
 	public synchronized List<DrawResult> handleDraw2(Long userId, Long productId, List<String> prizeNumbers, String payMethod) throws Exception {
 		try {
+			// ============ 第一阶段：基础验证 ============
 			// 获取保护期结束时间
 			LocalDateTime protectionEndTime = getProtectionEndTime(userId, productId);
 			if (protectionEndTime != null) {
@@ -265,20 +266,28 @@ public class DrawResultService {
 				}
 			}
 
-			// 验证并扣除用户余额
+			// 计算总金额（但先不扣款，只是计算）
 			BigDecimal totalAmount = calculateTotalAmount(product, prizeNumbers.size(), payMethod);
-			deductUserBalance(userId, totalAmount, product.getPrizeCategory(), payMethod);
 
-			// 记录消费
-			recordConsume(userId, totalAmount , payMethod);
-
+			// ============ 第二阶段：先执行抽奖逻辑（不扣钱） ============
 			// 为每个选择的编号随机抽奖（按概率）
 			List<PrizeNumber> drawnPrizeNumbers = drawPrizesForNumbersWithStock(selectedPrizeNumbers, productDetails, productId);
 
-			// **在确认有抽奖结果后，开启保护模式**
-			if (!drawnPrizeNumbers.isEmpty()) {
-				handleDrawForLock(userId, productId, prizeNumbers); // 延长保护期
+			// 检查抽奖结果 - 如果没抽中任何东西，直接返回空结果（不扣钱）
+			if (drawnPrizeNumbers.isEmpty()) {
+				// 可以选择抛异常或返回空结果
+				throw new Exception("很抱歉，這次沒有抽中任何獎品，未扣除任何費用");
 			}
+
+			// ============ 第三阶段：确认抽中后才扣款和处理后续 ============
+			// 现在确定抽中了，才进行扣款
+			deductUserBalance(userId, totalAmount, product.getPrizeCategory(), payMethod);
+
+			// 记录消费
+			recordConsume(userId, totalAmount, payMethod);
+
+			// **在确认有抽奖结果后，开启保护模式**
+			handleDrawForLock(userId, productId, prizeNumbers); // 延长保护期
 
 			// 处理抽奖结果
 			List<DrawResult> drawResults = processDrawResults(userId, productId, drawnPrizeNumbers, product, payMethod);
@@ -290,7 +299,7 @@ public class DrawResultService {
 			addToPrizeCart(prizeCartId, drawnPrizeNumbers, product);
 
 			// 处理SP奖并获取 DrawResult
-			DrawResult spDrawResult = handleSPPrize(userId, productId, prizeCartId , product ,payMethod);
+			DrawResult spDrawResult = handleSPPrize(userId, productId, prizeCartId, product, payMethod);
 			if (spDrawResult != null) {
 				drawResults.add(spDrawResult);
 			}
@@ -311,11 +320,11 @@ public class DrawResultService {
 			}
 
 			return drawResults;
+
 		} catch (Exception e) {
 			throw new Exception("抽獎錯誤: " + e.getMessage());
 		}
 	}
-
 	private void recordConsume(Long userId, BigDecimal amount , String payMethod) {
 		LocalDateTime localDateTime = LocalDateTime.now();
 		userTransactionRepository.insertTransaction(userId, "CONSUME", amount , localDateTime , payMethod);
