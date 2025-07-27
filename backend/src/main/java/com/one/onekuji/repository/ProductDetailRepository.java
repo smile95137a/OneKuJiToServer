@@ -80,4 +80,21 @@ public interface ProductDetailRepository {
             "probability = #{probability} , size = #{size} , sliver_price = #{sliverPrice}" +
             "WHERE product_detail_id = #{productDetailId}")
     DetailRes updateProductDTO(DetailRes byId);
+
+    // 根據產品ID獲取所有記錄，排除指定的詳情ID列表
+    @Select("<script>" +
+            "SELECT * FROM product_detail WHERE product_id = #{productId} " +
+            "<if test='currentDetailIds != null and currentDetailIds.size() > 0'>" +
+            "AND product_detail_id NOT IN " +
+            "<foreach collection='currentDetailIds' item='id' open='(' separator=',' close=')'>" +
+            "#{id}" +
+            "</foreach>" +
+            "</if>" +
+            "</script>")
+    List<DetailRes> findByProductIdExcluding(@Param("productId") Integer productId,
+                                             @Param("currentDetailIds") List<Integer> currentDetailIds);
+
+    // 根據產品ID獲取所有記錄
+    @Select("SELECT * FROM product_detail WHERE product_id = #{productId}")
+    List<DetailRes> findByProductId(@Param("productId") Integer productId);
 }

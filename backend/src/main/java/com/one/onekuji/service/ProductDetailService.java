@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductDetailService {
@@ -37,56 +39,89 @@ public class ProductDetailService {
      * @param detailReqs 包含产品详细信息的请求列表。
      * @return 返回插入后的详细响应列表。
      */
+
     public List<DetailRes> addProductDetails(List<DetailReq> detailReqs) {
         List<DetailRes> detailResList = new ArrayList<>();
         List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
+
+        Integer productId = Integer.valueOf(detailReqs.get(0).getProductId());
+
+        // 1. 獲取該商品所有現有的 product_detail（排除本次要更新的）
+        List<Integer> currentDetailIds = detailReqs.stream()
+                .map(DetailReq::getProductDetailId)
+                .filter(Objects::nonNull) // 過濾掉新增的項目（ID為null）
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+
+        List<DetailRes> existingDetails = new ArrayList<>();
+        if (!currentDetailIds.isEmpty()) {
+            existingDetails = productDetailMapper.findByProductIdExcluding(productId, currentDetailIds);
+        } else {
+            // 如果都是新增的項目，則獲取該商品的所有現有記錄
+            existingDetails = productDetailMapper.findByProductId(productId);
+        }
+
+        // 2. 計算總數量：現有的 + 本次傳入的（排除 grade 為 "LAST" 的項）
         int totalQuantity = 0;
 
-        // 计算总数量，排除 grade 为 "LAST" 的项
-        // 1. 计算总数量，排除等级为 "LAST" 的项。
-        for (DetailReq detailReq : detailReqs) {
-                if (shouldIncludeInPrizeNumbers(detailReq)) { // 判断是否要包含在奖品编号列表中
-                    totalQuantity += detailReq.getQuantity();
-                }
+        // 現有記錄的數量
+        for (DetailRes existing : existingDetails) {
+            if (shouldIncludeInPrizeNumbers(existing)) {
+                totalQuantity += existing.getQuantity();
             }
+        }
 
-        // 2. 更新产品总数量
-        productRepository.updateTotalQua(totalQuantity, detailReqs.get(0).getProductId());
+        // 本次傳入的數量
+        for (DetailReq detailReq : detailReqs) {
+            if (shouldIncludeInPrizeNumbers(detailReq)) {
+                totalQuantity += detailReq.getQuantity();
+            }
+        }
 
-        // 3. 删除当前产品下所有的奖品编号，避免重复
-        prizeNumberMapper.deleteProductById(Long.valueOf(detailReqs.get(0).getProductId()));
+        // 3. 更新產品總數量
+        productRepository.updateTotalQua(totalQuantity, productId);
 
-        // 4. 创建并打乱奖品编号
+        // 4. 删除當前產品下所有的獎品編號，避免重複
+        prizeNumberMapper.deleteProductById(Long.valueOf(productId));
+
+        // 5. 創建並打亂獎品編號
         List<Integer> shuffledNumbers = new ArrayList<>();
         for (int i = 1; i <= totalQuantity; i++) {
             shuffledNumbers.add(i);
         }
-        Collections.shuffle(shuffledNumbers); // 打乱奖品编号
+        Collections.shuffle(shuffledNumbers); // 打亂獎品編號
 
         int currentIndex = 0;
+
+        // 6. 處理本次傳入的 detailReqs
         for (DetailReq detailReq : detailReqs) {
-            // 5. 转义 HTML 字符，确保安全
+            // 轉義 HTML 字符，確保安全
             detailReq.setDescription(escapeTextForHtml(detailReq.getDescription()));
             detailReq.setSpecification(escapeTextForHtml(detailReq.getSpecification()));
             detailReq.setStockQuantity(detailReq.getQuantity());
-
-            // 6. 计算尺寸，并将结果存入 detailReq
             detailReq.setSize(detailReq.getSize());
 
             if(detailReq.getIsPrize() == null){
                 detailReq.setIsPrize(String.valueOf(false));
             }
-            // 7. 插入产品细节，不排除 "LAST" 等级
-            productDetailMapper.insert(detailReq);
+
+            // 插入或更新產品細節
+            if (detailReq.getProductDetailId() != null) {
+                // 更新現有記錄
+                productDetailMapper.update(detailReq);
+            } else {
+                // 插入新記錄
+                productDetailMapper.insert(detailReq);
+            }
+
             Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
 
-            // 8. 排除等级为 "LAST" 的项，不进行奖品编号处理
+            // 為本次傳入的項目創建獎品編號（排除 "LAST" 等級）
             if (shouldIncludeInPrizeNumbers(detailReq)) {
                 List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
-                // 为每个数量创建奖品编号
                 for (int i = 0; i < detailReq.getQuantity(); i++) {
                     PrizeNumber prizeNumber = new PrizeNumber();
-                    prizeNumber.setProductId(detailReq.getProductId());
+                    prizeNumber.setProductId(productId);
                     prizeNumber.setProductDetailId(Math.toIntExact(productDetailId));
                     prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
                     prizeNumber.setIsDrawn(false);
@@ -94,27 +129,49 @@ public class ProductDetailService {
                     detailPrizeNumbers.add(prizeNumber);
                     currentIndex++;
                 }
-
-                // 打乱当前产品细节的奖品编号
                 Collections.shuffle(detailPrizeNumbers);
                 allPrizeNumbers.addAll(detailPrizeNumbers);
             }
 
-            // 9. 获取并添加详细响应数据
+            // 獲取並添加詳細響應數據
             DetailRes detailRes = productDetailMapper.findById(productDetailId);
             detailResList.add(detailRes);
         }
 
-        // 10. 批量插入所有奖品编号，确保插入不包括 "LAST" 等级的奖品
+        // 7. 處理現有的 product_detail 記錄（為它們重新創建獎品編號）
+        for (DetailRes existing : existingDetails) {
+            if (shouldIncludeInPrizeNumbers(existing)) {
+                List<PrizeNumber> existingPrizeNumbers = new ArrayList<>();
+                for (int i = 0; i < existing.getQuantity(); i++) {
+                    PrizeNumber prizeNumber = new PrizeNumber();
+                    prizeNumber.setProductId(productId);
+                    prizeNumber.setProductDetailId(existing.getProductDetailId().intValue());
+                    prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
+                    prizeNumber.setIsDrawn(false);
+                    prizeNumber.setLevel(existing.getGrade());
+                    existingPrizeNumbers.add(prizeNumber);
+                    currentIndex++;
+                }
+                Collections.shuffle(existingPrizeNumbers);
+                allPrizeNumbers.addAll(existingPrizeNumbers);
+            }
+
+            // 將現有記錄也加入到返回列表中
+            detailResList.add(existing);
+        }
+
+        // 8. 批量插入所有獎品編號
         if (!allPrizeNumbers.isEmpty()) {
             prizeNumberMapper.insertBatch(allPrizeNumbers);
         }
 
-        // 11. 返回生成的详细响应列表
+        // 9. 返回生成的詳細響應列表
         return detailResList;
     }
-
-
+    // 輔助方法：判斷 DetailRes 是否應該包含在獎品編號中
+    private boolean shouldIncludeInPrizeNumbers(DetailRes detailRes) {
+        return !"LAST".equals(detailRes.getGrade());
+    }
     // 判断是否应将该项包括在奖品编号中
     private boolean shouldIncludeInPrizeNumbers(DetailReq detailReq) {
         return !"LAST".equals(detailReq.getGrade());
@@ -126,6 +183,7 @@ public class ProductDetailService {
         // 获取产品信息
         Product productById = productRepository.getProductById(Long.valueOf(productDetailReq.getProductId()));
         DetailRes byId = productDetailMapper.findById(id);
+
         // 检查商品状态
         boolean isDrawnPrize = prizeNumberMapper.isTrue(productDetailReq.getProductId())
                 .stream().anyMatch(PrizeNumber::getIsDrawn);
@@ -153,19 +211,20 @@ public class ProductDetailService {
             productDetailReq.setSpecification(escapeTextForHtml(productDetailReq.getSpecification()));
         }
 
-
         // 更新商品细节
         productDetailReq.setProductDetailId(Math.toIntExact(id));
         productDetailMapper.update(productDetailReq);
 
         // 如果未抽奖且未上架，则更新库存和奖品编号
         if (!isDrawnPrize && !isProductAvailable) {
-            // 更新产品库存
-            List<ProductDetail> productDetails = productDetailMapper.getProductDetailByProductId(Long.valueOf(productDetailReq.getProductId()));
+            // **修復：使用統一的 DetailRes 類型獲取產品詳情**
+            Integer productId = Integer.valueOf(productDetailReq.getProductId());
+            List<DetailRes> productDetails = productDetailMapper.findByProductId(productId);
+
             int totalQuantity = 0;
 
             // 计算产品总数量，排除 grade 为 "LAST" 的项
-            for (ProductDetail detail : productDetails) {
+            for (DetailRes detail : productDetails) {
                 if (shouldIncludeInPrizeNumbers(detail)) {
                     totalQuantity += detail.getQuantity();
                 }
@@ -189,7 +248,7 @@ public class ProductDetailService {
             Collections.shuffle(shuffledNumbers);
 
             // 为每个产品细节重新生成奖品编号
-            for (ProductDetail detail : productDetails) {
+            for (DetailRes detail : productDetails) {
                 if (!shouldIncludeInPrizeNumbers(detail)) {
                     continue; // 跳过 "LAST" 的项
                 }
@@ -197,8 +256,8 @@ public class ProductDetailService {
                 List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
                 for (int i = 0; i < detail.getQuantity(); i++) {
                     PrizeNumber prizeNumber = new PrizeNumber();
-                    prizeNumber.setProductId(detail.getProductId());
-                    prizeNumber.setProductDetailId(Math.toIntExact(detail.getProductDetailId()));
+                    prizeNumber.setProductId(detail.getProductId()); // 確保類型正確
+                    prizeNumber.setProductDetailId(detail.getProductDetailId().intValue());
                     prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
                     prizeNumber.setIsDrawn(false);
                     prizeNumber.setLevel(detail.getGrade());
@@ -220,8 +279,6 @@ public class ProductDetailService {
         // 返回更新后的商品详情
         return productDetailMapper.findById(id);
     }
-
-
 
     // 判断是否应将该项包括在奖品编号中
     private boolean shouldIncludeInPrizeNumbers(ProductDetail detailReq) {
