@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: com.one.onekuji.BackendApplication
+Built-By: YourName
+Built-Jdk: 17.0.2
+Build-Jdk-Spec: 17
+Implementation-Title: backend
+Implementation-Version: 0.0.1-SNAPSHOT
+Spring-Boot-Version: 3.3.0
+Class-Path: lib/some-library.jar lib/another-library.jar
