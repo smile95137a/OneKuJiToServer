@@ -7,6 +7,7 @@ import com.one.frontend.response.ReceiptRes;
 import com.one.frontend.response.UserRes;
 import com.one.frontend.util.Md5;
 import jakarta.mail.MessagingException;
+import org.springframework.http.HttpEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -46,7 +47,7 @@ public class InvoiceService {
                 .phone(null)
                 .orderCode(null)
                 .datetime("2024-09-27 12:34:56")
-                .email(null)
+                .email("a0970124936@gmail.com")
                 .state(0)
                 .donationCode(null)
                 .taxType(null)
@@ -90,32 +91,99 @@ public class InvoiceService {
         System.out.println(receiptResResponseEntity.getBody());
     }
 
+//    public ResponseEntity<ReceiptRes> addB2CInvoice(ReceiptReq invoiceRequest) {
+//        String url = "https://www.giveme.com.tw/invoice.do?action=addB2C";
+//
+//        // 设置请求头
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        String date = System.currentTimeMillis()+"";
+//        // 创建一个 DateTimeFormatter，指定日期格式为 "yyyy-MM-dd"
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//        LocalDate currentDate = LocalDate.now();
+//        // 将当前日期格式化为字符串
+//        // 簽名
+//        String timeStamp = String.valueOf(System.currentTimeMillis());
+//        String idno = "eason";            // API 帳號
+//        String password = "Jj47075614";   // 後台設定的密碼
+//        String uncode = "47075614";       // 統一編號
+//        String sign = Md5.MD5(timeStamp + idno + password).toUpperCase();
+//
+//        // 發票日期
+//        String formattedDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        String md5 = Md5.MD5(date+idno+password).toUpperCase();
+////        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
+//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode(uncode).idno("eason")
+//                .sign(sign).customerName(null).phone(invoiceRequest.getPhone()).orderCode(invoiceRequest.getOrderCode()).uncode(invoiceRequest.getUncode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
+////        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
+////                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
+//        System.out.println(req);
+//        // 发送 POST 请求
+//        try {
+//            // 直接发送 JSON 对象
+//            return restTemplate.postForEntity(url, req, ReceiptRes.class); // 处理响应
+//        } catch (HttpClientErrorException e) {
+//            System.err.println("HTTP error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+//            throw e; // 重新抛出异常
+//        }
+//    }
+
     public ResponseEntity<ReceiptRes> addB2CInvoice(ReceiptReq invoiceRequest) {
         String url = "https://www.giveme.com.tw/invoice.do?action=addB2C";
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        String date = System.currentTimeMillis()+"";
+
+        String timeStamp = System.currentTimeMillis() + "";
+
         // 创建一个 DateTimeFormatter，指定日期格式为 "yyyy-MM-dd"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate currentDate = LocalDate.now();
         // 将当前日期格式化为字符串
         String formattedDate = currentDate.format(formatter);
-        String md5 = Md5.MD5(date+"eason"+"Jj47075614").toUpperCase();
-//        String md5 = Md5.MD5(date + "Giveme09" + "6F89Gi").toUpperCase();
-        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("47075614").idno("eason")
-                .sign(md5).customerName(null).phone(invoiceRequest.getPhone()).orderCode(invoiceRequest.getOrderCode()).uncode(invoiceRequest.getUncode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
-//        ReceiptReq req = ReceiptReq.builder().timeStamp(date).uncode("53418005").idno("Giveme09")
-//                .sign(md5).customerName(null).phone(null).orderCode(invoiceRequest.getOrderCode()).datetime(formattedDate).email(invoiceRequest.getEmail()).state(invoiceRequest.getState()).donationCode(invoiceRequest.getDonationCode()).taxType(null).companyCode(null).freeAmount(null).zeroAmount(null).sales(null).totalFee(invoiceRequest.getTotalFee()).content("再來一抽備註").items(invoiceRequest.getItems()).build();
-        System.out.println(req);
+
+        // 修正簽名計算：使用正確的參數順序
+        String md5 = Md5.MD5(timeStamp + "eason" + "Jj47075614").toUpperCase();
+
+        // 建立請求物件 - 移除重複的 uncode 設定
+        ReceiptReq req = ReceiptReq.builder()
+                .timeStamp(timeStamp)
+                .uncode("47075614")  // 只設定一次
+                .idno("eason")
+                .sign(md5)
+                .customerName(invoiceRequest.getCustomerName())  // 使用傳入的參數
+                .phone(invoiceRequest.getPhone())
+                .orderCode(invoiceRequest.getOrderCode())
+                .datetime(formattedDate)
+                .email(invoiceRequest.getEmail())
+                .state(invoiceRequest.getState())
+                .donationCode(invoiceRequest.getDonationCode())
+                .taxType(invoiceRequest.getTaxType())  // 使用傳入的參數
+                .companyCode(invoiceRequest.getCompanyCode())
+                .freeAmount(invoiceRequest.getFreeAmount())
+                .zeroAmount(invoiceRequest.getZeroAmount())
+                .sales(invoiceRequest.getSales())
+                .amount(invoiceRequest.getAmount())  // 加入 amount 欄位
+                .totalFee(invoiceRequest.getTotalFee())
+                .content(invoiceRequest.getContent() != null ? invoiceRequest.getContent() : "再來一抽備註")  // 允許自定義content
+                .items(invoiceRequest.getItems())
+                .build();
+
+        System.out.println("Request: " + req);
+
+        // 建立 HttpEntity 包含 headers
+        HttpEntity<ReceiptReq> entity = new HttpEntity<>(req, headers);
+
         // 发送 POST 请求
         try {
-            // 直接发送 JSON 对象
-            return restTemplate.postForEntity(url, req, ReceiptRes.class); // 处理响应
+            return restTemplate.postForEntity(url, entity, ReceiptRes.class);
         } catch (HttpClientErrorException e) {
             System.err.println("HTTP error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
-            throw e; // 重新抛出异常
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
+            throw new RuntimeException("發票開立失敗", e);
         }
     }
 
