@@ -39,21 +39,48 @@ public class ProductDetailService {
      * @param detailReqs 包含产品详细信息的请求列表。
      * @return 返回插入后的详细响应列表。
      */
-
     public List<DetailRes> addProductDetails(List<DetailReq> detailReqs) {
         List<DetailRes> detailResList = new ArrayList<>();
         List<PrizeNumber> allPrizeNumbers = new ArrayList<>();
 
         Integer productId = Integer.valueOf(detailReqs.get(0).getProductId());
 
-        // 1. 獲取本次要更新的明細ID列表
-        List<Integer> currentDetailIds = detailReqs.stream()
-                .map(DetailReq::getProductDetailId)
-                .filter(Objects::nonNull) // 過濾掉新增的項目（ID為null）
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
+        // 1. 獲取該商品所有現有的 product_detail 記錄
+        List<DetailRes> existingDetails = productDetailMapper.findByProductId(productId);
 
-        // 2. 先執行插入和更新操作
+        // 2. 計算總數量：現有的 + 本次新增的（排除 grade 為 "LAST" 的項）
+        int totalQuantity = 0;
+
+        // 現有記錄的數量
+        for (DetailRes existing : existingDetails) {
+            if (shouldIncludeInPrizeNumbers(existing)) {
+                totalQuantity += existing.getQuantity();
+            }
+        }
+
+        // 本次新增的數量
+        for (DetailReq detailReq : detailReqs) {
+            if (shouldIncludeInPrizeNumbers(detailReq)) {
+                totalQuantity += detailReq.getQuantity();
+            }
+        }
+
+        // 3. 更新產品總數量
+        productRepository.updateTotalQua(totalQuantity, productId);
+
+        // 4. 刪除當前產品下所有的獎品編號，準備重新生成
+        prizeNumberMapper.deleteProductById(Long.valueOf(productId));
+
+        // 5. 創建並打亂獎品編號
+        List<Integer> shuffledNumbers = new ArrayList<>();
+        for (int i = 1; i <= totalQuantity; i++) {
+            shuffledNumbers.add(i);
+        }
+        Collections.shuffle(shuffledNumbers);
+
+        int currentIndex = 0;
+
+        // 6. 處理本次新增的 detailReqs（全部為新增）
         for (DetailReq detailReq : detailReqs) {
             // 轉義 HTML 字符，確保安全
             detailReq.setDescription(escapeTextForHtml(detailReq.getDescription()));
@@ -61,60 +88,63 @@ public class ProductDetailService {
             detailReq.setStockQuantity(detailReq.getQuantity());
             detailReq.setSize(detailReq.getSize());
 
-            if(detailReq.getIsPrize() == null){
+            if (detailReq.getIsPrize() == null) {
                 detailReq.setIsPrize(String.valueOf(false));
             }
 
-            // 插入或更新產品細節
-            if (detailReq.getProductDetailId() != null) {
-                // 更新現有記錄
-                productDetailMapper.update(detailReq);
-            } else {
-                // 插入新記錄
-                productDetailMapper.insert(detailReq);
-            }
-        }
+            // 插入新記錄
+            productDetailMapper.insert(detailReq);
 
-        // 3. 重新計算總數量：查詢該產品下所有最新的產品明細
-        List<DetailRes> allCurrentDetails = productDetailMapper.findByProductId(productId);
-        int totalQuantity = 0;
-        for (DetailRes detail : allCurrentDetails) {
-            if (shouldIncludeInPrizeNumbers(detail)) {
-                totalQuantity += detail.getQuantity();
-            }
-        }
+            // 方案A: 如果 Mapper 有配置 useGeneratedKeys="true" keyProperty="productDetailId"
+            // 則 insert 後會自動回填 ID，可直接使用
+            Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
 
-        // 4. 更新產品總數量
-        productRepository.updateTotalQua(totalQuantity, productId);
+            // 方案B: 如果沒有自動回填，需要根據唯一條件查詢剛插入的記錄
+            // DetailRes inserted = productDetailMapper.findByProductIdAndGrade(productId, detailReq.getGrade());
+            // Long productDetailId = inserted.getProductDetailId();
 
-        // 5. 删除當前產品下所有的獎品編號，避免重複
-        prizeNumberMapper.deleteProductById(Long.valueOf(productId));
-
-        // 6. 創建並打亂獎品編號
-        List<Integer> shuffledNumbers = new ArrayList<>();
-        for (int i = 1; i <= totalQuantity; i++) {
-            shuffledNumbers.add(i);
-        }
-        Collections.shuffle(shuffledNumbers); // 打亂獎品編號
-
-        // 7. 為所有產品明細重新創建獎品編號
-        int currentIndex = 0;
-        for (DetailRes detail : allCurrentDetails) {
-            if (shouldIncludeInPrizeNumbers(detail)) {
+            // 為本次新增的項目創建獎品編號（排除 "LAST" 等級）
+            if (shouldIncludeInPrizeNumbers(detailReq)) {
                 List<PrizeNumber> detailPrizeNumbers = new ArrayList<>();
-                for (int i = 0; i < detail.getQuantity(); i++) {
+                for (int i = 0; i < detailReq.getQuantity(); i++) {
                     PrizeNumber prizeNumber = new PrizeNumber();
                     prizeNumber.setProductId(productId);
-                    prizeNumber.setProductDetailId(detail.getProductDetailId().intValue());
+                    prizeNumber.setProductDetailId(Math.toIntExact(productDetailId));
                     prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
                     prizeNumber.setIsDrawn(false);
-                    prizeNumber.setLevel(detail.getGrade());
+                    prizeNumber.setLevel(detailReq.getGrade());
                     detailPrizeNumbers.add(prizeNumber);
                     currentIndex++;
                 }
                 Collections.shuffle(detailPrizeNumbers);
                 allPrizeNumbers.addAll(detailPrizeNumbers);
             }
+
+            // 獲取並添加詳細響應數據
+            DetailRes detailRes = productDetailMapper.findById(productDetailId);
+            detailResList.add(detailRes);
+        }
+
+        // 7. 處理現有的 product_detail 記錄（為它們重新創建獎品編號）
+        for (DetailRes existing : existingDetails) {
+            if (shouldIncludeInPrizeNumbers(existing)) {
+                List<PrizeNumber> existingPrizeNumbers = new ArrayList<>();
+                for (int i = 0; i < existing.getQuantity(); i++) {
+                    PrizeNumber prizeNumber = new PrizeNumber();
+                    prizeNumber.setProductId(productId);
+                    prizeNumber.setProductDetailId(existing.getProductDetailId().intValue());
+                    prizeNumber.setNumber(String.valueOf(shuffledNumbers.get(currentIndex)));
+                    prizeNumber.setIsDrawn(false);
+                    prizeNumber.setLevel(existing.getGrade());
+                    existingPrizeNumbers.add(prizeNumber);
+                    currentIndex++;
+                }
+                Collections.shuffle(existingPrizeNumbers);
+                allPrizeNumbers.addAll(existingPrizeNumbers);
+            }
+
+            // 將現有記錄也加入到返回列表中
+            detailResList.add(existing);
         }
 
         // 8. 批量插入所有獎品編號
@@ -122,19 +152,7 @@ public class ProductDetailService {
             prizeNumberMapper.insertBatch(allPrizeNumbers);
         }
 
-        // 9. 只返回本次操作的明細（這是關鍵！）
-        for (DetailReq detailReq : detailReqs) {
-            // 確保 productDetailId 不為空（插入操作後應該已經設定了ID）
-            if (detailReq.getProductDetailId() != null) {
-                Long productDetailId = Long.valueOf(detailReq.getProductDetailId());
-                DetailRes detailRes = productDetailMapper.findById(productDetailId);
-                if (detailRes != null) {
-                    detailResList.add(detailRes);
-                }
-            }
-        }
-
-        // 10. 返回本次操作的詳細響應列表
+        // 9. 返回生成的詳細響應列表（新增 + 現有）
         return detailResList;
     }
     // 輔助方法：判斷 DetailRes 是否應該包含在獎品編號中
