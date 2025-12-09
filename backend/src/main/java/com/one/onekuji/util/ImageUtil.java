@@ -1,215 +1,50 @@
 package com.one.onekuji.util;
 
-import jakarta.annotation.PostConstruct;
-import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.beans.factory.annotation.Value;
+import com.one.onekuji.util.storage.ImageStorageService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 @Component
 public class ImageUtil {
 
-    @Value("${pictureFile.path}")
-    private String picturePath;
+    private static ImageStorageService delegate;
 
-    @Value("${pictureFile.path-mapping}")
-    private String picturePathMapping;
-
-    private static String staticPicturePath;
-    private static String staticPicturePathMapping;
-    private static final int TARGET_SIZE = 400;
-    private static final int RECT_WIDTH = 600;
-    private static final int RECT_HEIGHT = 300;
-    private static final float OUTPUT_QUALITY = 0.85f;
-
-    @PostConstruct
-    public void init() {
-        staticPicturePath = picturePath.endsWith("/") ? picturePath : picturePath + "/";
-        staticPicturePathMapping = picturePathMapping.endsWith("/") ? picturePathMapping : picturePathMapping + "/";
+    public ImageUtil(ImageStorageService imageStorageService) {
+        ImageUtil.delegate = imageStorageService;
     }
 
     public static String upload(MultipartFile file) {
-        return uploadFile(file, false);
+        if (delegate == null) {
+            throw new IllegalStateException("ImageStorageService delegate is not initialized. Make sure the Spring context is up and configure pictureFile.storage-type property.");
+        }
+        try {
+            return delegate.upload(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String uploadForCKEditor(MultipartFile file) {
-        return uploadFile(file, true);
+        if (delegate == null) {
+            throw new IllegalStateException("ImageStorageService delegate is not initialized. Make sure the Spring context is up and configure pictureFile.storage-type property.");
+        }
+        try {
+            return delegate.uploadForCKEditor(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String uploadRectangle(MultipartFile file) {
-        return uploadRectangleFile(file);
-    }
-
-    private static String uploadFile(MultipartFile file, boolean isForCKEditor) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
+        if (delegate == null) {
+            throw new IllegalStateException("ImageStorageService delegate is not initialized. Make sure the Spring context is up and configure pictureFile.storage-type property.");
         }
-
-        String originalFileName = file.getOriginalFilename();
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + (originalFileName != null ? originalFileName : "image");
-        String fileExtension = getFileExtension(originalFileName);
-
-        if (fileExtension == null) {
-            throw new IllegalArgumentException("Invalid file extension");
-        }
-
-        String filePath = staticPicturePath + uniqueFileName;
-        File dest = new File(filePath);
-
         try {
-            Files.createDirectories(Paths.get(staticPicturePath));
-
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-            if (originalImage == null) {
-                throw new IOException("Failed to read image file");
-            }
-
-            if (isForCKEditor) {
-                Thumbnails.of(originalImage)
-                        .scale(1)
-                        .toFile(dest);
-            } else {
-                BufferedImage processedImage = processImageWithAspectRatio(originalImage);
-                ImageIO.write(processedImage, fileExtension, dest);
-            }
+            return delegate.uploadRectangle(file);
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("File upload failed", e);
+            throw new RuntimeException(e);
         }
-
-        return staticPicturePathMapping + uniqueFileName;
-    }
-
-    private static String uploadRectangleFile(MultipartFile file) {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File is empty");
-        }
-
-        String originalFileName = file.getOriginalFilename();
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + (originalFileName != null ? originalFileName : "rectangle_image");
-        String fileExtension = getFileExtension(originalFileName);
-
-        if (fileExtension == null) {
-            throw new IllegalArgumentException("Invalid file extension");
-        }
-
-        String filePath = staticPicturePath + uniqueFileName;
-        File dest = new File(filePath);
-
-        try {
-            Files.createDirectories(Paths.get(staticPicturePath));
-
-            BufferedImage originalImage = ImageIO.read(file.getInputStream());
-            if (originalImage == null) {
-                throw new IOException("Failed to read image file");
-            }
-
-            BufferedImage processedImage = processRectangleImageWithAspectRatio(originalImage);
-            ImageIO.write(processedImage, fileExtension, dest);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Rectangle file upload failed", e);
-        }
-
-        return staticPicturePathMapping + uniqueFileName;
-    }
-
-    private static BufferedImage processImageWithAspectRatio(BufferedImage originalImage) {
-        int originalWidth = originalImage.getWidth();
-        int originalHeight = originalImage.getHeight();
-
-        double scale = Math.min(
-                (double) TARGET_SIZE / originalWidth,
-                (double) TARGET_SIZE / originalHeight
-        );
-
-        int scaledWidth = (int) (originalWidth * scale);
-        int scaledHeight = (int) (originalHeight * scale);
-
-        BufferedImage finalImage = new BufferedImage(
-                TARGET_SIZE,
-                TARGET_SIZE,
-                BufferedImage.TYPE_INT_RGB
-        );
-
-        Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
-
-        try {
-            BufferedImage scaledImage = Thumbnails.of(originalImage)
-                    .size(scaledWidth, scaledHeight)
-                    .outputQuality(OUTPUT_QUALITY)
-                    .asBufferedImage();
-
-            int x = (TARGET_SIZE - scaledWidth) / 2;
-            int y = (TARGET_SIZE - scaledHeight) / 2;
-
-            g2d.drawImage(scaledImage, x, y, null);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to process image", e);
-        } finally {
-            g2d.dispose();
-        }
-
-        return finalImage;
-    }
-
-    private static BufferedImage processRectangleImageWithAspectRatio(BufferedImage originalImage) {
-        int originalWidth = originalImage.getWidth();
-        int originalHeight = originalImage.getHeight();
-
-        double scale = Math.min(
-                (double) RECT_WIDTH / originalWidth,
-                (double) RECT_HEIGHT / originalHeight
-        );
-
-        int scaledWidth = (int) (originalWidth * scale);
-        int scaledHeight = (int) (originalHeight * scale);
-
-        BufferedImage finalImage = new BufferedImage(
-                RECT_WIDTH,
-                RECT_HEIGHT,
-                BufferedImage.TYPE_INT_RGB
-        );
-
-        Graphics2D g2d = finalImage.createGraphics();
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, RECT_WIDTH, RECT_HEIGHT);
-
-        try {
-            BufferedImage scaledImage = Thumbnails.of(originalImage)
-                    .size(scaledWidth, scaledHeight)
-                    .outputQuality(OUTPUT_QUALITY)
-                    .asBufferedImage();
-
-            int x = (RECT_WIDTH - scaledWidth) / 2;
-            int y = (RECT_HEIGHT - scaledHeight) / 2;
-
-            g2d.drawImage(scaledImage, x, y, null);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to process rectangle image", e);
-        } finally {
-            g2d.dispose();
-        }
-
-        return finalImage;
-    }
-
-    private static String getFileExtension(String fileName) {
-        if (fileName != null && fileName.contains(".")) {
-            return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        }
-        return null;
     }
 }
