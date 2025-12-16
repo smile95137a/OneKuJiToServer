@@ -8,9 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.S3Utilities;
-import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,17 +21,15 @@ public class S3ImageStorageService implements ImageStorageService {
 
     private final S3Client s3Client;
     private final S3Properties s3Properties;
-    private final S3Utilities s3Utilities;
 
     private static final int TARGET_SIZE = 400;
     private static final int RECT_WIDTH = 600;
     private static final int RECT_HEIGHT = 300;
     private static final float OUTPUT_QUALITY = 0.85f;
 
-    public S3ImageStorageService(S3Client s3Client, S3Properties s3Properties, S3Utilities s3Utilities) {
+    public S3ImageStorageService(S3Client s3Client, S3Properties s3Properties) {
         this.s3Client = s3Client;
         this.s3Properties = s3Properties;
-        this.s3Utilities = s3Utilities;
         if (this.s3Properties == null || this.s3Properties.getBucketName() == null || this.s3Properties.getBucketName().isEmpty()) {
             throw new IllegalStateException("S3 bucket name is not configured. Please set s3.bucket-name property.");
         }
@@ -90,31 +85,15 @@ public class S3ImageStorageService implements ImageStorageService {
                 .bucket(s3Properties.getBucketName())
                 .key(key)
                 .contentType("image/" + fileExtension)
-                .acl(ObjectCannedACL.PUBLIC_READ)
+                // 移除 ACL 設定，改用 Bucket Policy 控制公開存取
+                // .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
-        // Build public URL
-        String url;
-        if (s3Properties.getEndpointUrl() != null && !s3Properties.getEndpointUrl().isEmpty()) {
-            url = s3Properties.getEndpointUrl();
-            if (!url.endsWith("/")) {
-                url += "/";
-            }
-            url += s3Properties.getBucketName() + "/" + key;
-        } else {
-            // Use S3Utilities to construct URL when using standard AWS
-            try {
-                GetUrlRequest getUrlRequest = GetUrlRequest.builder().bucket(s3Properties.getBucketName()).key(key).build();
-                url = s3Utilities.getUrl(getUrlRequest).toExternalForm();
-            } catch (Exception e) {
-                // Fallback
-                url = "https://" + s3Properties.getBucketName() + ".s3." + s3Properties.getRegion() + ".amazonaws.com/" + key;
-            }
-        }
-
-        return url;
+        // 上傳到 S3 的 images/ 目錄，但只回傳 /檔名
+        // 前端組合：https://onemorelottery.tw/images + /檔名
+        return "/" + uniqueFileName;
     }
 
     private String uploadRectangleInternal(InputStream inputStream, String originalFilename) throws IOException {
@@ -141,26 +120,14 @@ public class S3ImageStorageService implements ImageStorageService {
                 .bucket(s3Properties.getBucketName())
                 .key(key)
                 .contentType("image/" + fileExtension)
-                .acl(ObjectCannedACL.PUBLIC_READ)
+                // 移除 ACL 設定，改用 Bucket Policy 控制公開存取
+                // .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
-        String url;
-        if (s3Properties.getEndpointUrl() != null && !s3Properties.getEndpointUrl().isEmpty()) {
-            url = s3Properties.getEndpointUrl();
-            if (!url.endsWith("/")) {
-                url += "/";
-            }
-            url += s3Properties.getBucketName() + "/" + key;
-        } else {
-            try {
-                GetUrlRequest getUrlRequest = GetUrlRequest.builder().bucket(s3Properties.getBucketName()).key(key).build();
-                url = s3Utilities.getUrl(getUrlRequest).toExternalForm();
-            } catch (Exception e) {
-                url = "https://" + s3Properties.getBucketName() + ".s3." + s3Properties.getRegion() + ".amazonaws.com/" + key;
-            }
-        }
-        return url;
+        // 上傳到 S3 的 images/ 目錄，但只回傳 /檔名
+        // 前端組合：https://onemorelottery.tw/images + /檔名
+        return "/" + uniqueFileName;
     }
 
     private BufferedImage processImageWithAspectRatio(BufferedImage originalImage) {

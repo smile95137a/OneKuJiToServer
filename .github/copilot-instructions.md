@@ -1,88 +1,245 @@
 ```instructions
+# OneKuJi 一番賞抽獎系統 — AI 開發指引
 
-倉庫快照：多模組 Java (Maven) 專案 — 模組：`common`、`backend`、`frontend`。
+## 專案架構總覽
+多模組 Spring Boot 3.3.1 (Java 17) Maven 專案 — **關鍵職責分離**：
+- `backend`: 管理後台 API + MyBatis 資料層 (`@MapperScan("com.one.onekuji.repository")`)
+- `frontend`: 使用者商店 API + JPA repositories + ECPay 金流整合
+- `common`: 跨模組共用的 DTO、Controller、Service（可被 backend/frontend 依賴）
 
-快速開發 (Quick start)
-- 建置：mvn -DskipTests package
-- 啟動後端：mvn -pl backend -am spring-boot:run（或直接執行 `BackendApplication`）；啟動前端：mvn -pl frontend -am spring-boot:run
-- Windows 範例環境變數：
-  set SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/onekuji?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=true
+**核心業務邏輯**：一番賞（Ichiban Kuji）盲盒抽獎系統，每個產品有多個獎品等級（A/B/C/LAST 等），使用者購買抽獎券抽取獎品。
 
-各模組責任範圍
-- `backend`：管理後台 API、MyBatis Mapper（`com.one.onekuji.repository`）與 Service 層
-- `frontend`：前端商店頁面、ECPay 金流整合（`com.one.frontend.ecpay`）與 JPA repository
-- `common`：共用 DTO、Controller
+## 快速啟動（開發環境）
+```cmd
+# 建置所有模組
+mvn clean package -DskipTests
 
-快速參考
-- Controller 統一使用 `ResponseUtils.success/failure` （ApiResponse）：參考 `backend/src/main/java/com/one/onekuji/util/ResponseUtils.java`。
-- 新增 MyBatis Mapper：在 `backend/.../repository` 新增 `@Mapper` 介面，使用 `@Select/@Insert/@Update`。
-- 檔案上傳：`ImageUtil` 預期會使用 `pictureFile.path` 與 `pictureFile.path-mapping`，若未設定則會 fallback 至 `file.upload-dir`。
-- JWT：`JwtTokenProvider`、`JwtAuthenticationFilter`、`GenerateJwtSecret.java` 可用於建立 base64 的 JWT secret。
-- ECPay：`frontend` 中 `com.one.frontend.ecpay` 與 `EcpayPayment.xml`（包含 Test/Prod 端點），相關金流金鑰請透過組態設定。
+# 啟動後端（管理後台，port 8080）
+mvn -pl backend -am spring-boot:run
 
-注意事項
-- 本專案沒有自動 DB migration 工具（需人工更新 schema）；請注意資料庫結構變更。
-- `SpringSecurityConfig` 預設許多端點為 permitAll，部署前請依實際情況檢視權限設計與安全設定。
+# 啟動前端（使用者商店，port 8081）
+mvn -pl frontend -am spring-boot:run
 
-簡單後端測試流程（從 0 到 1）
-1) 設定 DB 環境變數
-2) 設定 `pictureFile.path=/absolute/path/uploads` 與 `pictureFile.path-mapping=/uploads/`（開發環境）
-3) 啟動後端
-4) 使用 POST `/api/auth/login` 登入並透過 Swagger 測試 API
+# 設定 DB（Windows）
+set SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/onekuji?serverTimezone=UTC^&useUnicode=true^&characterEncoding=utf-8^&useSSL=true
+```
 
-重要的設定檔位置
-- 後端組態（Backend props）：`backend/src/main/resources/application.properties`（包含 DB、JWT、log、檔案 mappings）
-- 前端組態（Frontend props）：`frontend/src/main/resources/application.properties`（結構相同）
-- 圖片 / 靜態對應：`pictureFile.path`（實體檔案路徑）與 `pictureFile.path-mapping`（URL 前綴）
-- DB：建議使用 MySQL，開發可使用本地資料庫；無自動 migration，請視需求改變 schema
+**測試流程**：Swagger UI at `http://localhost:8080/swagger-ui/index.html#/` → POST `/api/auth/login` 取得 JWT token → 在 Authorize 設定 Bearer token。
 
-主要模式與慣例
-- REST controllers 位於 `.../controller`，使用 `@RequestMapping("/api/...")`。
-- Service 層位於 `.../service`，使用 Spring DI，建議使用建構子注入或 `@AllArgsConstructor`。
-- 資料存取：
-  - MyBatis (後端）：`repository` 下使用 `@Mapper` 與 SQL 片段或注解。
-  - JPA (frontend/common）：用於 DTO/Repository 操作。
-- DTO 命名規則：`*Req` = request、`*Res` = response；`DTO`用於 JPA entity / 資料傳遞。
-- API 回應：控制器回傳 `ApiResponse<T>`，可使用 `ResponseUtils.success/failure` 製造回應。
+## 核心業務邏輯：獎品編號系統（Prize Number System）
 
-安全 / 認證
-- 使用 JWT（`JwtTokenProvider`、`JwtAuthenticationFilter`）；JWT secret 請使用 base64 編碼的 `app.jwt-secret`（可使用 `GenerateJwtSecret` 產生）。
-- 後台預設登入 API: POST `/api/auth/login`，回傳 `ApiResponse<JWTAuthResponse>`。
-- 注意：在 `SpringSecurityConfig` 設為 permitAll 的端點需在正式環境重新檢查權限政策。
+**理解這個系統是修改產品/抽獎邏輯的關鍵**：
 
-檔案上傳與 HTML 編輯器
-- HTML 內容會經 `HtmlProcessor` 清洗/處理，圖片會由 `ImageUtil` 上傳並回傳圖片 URL。`ImageUtil` 依賴 `pictureFile.path` + `pictureFile.path-mapping`。
-- 許多 Controller 接受 MultipartFile（例如 `@RequestPart("images")` ，會呼叫 `ImageUtil.upload()`）。
+### 資料結構
+- `product`: 產品主檔（一番賞商品，例如「海賊王一番賞」）
+- `product_detail`: 獎品項目（等級、數量、圖片）— 一個產品有多個等級的獎品
+- `prize_number`: 獎品編號池（每個實體獎品對應一個編號，用於抽獎）
+- `draw_result`: 抽獎結果記錄
 
-支付整合
-- frontend 中 `com.one.frontend.ecpay.payment.integration` 為 ECPay 整合位置；相關的 `EcpayPayment.xml` 含測試/正式端點，請在組態中提供金流金鑰。
+### 獎品編號生成邏輯（`ProductDetailService.regeneratePrizeNumbers()`）
+1. **何時觸發**：新增/更新 `product_detail` 且產品未抽獎/未上架時
+2. **運作方式**：
+   - 刪除該產品所有舊的 `prize_number` 記錄
+   - 根據每個 `product_detail.quantity` 生成對應數量的編號（例如 A 賞 5 個 → 生成 5 個編號）
+   - **LAST 獎不參與編號池**（`grade = 'LAST'` 會被排除）
+   - 編號隨機打散（`Collections.shuffle`）後批次寫入 DB
+3. **限制**：產品已上架（`AVAILABLE`）或有人已抽獎（`prize_number.is_drawn = true`）時，**不可重新生成編號**，只能更新銀幣/尺寸/概率欄位
 
-常見變更與範例
-- 新增 Controller 範例：
-  - 檔案：`backend/src/main/java/com/one/onekuji/controller/FooController.java`
-  - 樣式：`@RestController`, `@RequestMapping("/api/foo")`, 回傳 `ResponseEntity<ApiResponse<...>>` 與使用 `ResponseUtils.success(...)`。
-- MyBatis Mapper 範例：
-  - 檔案：`backend/src/main/java/com/one/onekuji/repository/BarMapper.java`
-  - 標註 `@Mapper`，使用 `@Select/@Insert/@Update` 並回傳 DTO。
+### 抽獎流程（`DrawResultService.handleDraw2()`）
+1. 使用者選擇獎品編號（從前端傳入的 `prizeNumbers` 字串陣列）
+2. 檢查編號是否已被抽走（`is_drawn` 欄位）
+3. 扣款 → **按概率計算實際抽中的獎品**（`drawPrizeForNumber()`）
+4. 更新 `prize_number.is_drawn = true` + `product_detail.quantity -= 1`
+5. 寫入 `draw_result` 記錄 + 發送 WebSocket 訊息（`/topic/lottery`）
+6. 特殊處理：所有獎品抽完後自動抽 LAST 賞（`handleSPPrize()`）
 
-除錯與開發工作流程
-- 使用 Swagger UI 測試 API（後端）：`http://localhost:8080/swagger-ui/index.html#/`。
-- 使用組態調整 LOG 等級觀察 MyBatis/Hibernate SQL；必要時將 LOG level 設高。
-- 產生 JWT secret：執行 `GenerateJwtSecret.main()`，把輸出填回 `app.jwt-secret`。
-- 若上傳失敗請檢查 `pictureFile.path` 與 `pictureFile.path-mapping` 是否正確設定；開發環境可把 `pictureFile.path=uploads/` 與 `pictureFile.path-mapping=/uploads/`。
+**關鍵查詢**：`PrizeNumberMapper.getPrizeNumbersByProductIdAndNumbers()` 批次取得使用者選的編號。
 
-優先查看（核心檔案）
-- 專案根：`pom.xml`（多模組）
-- 後端：`BackendApplication.java`（MapperScan）、`application.properties`、`SpringSecurityConfig`、`JwtTokenProvider`、`ImageUtil`、`ResponseUtils` 等。
-- 前端：`FrontEndApplication.java`、 `OrderService` 以及 ECPay 相關程式碼與設定檔。
-- 共用：`common/src/main/java/...` 包含共用 Controller / DTO。
+## 圖片儲存架構（Strategy Pattern 實作）
 
-不明顯但重要的細節
-- 此專案後端同時使用 MyBatis 與 JPA（依模組不同），請根據模組類型選擇合適的資料存取策略。
-- `ImageUtil` 會讀 `pictureFile.path` 與 `pictureFile.path-mapping`（而非 `file.upload-dir`），開發時需確認兩種配置是否一致。
-- `GlobalExceptionHandler` 會回傳 `ApiResponse` 物件 (程式錯誤為「code + message」格式)；在新增 Controller 時，建議維持 Controller 回傳 `ResponseEntity<ApiResponse<T>>` 的慣例。
+**重要**：專案使用 **可切換的儲存後端**，透過 `pictureFile.storage-type` 決定本地或 S3。
 
-若有任何疑問，請指定要修改或檢視的檔案與需求，我會就該範圍進行改良或提供更完整的開發/執行指引。
+### 架構設計
+```
+ImageUtil (static facade)
+    ↓ 委派給
+ImageStorageService (interface)
+    ↓ 實作
+LocalImageStorageService (@ConditionalOnProperty "local")
+S3ImageStorageService (@ConditionalOnProperty "s3")
+```
+
+### 實際使用（Controllers）
+```java
+// 所有 Controller 統一使用 ImageUtil 靜態方法
+String url = ImageUtil.upload(multipartFile);              // 400x400 正方形
+String editorUrl = ImageUtil.uploadForCKEditor(file);      // 原尺寸（富文本編輯器）
+String bannerUrl = ImageUtil.uploadRectangle(file);        // 600x300 矩形
+```
+
+### 生產環境配置（S3 模式）
+```properties
+pictureFile.storage-type=s3
+s3.bucket-name=onemorelottery-img
+s3.region=us-east-1
+s3.access-key-id=                    # 空白表示使用 EC2 IAM Role
+s3.secret-access-key=                # 同上
+```
+
+**回傳格式**：S3 模式只回傳 **相對路徑** `images/<filename>`，前端自行組合 `https://onemorelottery.tw/images/<filename>`（隱藏 S3 bucket 資訊）。
+
+### S3 遷移工具
+```cmd
+# 將既有 DB 圖片 URL 遷移至 S3（dry-run 模式）
+java -cp backend/target/backend-0.0.1-SNAPSHOT.jar com.one.onekuji.s3.migration.S3DbMigrationTool
+
+# 實際執行遷移
+java -cp backend/target/backend-0.0.1-SNAPSHOT.jar com.one.onekuji.s3.migration.S3DbMigrationTool --s3.migration.dry-run=false
+```
+
+掃描資料表：`store_product`, `product`, `product_detail`, `news`, `draw_result`, `banner`。
+
+## API 回應規範
+**所有** Controller 必須使用統一回應格式：
+```java
+@PostMapping("/add")
+public ResponseEntity<ApiResponse<ProductRes>> addProduct(@RequestBody ProductReq req) {
+    ProductRes result = productService.add(req);
+    return ResponseUtils.success(result);  // 或 ResponseUtils.failure("error message")
+}
+```
+
+`ApiResponse<T>` 結構：`{ code: 200, message: "success", data: T }`
+
+## 資料存取模式（混合使用）
+
+### MyBatis（Backend 主要使用）
+```java
+@Mapper  // 必須加此註解
+public interface ProductMapper {
+    @Select("SELECT * FROM product WHERE product_id = #{id}")
+    ProductRes getProductById(Long id);
+    
+    @Insert("INSERT INTO product (...) VALUES (...)")
+    @Options(useGeneratedKeys = true, keyProperty = "productId")
+    void insert(ProductReq req);
+}
+```
+- `@MapperScan` 設定在 `BackendApplication` / `FrontEndApplication`
+- MyBatisConfig 啟用 `mapUnderscoreToCamelCase = true`（DB snake_case ↔ Java camelCase）
+
+### JPA（Frontend/Common 使用）
+用於簡單 CRUD 或關聯查詢。
+
+## 安全與認證
+- JWT 驗證：`JwtAuthenticationFilter` 攔截請求，從 `Authorization: Bearer <token>` 驗證
+- 產生 JWT secret：執行 `backend/src/main/java/PasswordEncoderDemo.java` 或 `GenerateJwtSecret.main()`
+- **CORS 設定**：`SpringSecurityConfig` / `CorsConfig` 允許 `https://onemorelottery.tw` 與 `http://localhost:5173`
+- **注意**：目前 `SpringSecurityConfig.securityFilterChain()` 設定 `.requestMatchers("/**").permitAll()`，**生產環境需限縮權限**
+
+## 支付整合（ECPay）
+- 位置：`frontend/src/main/java/com/one/frontend/ecpay`
+- 設定檔：`frontend/src/main/resources/payment_conf.xml`（包含測試/正式 URL）
+- 相關金鑰請透過環境變數或 application.properties 設定
+
+## 資料庫管理
+**無自動 Migration 工具**（無 Flyway/Liquibase）— **所有 schema 變更需手動執行 SQL**。
+
+新增欄位步驟：
+1. 手動 ALTER TABLE
+2. 更新對應的 `@Mapper` SQL 語句
+3. 更新 DTO class 新增欄位
+
+## 開發工作流程
+
+### 新增功能（典型流程）
+1. **定義 DTO**：在 `model` / `request` / `response` 建立 Java class
+2. **寫 Mapper**：`@Mapper` interface + SQL 註解或 XML
+3. **寫 Service**：業務邏輯，呼叫 Mapper
+4. **寫 Controller**：`@RestController` + `ResponseUtils.success/failure`
+5. **測試**：透過 Swagger UI 測試
+
+### 修改獎品系統
+**警告**：若產品已上架或已有抽獎記錄，`ProductDetailService.regeneratePrizeNumbers()` 不會執行。
+
+修改限制判斷邏輯：
+```java
+// ProductDetailService.updateProductDetail()
+boolean isDrawnPrize = prizeNumberMapper.isTrue(productId).stream().anyMatch(PrizeNumber::getIsDrawn);
+boolean isProductAvailable = product.getStatus().equals(ProductStatus.AVAILABLE);
+```
+
+### 除錯技巧
+- **SQL 查詢紀錄**：在 `application.properties` 設定 `logging.level.com.one.onekuji.repository=DEBUG`
+- **圖片上傳失敗**：檢查 `pictureFile.storage-type` 與對應的 path/bucket 設定
+- **JWT 驗證失敗**：確認 `app.jwt-secret` 為 base64 編碼，且前端 header 正確設定 `Authorization: Bearer <token>`
+
+## 關鍵檔案清單
+```
+pom.xml                                          # 多模組定義
+backend/src/main/java/com/one/onekuji/
+  ├── BackendApplication.java                    # 後端啟動類（@MapperScan）
+  ├── config/
+  │   ├── SpringSecurityConfig.java              # 安全配置（CORS + JWT filter）
+  │   ├── S3Config.java                          # S3Client bean（支援 IAM Role）
+  │   └── URLConfig.java                         # 本地檔案靜態資源映射（僅 local 模式）
+  ├── util/
+  │   ├── ImageUtil.java                         # 圖片上傳 facade（靜態方法委派）
+  │   ├── ResponseUtils.java                     # API 回應工具
+  │   └── storage/
+  │       ├── ImageStorageService.java           # 儲存介面
+  │       ├── LocalImageStorageService.java      # 本地檔案實作
+  │       └── S3ImageStorageService.java         # S3 實作
+  ├── service/ProductDetailService.java          # 獎品編號生成邏輯
+  ├── repository/PrizeNumberMapper.java          # 獎品編號 Mapper
+  └── s3/migration/S3MigrationService.java       # S3 遷移工具
+
+frontend/src/main/java/com/one/frontend/
+  ├── FrontEndApplication.java                   # 前端啟動類
+  ├── ecpay/payment/integration/                 # ECPay 金流整合
+  └── service/DrawResultService.java             # 抽獎核心邏輯
+
+common/src/main/java/com/one/
+  ├── controller/                                # 共用 Controller
+  ├── model/                                     # 共用 DTO
+  └── service/DrawResultService.java             # 抽獎服務（前後端共用）
+```
+
+## 非顯而易見的重要細節
+
+### 1. 獎品編號不可逆
+`regeneratePrizeNumbers()` 會刪除舊編號重新生成 — **已上架商品禁止執行**（會導致使用者已選的編號失效）。
+
+### 2. LAST 獎特殊處理
+- LAST 獎不進入編號池（`shouldIncludeInPrizeNumbers()` 判斷）
+- 所有獎品抽完後觸發 `handleSPPrize()` 自動放入獎品盒
+
+### 3. 圖片 URL 映射差異
+- **Local 模式**：回傳 `/uploads/uuid_file.jpg`（由 `URLConfig` 映射到實體路徑）
+- **S3 模式**：回傳 `images/uuid_file.jpg`（前端自行加上 domain）
+
+### 4. MyBatis TypeHandler
+`ListTypeHandler` / `StringListConverter` 處理 JSON 陣列與資料庫 TEXT 欄位的轉換（例如 `imageUrls`）。
+
+### 5. WebSocket 抽獎通知
+抽獎成功後發送訊息到 `/topic/lottery`，前端即時顯示其他使用者抽獎結果（跑馬燈效果）。
+
+## 常見錯誤與解法
+
+| 錯誤訊息 | 原因 | 解法 |
+|---------|------|------|
+| `ImageStorageService delegate is not initialized` | Spring context 未啟動或 storage-type 未設定 | 確認在 Spring 環境執行 + 設定 `pictureFile.storage-type` |
+| `部分指定的獎品編號不存在或重複` | 前端傳入的編號不在 DB 或已被抽走 | 檢查 `prize_number` 表 + `is_drawn` 狀態 |
+| `S3 bucket name is not configured` | S3 模式但未設定 bucket | 設定 `s3.bucket-name` |
+| `所有獎品都已抽完` | 該產品所有 `product_detail.quantity = 0` | 正常邏輯，應觸發 LAST 獎 |
+
+## 生產部署檢查清單
+- [ ] 設定 `app.jwt-secret`（base64 編碼）
+- [ ] 修改 `SpringSecurityConfig` 限縮 `permitAll()` 範圍
+- [ ] 確認 `s3.bucket-name` 與 `s3.region` 正確
+- [ ] 檢查 CORS `allowedOrigins` 僅包含生產 domain
+- [ ] 執行 S3 遷移工具（先 dry-run 測試）
+- [ ] 手動執行 DB schema 變更
 
 ```
 

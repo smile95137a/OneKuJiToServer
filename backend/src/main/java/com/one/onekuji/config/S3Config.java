@@ -6,7 +6,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Utilities;
 
 import java.net.URI;
 
@@ -28,13 +27,5 @@ public class S3Config {
             builder.serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder().pathStyleAccessEnabled(true).build());
         }
         return builder.build();
-    }
-
-    @Bean
-    public S3Utilities s3Utilities(S3Properties s3Properties) {
-        if (s3Properties.getRegion() != null && !s3Properties.getRegion().isEmpty()) {
-            return S3Utilities.builder().region(Region.of(s3Properties.getRegion())).build();
-        }
-        return S3Utilities.builder().build();
     }
 }
