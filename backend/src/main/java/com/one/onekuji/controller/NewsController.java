@@ -102,10 +102,18 @@ public class NewsController {
     }
 
     private String replaceBlobUrlsWithFileUrls(String content, List<String> fileUrls) {
-        // 假设 images 是按照顺序上传并生成 URL 的，你可以遍历所有 blob 并替换为实际的图片 URL
+        // 將相對路徑轉換為完整的 URL
+        List<String> fullUrls = new ArrayList<>();
         for (String fileUrl : fileUrls) {
-            // 替换匹配的 blob URL
-            content = content.replaceFirst("blob:[^\\s\"]+", fileUrl);
+            // fileUrl 格式: /xxx.jpg
+            // 轉換為: https://onemorelottery.tw/images/xxx.jpg
+            String fullUrl = "https://onemorelottery.tw/images" + fileUrl;
+            fullUrls.add(fullUrl);
+        }
+        
+        // 替換 blob URL 為完整的圖片 URL
+        for (String fullUrl : fullUrls) {
+            content = content.replaceFirst("blob:[^\\s\"]+", fullUrl);
         }
         return content;
     }
@@ -164,14 +172,23 @@ public class NewsController {
     }
 
     private String replaceBlobUrlsWithFileUrls2(String content, List<String> fileUrls) {
-        // 假设这里有一个方法可以提取 Blob URL，暂时用一个示例的方式
+        // 提取 Blob URL
         List<String> blobUrls = extractBlobUrls(content);
 
+        // 將相對路徑轉換為完整的 URL
+        List<String> fullUrls = new ArrayList<>();
+        for (String fileUrl : fileUrls) {
+            // fileUrl 格式: /xxx.jpg
+            // 轉換為: https://onemorelottery.tw/images/xxx.jpg
+            String fullUrl = "https://onemorelottery.tw/images" + fileUrl;
+            fullUrls.add(fullUrl);
+        }
+
+        // 替換 Blob URL 為完整的圖片 URL
         for (int i = 0; i < blobUrls.size(); i++) {
             String blobUrl = blobUrls.get(i);
-            // 替换 Blob URL 为实际文件 URL
-            if (i < fileUrls.size()) {
-                content = content.replace(blobUrl, fileUrls.get(i));
+            if (i < fullUrls.size()) {
+                content = content.replace(blobUrl, fullUrls.get(i));
             }
         }
         return content;
