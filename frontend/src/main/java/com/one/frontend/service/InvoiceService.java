@@ -91,7 +91,7 @@ public class InvoiceService {
     }
 
     public ResponseEntity<ReceiptRes> addB2CInvoice(ReceiptReq invoiceRequest) {
-        String url = "https://www.giveme.com.tw/invoice.do?action=addB2C";
+        String url = "https://www.xxxxxxx.com.tw/invoice.do?action=addB2C";
 
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
@@ -120,7 +120,7 @@ public class InvoiceService {
     }
 
     public ResponseEntity<byte[]> getInvoicePicture(String code , Long userId) throws MessagingException {
-        String url = "https://www.giveme.com.tw/invoice.do?action=picture";
+        String url = "https://www.xxxxxxx.com.tw/invoice.do?action=picture";
         // 设置请求头
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

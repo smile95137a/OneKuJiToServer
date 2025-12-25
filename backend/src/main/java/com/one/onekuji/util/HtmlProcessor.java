@@ -11,7 +11,7 @@ import java.util.Base64;
 
 public class HtmlProcessor {
 
-    private static final String BASE_URL = "https://api.onemorelottery.tw:8080/img/";
+    private static final String BASE_URL = "https://api.localhost.tw:8080/img/";
 
     public static String processHtml(String html) {
         if (html == null || html.isEmpty()) {

@@ -28,7 +28,7 @@ public class GomypayLogisticsTest {
         params.add("ReceiverName", "李四"); // 取貨人姓名
         params.add("ReceiverMobilePhone", "0987654321"); // 取貨人手機電話
         params.add("OPMode", "3"); // 通路代號
-        params.add("Internetsite", "https://api.onemorelottery.tw/logistics/callback"); // 接收狀態的網址
+        params.add("Internetsite", "https://api.localhost.tw/logistics/callback"); // 接收狀態的網址
         params.add("ShipDate", "2024-10-09"); // 出貨日期
         params.add("CHKMAC", s); // 檢查碼
 

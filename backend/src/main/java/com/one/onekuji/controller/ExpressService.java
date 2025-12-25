@@ -55,7 +55,7 @@ public class ExpressService {
         params.add("ReceiverName", logisticsRequest.getReceiverName()); // 取貨人姓名
         params.add("ReceiverMobilePhone", logisticsRequest.getReceiverMobilePhone()); // 取貨人手機電話
         params.add("OPMode", logisticsRequest.getOpMode()); // 通路代號
-        params.add("Internetsite", "https://api.onemorelottery.tw:8081/logistics/callback"); // 接收狀態的網址
+        params.add("Internetsite", "https://api.localhost.tw:8081/logistics/callback"); // 接收狀態的網址
         params.add("ShipDate", logisticsRequest.getShipDate()); // 出貨日期
         params.add("CHKMAC", s); // 檢查碼
 

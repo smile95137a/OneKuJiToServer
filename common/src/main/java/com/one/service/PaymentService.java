@@ -153,7 +153,7 @@ return null;
                 .buyerTelm(paymentRequest.getBuyerTelm().trim())  // 消費者手機，去除前後空白
                 .buyerMail(paymentRequest.getBuyerMail().trim())  // 消費者Email，去除前後空白
                 .buyerMemo("再來一抽備註")  // 消費備註，去除前後空白
-                .callbackUrl("https://api.onemorelottery.tw:8081/payment/paymentCallback".trim())  // 背景對帳網址，去除空白
+                .callbackUrl("https://api.localhost.tw:8081/payment/paymentCallback".trim())  // 背景對帳網址，去除空白
                 .eReturn("1".trim())  // 是否使用Json回傳，去除空白
                 .strCheck(STRCHECK.trim())  // 交易驗證密碼，去除前後空白
                 .build();
@@ -213,7 +213,7 @@ return null;
                 .buyerTelm(paymentRequest.getBuyerTelm().trim())  // 消費者手機，去除空白
                 .buyerMail(paymentRequest.getBuyerMail().trim())  // 消費者Email，去除空白
                 .buyerMemo("再來一抽備註")  // 消費備註，去除空白
-                .callbackUrl("https://api.onemorelottery.tw:8081/payment/paymentCallback2".trim())  // 背景對帳網址，去除空白
+                .callbackUrl("https://api.localhost.tw:8081/payment/paymentCallback2".trim())  // 背景對帳網址，去除空白
                 .eReturn("1".trim())  // 是否使用Json回傳，去除空白
                 .strCheck(STRCHECK.trim())  // 交易驗證密碼，去除空白
                 .build();
