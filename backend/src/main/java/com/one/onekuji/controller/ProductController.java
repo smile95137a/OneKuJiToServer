@@ -143,7 +143,7 @@ public class ProductController {
 
 	@PostMapping("/uploadProductImg")
 	public ResponseEntity<ApiResponse<List<String>>> uploadProductImg(
-			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam(value = "isUseCrop", required = false, defaultValue = "false") boolean isUseCrop,
 			@RequestParam("productId") Long productId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
@@ -179,7 +179,7 @@ public class ProductController {
 
 	@PostMapping("/uploadProductBannerImg")
 	public ResponseEntity<ApiResponse<List<String>>> uploadProductBannerImg(
-			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam(value = "isUseCrop", required = false, defaultValue = "false") boolean isUseCrop,
 			@RequestParam("productId") Long productId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {

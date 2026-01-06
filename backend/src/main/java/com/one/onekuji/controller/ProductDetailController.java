@@ -101,7 +101,7 @@ public class ProductDetailController {
     
 	@PostMapping("/uploadProductDetailImg")
 	public ResponseEntity<ApiResponse<List<String>>> uploadProductDetailImg(
-			@RequestParam("isUseCrop") boolean isUseCrop,
+			@RequestParam(value = "isUseCrop", required = false, defaultValue = "false") boolean isUseCrop,
 			@RequestParam("productDetailId") Long productDetailId,
 			@RequestParam(value = "files", required = false) List<MultipartFile> files,
 			@RequestParam(value = "existingUrls", required = false) List<String> existingUrls) {
