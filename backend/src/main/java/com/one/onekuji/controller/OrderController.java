@@ -4,6 +4,7 @@ import com.one.onekuji.model.Order;
 import com.one.onekuji.request.OrderQueryReq;
 import com.one.onekuji.request.OrderStatusUpdateRequest;
 import com.one.onekuji.response.OrderRes;
+import com.one.onekuji.response.PageRes;
 import com.one.onekuji.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,12 @@ public class OrderController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @PostMapping("/query")
+    public ResponseEntity<PageRes<OrderRes>> queryOrders(@RequestBody OrderQueryReq req) {
+        PageRes<OrderRes> page = orderService.queryOrders(req);
+        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")

@@ -6,6 +6,7 @@ import com.one.onekuji.repository.OrderRepository;
 import com.one.onekuji.repository.ShippingMethodRepository;
 import com.one.onekuji.request.OrderQueryReq;
 import com.one.onekuji.response.OrderRes;
+import com.one.onekuji.response.PageRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -93,6 +94,21 @@ public class OrderService {
 //                .collect(Collectors.toList());
 
         return list;
+    }
+
+    public PageRes<OrderRes> queryOrders(OrderQueryReq req) {
+        // 日期邊界處理：startDate 取當天最開始、endDate 取當天最結束
+        if (req.getStartDate() != null) {
+            LocalDateTime start = convertToLocalDateTime(req.getStartDate()).with(LocalTime.MIN);
+            req.setStartDate(java.util.Date.from(start.atZone(ZoneId.systemDefault()).toInstant()));
+        }
+        if (req.getEndDate() != null) {
+            LocalDateTime end = convertToLocalDateTime(req.getEndDate()).with(LocalTime.MAX);
+            req.setEndDate(java.util.Date.from(end.atZone(ZoneId.systemDefault()).toInstant()));
+        }
+        long total = orderMapper.countOrders(req);
+        List<OrderRes> list = orderMapper.queryOrders(req);
+        return PageRes.of(list, total, req.getPage(), req.getSafeSize());
     }
 
     public String updateOrder(Long id, String resultStatus) {

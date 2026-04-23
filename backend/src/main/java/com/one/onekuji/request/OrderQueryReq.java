@@ -17,4 +17,17 @@ public class OrderQueryReq {
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Taipei")
 	private Date endDate;
+
+	private String orderNumber;
+	private String resultStatus;
+	private int page = 1;
+	private int size = 20;
+
+	public int getOffset() {
+		return (page - 1) * size;
+	}
+
+	public int getSafeSize() {
+		return Math.min(size, 100);
+	}
 }

@@ -7,7 +7,9 @@ import com.one.onekuji.eenum.PrizeCategory;
 import com.one.onekuji.eenum.ProductType;
 import com.one.onekuji.model.ApiResponse;
 import com.one.onekuji.model.Product;
+import com.one.onekuji.request.ProductQueryReq;
 import com.one.onekuji.request.ProductReq;
+import com.one.onekuji.response.PageRes;
 import com.one.onekuji.response.ProductRes;
 import com.one.onekuji.service.ProductService;
 import com.one.onekuji.util.ImageUtil;
@@ -43,6 +45,13 @@ public class ProductController {
 
         ApiResponse<List<ProductRes>> response = ResponseUtils.success(200, null, products);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "商品分頁查詢", description = "支援分頁、模糊搜尋、篩選條件")
+    @PostMapping("/query")
+    public ResponseEntity<ApiResponse<PageRes<ProductRes>>> queryProducts(@RequestBody ProductQueryReq req) {
+        PageRes<ProductRes> page = productService.queryProducts(req);
+        return ResponseEntity.ok(ResponseUtils.success(200, null, page));
     }
 
     @Operation(summary = "獲取產品詳情", description = "通過產品 ID 獲取產品的詳細信息")

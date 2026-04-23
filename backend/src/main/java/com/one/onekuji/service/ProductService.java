@@ -11,7 +11,9 @@ import com.one.onekuji.repository.ProductDetailRepository;
 import com.one.onekuji.repository.ProductRepository;
 import com.one.onekuji.repository.UserRepository;
 import com.one.onekuji.request.DetailReq;
+import com.one.onekuji.request.ProductQueryReq;
 import com.one.onekuji.request.ProductReq;
+import com.one.onekuji.response.PageRes;
 import com.one.onekuji.response.ProductRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,13 @@ public class ProductService {
 
     public List<ProductRes> getOneKuJiType(PrizeCategory type) {
         return productRepository.getOneKuJiType(type);
+    }
+
+    public PageRes<ProductRes> queryProducts(ProductQueryReq req) {
+        long total = productRepository.countProducts(req);
+        List<Product> products = productRepository.queryProducts(req);
+        List<ProductRes> list = products.stream().map(this::convertEntityToRes).collect(Collectors.toList());
+        return PageRes.of(list, total, req.getPage(), req.getSafeSize());
     }
 
     public ProductRes createProduct(ProductReq productReq) {

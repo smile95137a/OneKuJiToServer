@@ -3,6 +3,7 @@ package com.one.onekuji.repository;
 import com.one.onekuji.eenum.PrizeCategory;
 import com.one.onekuji.eenum.ProductType;
 import com.one.onekuji.model.Product;
+import com.one.onekuji.request.ProductQueryReq;
 import com.one.onekuji.response.ProductRes;
 import org.apache.ibatis.annotations.*;
 
@@ -90,4 +91,52 @@ public interface ProductRepository {
     void updateProductPrice(Product product);
 
     //ENUM('FIGURE', 'BONUS', 'C3')
+
+    @Select({
+        "<script>",
+        "SELECT * FROM product",
+        "WHERE 1=1",
+        "<if test='productName != null and productName != \"\"'>",
+        "  AND product_name LIKE CONCAT('%', #{productName}, '%')",
+        "</if>",
+        "<if test='productType != null'>",
+        "  AND product_type = #{productType}",
+        "</if>",
+        "<if test='prizeCategory != null'>",
+        "  AND prize_category = #{prizeCategory}",
+        "</if>",
+        "<if test='status != null'>",
+        "  AND status = #{status}",
+        "</if>",
+        "ORDER BY",
+        "  CASE WHEN status='AVAILABLE' THEN 1",
+        "       WHEN status='NOT_AVAILABLE_YET' THEN 2",
+        "       WHEN status='SOLD_OUT' THEN 3",
+        "       WHEN status='UNAVAILABLE' THEN 4",
+        "       ELSE 5 END,",
+        "  product_id DESC",
+        "LIMIT #{offset}, #{safeSize}",
+        "</script>"
+    })
+    List<Product> queryProducts(ProductQueryReq req);
+
+    @Select({
+        "<script>",
+        "SELECT COUNT(*) FROM product",
+        "WHERE 1=1",
+        "<if test='productName != null and productName != \"\"'>",
+        "  AND product_name LIKE CONCAT('%', #{productName}, '%')",
+        "</if>",
+        "<if test='productType != null'>",
+        "  AND product_type = #{productType}",
+        "</if>",
+        "<if test='prizeCategory != null'>",
+        "  AND prize_category = #{prizeCategory}",
+        "</if>",
+        "<if test='status != null'>",
+        "  AND status = #{status}",
+        "</if>",
+        "</script>"
+    })
+    long countProducts(ProductQueryReq req);
 }
