@@ -1,6 +1,7 @@
 package com.one.frontend.repository;
 
 import com.one.frontend.model.Product;
+import com.one.frontend.request.ProductQueryReq;
 import com.one.frontend.response.ProductDetailRes;
 import com.one.frontend.response.ProductRes;
 import org.apache.ibatis.annotations.*;
@@ -130,4 +131,60 @@ public interface ProductRepository {
 
     @Update("update product set status = 'NOT_AVAILABLE_YET' where product_id = #{productId}")
     void updateProductStatus(Long productId);
+
+    @Select({
+        "<script>",
+        "WITH product_summary AS (",
+        "  SELECT product_id,",
+        "    SUM(quantity) as detailQuantity,",
+        "    SUM(stock_quantity) as detailStockQuantity",
+        "  FROM product_detail WHERE grade != 'LAST' GROUP BY product_id",
+        ")",
+        "SELECT p.*, pc.category_uuid,",
+        "  COALESCE(ps.detailQuantity, 0) as detailQuantity,",
+        "  COALESCE(ps.detailStockQuantity, 0) as detailStockQuantity",
+        "FROM product p",
+        "LEFT JOIN product_summary ps ON p.product_id = ps.product_id",
+        "LEFT JOIN product_category pc ON p.category_id = pc.category_id",
+        "WHERE 1=1",
+        "<if test='productName != null and productName != \"\"'>",
+        "  AND p.product_name LIKE CONCAT('%', #{productName}, '%')",
+        "</if>",
+        "<if test='productType != null'>",
+        "  AND p.product_type = #{productType}",
+        "</if>",
+        "<if test='prizeCategory != null'>",
+        "  AND p.prize_category = #{prizeCategory}",
+        "</if>",
+        "<if test='status != null'>",
+        "  AND p.status = #{status}",
+        "</if>",
+        "ORDER BY CASE WHEN p.status='AVAILABLE' THEN 1",
+        "              WHEN p.status='NOT_AVAILABLE_YET' THEN 2",
+        "              WHEN p.status='SOLD_OUT' THEN 3",
+        "              WHEN p.status='UNAVAILABLE' THEN 4",
+        "              ELSE 5 END, p.product_id DESC",
+        "LIMIT #{offset}, #{safeSize}",
+        "</script>"
+    })
+    List<ProductRes> queryProducts(ProductQueryReq req);
+
+    @Select({
+        "<script>",
+        "SELECT COUNT(*) FROM product p WHERE 1=1",
+        "<if test='productName != null and productName != \"\"'>",
+        "  AND p.product_name LIKE CONCAT('%', #{productName}, '%')",
+        "</if>",
+        "<if test='productType != null'>",
+        "  AND p.product_type = #{productType}",
+        "</if>",
+        "<if test='prizeCategory != null'>",
+        "  AND p.prize_category = #{prizeCategory}",
+        "</if>",
+        "<if test='status != null'>",
+        "  AND p.status = #{status}",
+        "</if>",
+        "</script>"
+    })
+    long countProducts(ProductQueryReq req);
 }

@@ -123,22 +123,26 @@ public class OrderController {
 			var orderNumber = orderService.createPrizeOrder(payCartRes, prizeCartItemList, userId);
 
 			return ResponseEntity.ok(ResponseUtils.success(200, "支付成功，订单已创建", orderNumber));
+		}catch (IllegalArgumentException e){
+			return ResponseEntity.ok(ResponseUtils.failure(400, e.getMessage(), null));
 		}catch (Exception e){
 			e.printStackTrace();
+			return ResponseEntity.ok(ResponseUtils.failure(500, "系統錯誤，請稍後重試", null));
 		}
-		return ResponseEntity.ok(ResponseUtils.success(500, "失敗", null));
 	}
 
-	@GetMapping("/storeProduct/{orderNumber}")
-	public ResponseEntity<?> getStoreProductOrderById(@PathVariable String orderNumber) {
+	@PostMapping("/storeProduct")
+	public ResponseEntity<?> getStoreProductOrderById(@RequestBody Map<String, String> body) {
+		String orderNumber = body.get("orderNumber");
 		CustomUserDetails userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		var res = orderService.getOrderByOrderNumber(userId, orderNumber);
 		return ResponseEntity.ok(ResponseUtils.success(200, null, res));
 	}
 
-	@GetMapping("/productDetail/{orderNumber}")
-	public ResponseEntity<?> getStorePrizeProductOrderById(@PathVariable String orderNumber) {
+	@PostMapping("/productDetail")
+	public ResponseEntity<?> getStorePrizeProductOrderById(@RequestBody Map<String, String> body) {
+		String orderNumber = body.get("orderNumber");
 		CustomUserDetails userDetails = SecurityUtils.getCurrentUserPrinciple();
 		var userId = userDetails.getId();
 		var res = orderService.getPrizeOrderByOrderNumber(userId, orderNumber);

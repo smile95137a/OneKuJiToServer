@@ -451,6 +451,12 @@ public class OrderService {
 					orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
 				}
 
+				// 獲取所有購物車項的ID並移除（避免賞品盒項目累積）
+				List<Long> cartItemIds = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+				if (!cartItemIds.isEmpty()) {
+					prizeCartItemService.removeCartItems(cartItemIds, prizeCartItemList.get(0).getCartId());
+				}
+
 			}else if("2".equals(payCartRes.getPaymentMethod())){
 				// 插入訂單到資料庫
 				orderEntity.setResultStatus(OrderStatus.NO_PAY);
@@ -522,6 +528,12 @@ public class OrderService {
 					// 批量保存訂單詳情
 					if (!orderDetails.isEmpty()) {
 						orderDetailRepository.savePrizeOrderDetailBatch(orderDetails);
+					}
+
+					// 獲取所有購物車項的ID並移除（避免賞品盒項目累積）
+					List<Long> cartItemIds4 = prizeCartItemList.stream().map(PrizeCartItem::getPrizeCartItemId).collect(Collectors.toList());
+					if (!cartItemIds4.isEmpty()) {
+						prizeCartItemService.removeCartItems(cartItemIds4, prizeCartItemList.get(0).getCartId());
 					}
 
 				}

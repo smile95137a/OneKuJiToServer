@@ -96,24 +96,25 @@ public interface OrderDetailRepository {
     @Results({
             @Result(property = "orderDetailId", column = "id"),
             @Result(property = "productId", column = "product_id"),
+            @Result(property = "productName", column = "product_name"),
             @Result(property = "productDetailName", column = "product_detail_name"),
             @Result(property = "quantity", column = "quantity"),
             @Result(property = "unitPrice", column = "unit_price"),
             @Result(property = "totalPrice", column = "total_price"),
-            @Result(property = "ProductDetail.productDetailId", column = "product_detail_id"),
-            @Result(property = "ProductDetail.productName", column = "product_name"),
-            @Result(property = "ProductDetail.description", column = "description"),
-            @Result(property = "ProductDetail.sliverPrice", column = "sliver_price"),
-            @Result(property = "ProductDetail.imageUrls", column = "image_urls"),
+            @Result(property = "productDetailRes.productDetailId", column = "product_detail_id"),
+            @Result(property = "productDetailRes.productName", column = "product_name"),
+            @Result(property = "productDetailRes.description", column = "description"),
+            @Result(property = "productDetailRes.sliverPrice", column = "sliver_price"),
+            @Result(property = "productDetailRes.imageUrls", column = "image_urls"),
     })
     List<OrderDetailRes> findPrizeOrderDetailsByOrderId(Long orderId);
 
 
     @Insert({
             "<script>",
-            "INSERT INTO order_detail (order_id, product_detail_id, quantity, total_price , bill_number) VALUES ",
+            "INSERT INTO order_detail (order_id, product_detail_id, quantity, unit_price, total_price , bill_number) VALUES ",
             "<foreach collection='orderDetails' item='orderDetail' separator=','>",
-            "(#{orderDetail.orderId}, #{orderDetail.productDetailId}, #{orderDetail.quantity}, #{orderDetail.totalPrice} , #{orderDetail.billNumber})",
+            "(#{orderDetail.orderId}, #{orderDetail.productDetailId}, #{orderDetail.quantity}, #{orderDetail.unitPrice}, #{orderDetail.totalPrice} , #{orderDetail.billNumber})",
             "</foreach>",
             "</script>"
     })

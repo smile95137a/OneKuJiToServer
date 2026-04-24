@@ -4,6 +4,8 @@ import com.one.eenum.ProductStatus;
 import com.one.eenum.ProductType;
 import com.one.repository.ProductRepository;
 import com.one.repository.UserRepository;
+import com.one.request.ProductQueryReq;
+import com.one.response.PageRes;
 import com.one.response.ProductDetailRes;
 import com.one.response.ProductRes;
 import org.hibernate.service.spi.ServiceException;
@@ -65,5 +67,11 @@ public class ProductService {
 
     public List<ProductRes> getAll() {
         return productRepository.getAll();
+    }
+
+    public PageRes<ProductRes> queryProducts(ProductQueryReq req) {
+        long total = productRepository.countProducts(req);
+        List<ProductRes> list = productRepository.queryProducts(req);
+        return PageRes.of(list, total, req.getPage(), req.getSafeSize());
     }
 }

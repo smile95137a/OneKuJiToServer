@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/order")
@@ -20,26 +21,15 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @GetMapping("/query")
-    public ResponseEntity<List<OrderRes>> getAllOrders() {
-        try {
-            OrderQueryReq req = new OrderQueryReq();
-            List<OrderRes> orders = orderService.getAllOrders(req);
-            return new ResponseEntity<>(orders, HttpStatus.OK);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     @PostMapping("/query")
     public ResponseEntity<PageRes<OrderRes>> queryOrders(@RequestBody OrderQueryReq req) {
         PageRes<OrderRes> page = orderService.queryOrders(req);
         return ResponseEntity.ok(page);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long id) {
+    @PostMapping("/getById")
+    public ResponseEntity<Order> getOrderById(@RequestBody Map<String, Long> body) {
+        Long id = body.get("id");
         Order order = orderService.getOrderById(id);
         if (order != null) {
             return new ResponseEntity<>(order, HttpStatus.OK);

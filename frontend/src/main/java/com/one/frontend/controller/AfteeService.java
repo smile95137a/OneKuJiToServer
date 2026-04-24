@@ -119,7 +119,7 @@ public class AfteeService {
 
 	private Map<String, Object> getPrizePayload(String orderNo, String returnUrl) {
 		var order = orderRepository.getOrderByOrderNumber(orderNo);
-		var orderDetailList = orderDetailRepository.findOrderDetailsByOrderId(Long.valueOf(order.getId()));
+		var orderDetailList = orderDetailRepository.findPrizeOrderDetailsByOrderId(Long.valueOf(order.getId()));
 		User user = userRepository.getById(order.getUserId());
 		String address = order.getShippingCity() + order.getShippingArea() + order.getShippingAddress();
 
@@ -132,11 +132,11 @@ public class AfteeService {
 		
 		List<Map<String, Object>> items = orderDetailList.stream().map(detail -> {
 			Map<String, Object> item = new HashMap<>();
-			item.put("shop_item_id", detail.getProductId());
-			item.put("item_name", detail.getProductName());
+			item.put("shop_item_id", detail.getProductId() != null ? detail.getProductId() : 0);
+			item.put("item_name", detail.getProductName() != null ? detail.getProductName() : "賞品");
 			item.put("item_category", detail.getProductDetailName() != null ? detail.getProductDetailName() : "商品盒");
-			item.put("item_price", detail.getUnitPrice().intValue());
-			item.put("item_count", detail.getQuantity());
+			item.put("item_price", detail.getUnitPrice() != null ? detail.getUnitPrice().intValue() : 0);
+			item.put("item_count", detail.getQuantity() != null ? detail.getQuantity() : 1);
 			return item;
 		}).collect(Collectors.toList());
 
@@ -225,7 +225,7 @@ public class AfteeService {
 	}
 
 	public Map<String, Object> sendPreRegisterToAftee(Map<String, Object> preRegisterPayload) {
-		String url = afteeApiUrl + "v1/transactions/pre_register";
+		String url = afteeApiUrl.replaceAll("/$", "") + "/v1/transactions/pre_register";
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
