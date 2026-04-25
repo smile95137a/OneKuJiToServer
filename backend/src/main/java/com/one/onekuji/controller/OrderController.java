@@ -28,9 +28,9 @@ public class OrderController {
     }
 
     @PostMapping("/getById")
-    public ResponseEntity<Order> getOrderById(@RequestBody Map<String, Long> body) {
+    public ResponseEntity<OrderRes> getOrderById(@RequestBody Map<String, Long> body) {
         Long id = body.get("id");
-        Order order = orderService.getOrderById(id);
+        OrderRes order = orderService.getOrderById(id);
         if (order != null) {
             return new ResponseEntity<>(order, HttpStatus.OK);
         } else {

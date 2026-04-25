@@ -22,6 +22,43 @@ public interface OrderRepository {
     @Select("SELECT * FROM `order`  WHERE id = #{id}")
     Order getOrderById(Long id);
 
+    @Select("SELECT * FROM `order` WHERE id = #{id}")
+    @Results(id = "orderByIdResultMap", value = {
+        @Result(property = "id", column = "id"),
+        @Result(property = "orderNumber", column = "order_number"),
+        @Result(property = "totalAmount", column = "total_amount"),
+        @Result(property = "shippingCost", column = "shipping_cost"),
+        @Result(property = "isFreeShipping", column = "is_free_shipping"),
+        @Result(property = "bonusPointsEarned", column = "bonus_points_earned"),
+        @Result(property = "bonusPointsUsed", column = "bonus_points_used"),
+        @Result(property = "createdAt", column = "created_at"),
+        @Result(property = "updatedAt", column = "updated_at"),
+        @Result(property = "paidAt", column = "paid_at"),
+        @Result(property = "resultStatus", column = "result_status"),
+        @Result(property = "paymentMethod", column = "payment_method"),
+        @Result(property = "shippingMethod", column = "shipping_method"),
+        @Result(property = "shippingName", column = "shipping_name"),
+        @Result(property = "shippingEmail", column = "shipping_email"),
+        @Result(property = "shippingPhone", column = "shipping_phone"),
+        @Result(property = "shippingZipCode", column = "shipping_zip_code"),
+        @Result(property = "shippingCity", column = "shipping_city"),
+        @Result(property = "shippingArea", column = "shipping_area"),
+        @Result(property = "shippingAddress", column = "shipping_address"),
+        @Result(property = "billingZipCode", column = "billing_zip_code"),
+        @Result(property = "billingName", column = "billing_name"),
+        @Result(property = "billingCity", column = "billing_city"),
+        @Result(property = "billingArea", column = "billing_area"),
+        @Result(property = "billingAddress", column = "billing_address"),
+        @Result(property = "invoice", column = "invoice"),
+        @Result(property = "trackingNumber", column = "tracking_number"),
+        @Result(property = "shopId", column = "shop_id"),
+        @Result(property = "OPMode", column = "OPMode"),
+        @Result(property = "shippingMethodId", column = "shipping_mehtod_id"),
+        @Result(property = "shopName", column = "shop_name"),
+        @Result(property = "shopAddress", column = "shop_address"),
+    })
+    OrderRes getOrderResById(Long id);
+
     @Select("SELECT * FROM `order` ")
     List<Order> getAllOrders();
 

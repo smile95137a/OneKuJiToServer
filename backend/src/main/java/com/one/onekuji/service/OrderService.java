@@ -35,8 +35,12 @@ public class OrderService {
         orderMapper.insertOrder(order);
     }
 
-    public Order getOrderById(Long id) {
-        return orderMapper.getOrderById(id);
+    public OrderRes getOrderById(Long id) {
+        OrderRes order = orderMapper.getOrderResById(id);
+        if (order != null) {
+            order.setOrderDetails(orderDetailMapper.findOrderDetailsByOrderId(order.getId()));
+        }
+        return order;
     }
 
     public List<OrderRes> getAllOrders(OrderQueryReq req) {
