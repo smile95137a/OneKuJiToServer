@@ -793,7 +793,7 @@ return null;
                 cartItemRepository.addCartItem(cartItem);
             }
         }else if("2".equals(orderByOrderNumber.getType())){
-            if("2".equals(orderByOrderNumber.getPaymentMethod())){
+            if (!orderDetailsByOrderId.isEmpty()) {
                 List<PrizeCartItem> prizeCartItemList = new ArrayList<>();
                 for(OrderDetailRes detailRes:orderDetailsByOrderId) {
                     PrizeCartItem prizeCartItem = new PrizeCartItem();

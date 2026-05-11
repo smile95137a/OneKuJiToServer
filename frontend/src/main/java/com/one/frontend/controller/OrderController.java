@@ -120,6 +120,12 @@ public class OrderController {
 			}
 
 			var prizeCartItemList = prizeCartItemService.findByCartIdAndCartItemList(cartId, payCartRes.getPrizeCartItemIds());
+
+			if (prizeCartItemList == null || prizeCartItemList.isEmpty()) {
+				var response = ResponseUtils.failure(400, "購物車為空，無法建立訂單，請重新整理後再試", null);
+				return ResponseEntity.ok(response);
+			}
+
 			var orderNumber = orderService.createPrizeOrder(payCartRes, prizeCartItemList, userId);
 
 			return ResponseEntity.ok(ResponseUtils.success(200, "支付成功，订单已创建", orderNumber));
